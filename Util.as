@@ -1,18 +1,19 @@
 bool isIceSurface(EPlugSurfaceMaterialId surface) {
   return (surface_override == "ice") || (surface_override == "") && 
-    ICE_ENABLED && (surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Ice ||
+    (surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Ice ||
     surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::RoadIce ||
     surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Snow);
 }
 
+
 bool isPlasticSurface(EPlugSurfaceMaterialId surface) {
   return (surface_override == "plastic") || (surface_override == "") && 
-    PLASTIC_ENABLED && surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Plastic;
+    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Plastic;
 }
 
 bool isDirtSurface(EPlugSurfaceMaterialId surface) {
   return (surface_override == "dirt") || (surface_override == "") && 
-    DIRT_ENABLED && (surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Dirt ||
+    (surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Dirt ||
     surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::DirtRoad);
 }
 
@@ -27,7 +28,7 @@ bool isTarmacSurface(EPlugSurfaceMaterialId surface) {
 
 bool isGrassSurface(EPlugSurfaceMaterialId surface) {
     return (surface_override == "grass") || (surface_override == "") && 
-    GRASS_ENABLED && (surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Grass ||
+    (surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Grass ||
     surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Green);
 }
 
@@ -71,24 +72,9 @@ float normalizeSlipAngle(float slipAngle, float frontSpeed) {
   return ret * polarity;
 }
 
-float normalizeAcc(float acc, CSceneVehicleVisState @ visState) {
-  if (visState.WorldVel.LengthSquared() == 0) {
-    return 0;
-  }
-  float carAngle = visState.WorldVel.y / visState.WorldVel.Length();
-  if (ENABLE_GRAVITY) {
-    if (carAngle == 0) {
-      return acc;
-    }
-    return acc + (GRAVITY_VALUE / 100 * Math::Sin(carAngle * HALF_PI));
-  }
-  else {
-    return acc;
-  }
-}
 
 float calcVecAngle(vec3 vec1, vec3 vec2) {
-  if (vec1.Length() <= 0 || vec2.Length() <= 0) {
+  if (vec1.Length() == 0 || vec2.Length() == 0) {
     return 0;
   }
   float angle = Math::Acos(Math::Dot(vec1, vec2) / (vec1.Length() * vec2.Length())) - HALF_PI;
@@ -96,7 +82,7 @@ float calcVecAngle(vec3 vec1, vec3 vec2) {
 }
 
 float apply_derivative(float target, float current, float start, float dx) {
-  float base = Math::Abs((start - target)) / (2 ** (4 + TRANSITION_BASE_FACTOR));
+  float base = Math::Abs((start - target)) / (2 ** (4 + 5));
 
     if (dx == 0) {
         if (current < target) {
@@ -124,13 +110,6 @@ float apply_derivative(float target, float current, float start, float dx) {
       }
   }
 
-int getInvertSlip() {
-  if (INVERT_SLIP) {
-    return 1;
-  } else {
-    return -1;
-  }
-}
 
 float calculateSlip(CSceneVehicleVisState@ visState) {
   vec3 aim = visState.Left;
@@ -142,6 +121,38 @@ float calculateSlip(CSceneVehicleVisState@ visState) {
       slipAngle = normalizeSlipAngle(slipAngle, visState.FrontSpeed);
   }
 
-  slipAngle *= getInvertSlip();
   return slipAngle;
+}
+
+float getTargetThetaMultFactor(CSceneVehicleVisState@ visState) {
+  if (visState.FLIcing01 > 0) {
+    return 1;
+  }
+
+  float sum = 
+    getThetaMultForSurface(visState.FLGroundContactMaterial)
+    + getThetaMultForSurface(visState.FRGroundContactMaterial)
+    + getThetaMultForSurface(visState.RLGroundContactMaterial)
+    + getThetaMultForSurface(visState.RRGroundContactMaterial);
+  return sum / 4;
+
+}
+
+float getThetaMultForSurface(EPlugSurfaceMaterialId surface) {
+  if (isIceSurface(surface)) {
+    return 1;
+  }
+  if (isDirtSurface(surface)) {
+    return DIRT_TM;
+  }
+  if (isTarmacSurface(surface)) {
+    return TARMAC_TM;
+  }
+  if (isGrassSurface(surface)) {
+    return GRASS_TM;
+  }
+  if (isPlasticSurface(surface)) {
+    return PLASTIC_TM; 
+  }
+  return -1000;
 }

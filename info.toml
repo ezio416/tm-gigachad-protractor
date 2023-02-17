@@ -1,0 +1,9 @@
+[meta]
+name = "GigaChad Protractor"
+author = "sgt_bigbird"
+category = "Gamer Tools"
+version = "1.0.4"
+
+[script]
+dependencies = [ "VehicleState", "Camera" ]
+timeout = 0
