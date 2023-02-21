@@ -31,10 +31,10 @@ vec4 DANGER_UPSHIFT(241.0/255.0, 148.0/255.0, 180.0/255.0, 0.5);
 // ##############################################################
 
 
-[Setting category="General" name="Player pointer start" drag min=0 max=16]
+[Setting category="Ice" name="Player pointer start" drag min=0 max=16]
 float ICE_PP_S = 4;
 
-[Setting category="General" name="Player pointer length" drag min=0 max=16]
+[Setting category="Ice" name="Player pointer length" drag min=0 max=16]
 float ICE_PP_L = 8;
 
 [Setting category="General" name="Player pointer width" drag min=1 max=10]
@@ -94,8 +94,8 @@ float min_brightness = 0.1;
 [Setting category="General" drag min=0 max=10]
 int player_selected = 0;
 
-[Setting category="General" drag min=1 max=100]
-int SLIP_SMOOTHING = 20;
+[Setting category="General" name="Slip smoothing" drag min=1 max=100]
+int SLIP_SMOOTHING = 1;
 
 [Setting category="Theta mults" name="Tarmac/Platform Theta Mult" drag min=1 max=16]
 float TARMAC_TM = 4;
@@ -125,7 +125,25 @@ bool FADE_WHEN_OVERSLIDE = true;
 float FADE_OVERSLIDE_MULT = 1.5;
 
 [Setting category="General" name="Number of layers" drag min=1 max=10]
-int NUM_LAYERS;
+int NUM_LAYERS = 3;
 
 [Setting category="General" name="Layer height" drag min=0.1 max=1]
 float LAYER_HEIGHT = 0.1;
+
+[Setting category="General" name="SD start length" drag min=0 max=16]
+float SD_POINTER_S = 3.8;
+
+[Setting category="General" name="SD pointer length" drag min=0 max=16]
+float SD_POINTER_L = 8;
+
+[Setting category="Cam3" name="Internal cam3 start" drag min=0.1 max=10]
+float CAM3_I_S = 5.629;
+
+[Setting category="Cam3" name="Internal cam3 length" drag min=0.1 max=100]
+float CAM3_I_L = 100;
+
+[Setting category="Cam3" name="External cam3 start" drag min=0.1 max=10]
+float CAM3_E_S = 2.792;
+
+[Setting category="Cam3" name="External cam3 length" drag min=0.1 max=100]
+float CAM3_E_L = 100;

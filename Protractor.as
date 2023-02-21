@@ -21,6 +21,8 @@ class Protractor {
     int slip_pos = 0;
 
     float theta_mult;
+
+    int is_cam3 = 0;
     
     // opacity settings
     float playerPointerOpacity, playerFadeOpacity;
@@ -32,7 +34,6 @@ class Protractor {
 
     void setThetaMult(CSceneVehicleVisState@ visState) {
         float target = getTargetThetaMultFactor(visState);
-        print(tostring(theta_mult) + "\t" + tostring(target));
         if (target < 0 || target == theta_mult) {
             return;
         }
@@ -54,7 +55,13 @@ class Protractor {
         vec4 color
     ) {
         theta *= theta_mult;
-        for (int i = 0; i < NUM_LAYERS; i++) {
+
+        int layers = NUM_LAYERS; 
+        if (is_cam3 > 0) {
+            layers = 1;
+        }
+
+        for (int i = 0; i < layers; i++) {
             vec3 o = offset;
             float y_offset = LAYER_HEIGHT * i;
             o.y += y_offset;
@@ -114,11 +121,36 @@ class Protractor {
         return Math::Asin(target_sidespeed / vel);
     }
 
+    /** 
+     * Return codes:
+     * 0: Not cam 3. 
+     * 1: Cam 3 in-car. 
+     * 2: Cam three full. 
+     */
+    int isCam3(CSceneVehicleVisState@ visState) {
+        vec3 pos = visState.Position;
+        vec3 cameraPos = Camera::GetCurrentPosition();
+        vec3 pos_offset_forward = visState.Position + visState.Dir;
+
+        float v1 = (cameraPos - pos_offset_forward).LengthSquared();
+        float v2 = (cameraPos - pos).LengthSquared();
+
+        if (v1 > 1.9 && v1 < 2 && v2 > 0.85 && v2 < 0.9) {
+            return 1;
+        } else if (v1 > 2.3 && v1 < 2.4 && v2 > 2.7 && v2 < 2.8) {
+            return 2;
+        } else {
+            return 0;
+        }
+    }
+
     void render() {
         CSceneVehicleVisState@ visState = getVisState();
         if (visState == null) {
             return;
         }
+        is_cam3 = isCam3(visState);
+
         setThetaMult(visState);
         float vel = visState.WorldVel.Length();
         vec3 vec_vel = visState.WorldVel / vel;
@@ -249,8 +281,20 @@ class Protractor {
     void renderSurface(CSceneVehicleVisState@ visState, float vel, vec3 vec_vel, int min_slide_gear, array<vec2> ideal_sidespeed_arr) {
         float sideSpeed = vel * Math::Sin(Math::Angle(visState.Dir, vec_vel));
         vec4 color = getPlayerPointerColor(sideSpeed, ideal_sidespeed_arr);
-            
         float slip = getSlip(visState.Left, vec_vel);
+
+        float start = SD_POINTER_S;
+        float length = SD_POINTER_L;
+
+        if (is_cam3 > 0) {
+            if (is_cam3 == 1) {
+                start = CAM3_I_S;
+                length = CAM3_I_L;
+            } else {
+                start = CAM3_E_S;
+                length = CAM3_E_L;
+            }
+        }
 
         if (visState.CurGear >= min_slide_gear) {
             vec2 upper, lower;
@@ -284,8 +328,8 @@ class Protractor {
                     if (lower.y != -1) {
                         renderAngle( // ideal angle
                             visState,
-                            ICE_PP_S,
-                            ICE_PP_L / PLAYER_FRACTION,
+                            start,
+                            length / PLAYER_FRACTION,
                             ICE_PP_W,
                             (getSideSpeedAngle(vel, lower.x * i)),
                             vec3(0, 0, 0),
@@ -297,8 +341,8 @@ class Protractor {
                     if (upper.y != -1) {
                         renderAngle( // ideal angle
                             visState,
-                            ICE_PP_S,
-                            ICE_PP_L / PLAYER_FRACTION,
+                            start,
+                            length / PLAYER_FRACTION,
                             ICE_PP_W,
                             (getSideSpeedAngle(vel, upper.x * i)),
                             vec3(0, 0, 0),
@@ -314,8 +358,8 @@ class Protractor {
                     if (cur.x != upper.x && cur.x != lower.x) {
                         renderAngle( // ideal angle
                             visState,
-                            ICE_PP_S,
-                            ICE_PP_L / PLAYER_FRACTION,
+                            start,
+                            length / PLAYER_FRACTION,
                             ICE_PP_W,
                             (getSideSpeedAngle(vel, cur.x * i)),
                             vec3(0, 0, 0),
@@ -340,8 +384,8 @@ class Protractor {
 
         renderAngle( // player pointer
             visState,
-            ICE_PP_S,
-            ICE_PP_L,
+            start,
+            length,
             ICE_PP_W,
             slip,
             vec3(0, 0, 0),
