@@ -23,7 +23,7 @@ class Protractor {
     float theta_mult;
     
     // opacity settings
-    float playerPointerOpacity, playerTargetOpacity;
+    float playerPointerOpacity, playerFadeOpacity;
 
     GearStateManager gearStateManager();
 
@@ -32,6 +32,7 @@ class Protractor {
 
     void setThetaMult(CSceneVehicleVisState@ visState) {
         float target = getTargetThetaMultFactor(visState);
+        print(tostring(theta_mult) + "\t" + tostring(target));
         if (target < 0 || target == theta_mult) {
             return;
         }
@@ -40,11 +41,11 @@ class Protractor {
         } else {
             theta_mult = Math::Max(target, theta_mult - THETA_MULT_DERIVATIVE);
         }
+
     }
 
     void renderAngle(
         CSceneVehicleVisState@ visState,
-        vec3 basis,
         float start,
         float length,
         float width,
@@ -52,26 +53,32 @@ class Protractor {
         vec3 offset,
         vec4 color
     ) {
-
         theta *= theta_mult;
+        for (int i = 0; i < NUM_LAYERS; i++) {
+            vec3 o = offset;
+            float y_offset = LAYER_HEIGHT * i;
+            o.y += y_offset;
 
-        vec3 v_start = projectOffset(visState, projectAngle(visState, start, theta), offset);
-        vec3 v_end = projectOffset(visState, projectAngle(visState, start + length, theta), offset);
-        
-        if (Camera::IsBehind(v_start) && Camera::IsBehind(v_end)) {
-            return;
-        } 
+            vec3 v_start = projectOffset(visState, projectAngle(visState, start, theta), o);
+            vec3 v_end = projectOffset(visState, projectAngle(visState, start + length, theta), o);
+            
+            if (Camera::IsBehind(v_start) || Camera::IsBehind(v_end)) {
+                return;
+            } 
 
-        if (theta < -HALF_PI || theta > HALF_PI) {
-            return;
+            if (theta < -HALF_PI || theta > HALF_PI) {
+                return;
+            }
+
+            nvg::BeginPath();
+            nvg::MoveTo(Camera::ToScreenSpace(v_start));
+            nvg::LineTo(Camera::ToScreenSpace(v_end));
+            nvg::StrokeColor(ApplyOpacityToColor(color, playerFadeOpacity));
+            nvg::StrokeWidth(width);
+            nvg::Stroke();
+            nvg::ClosePath();
         }
-        nvg::BeginPath();
-        nvg::MoveTo(Camera::ToScreenSpace(v_start));
-        nvg::LineTo(Camera::ToScreenSpace(v_end));
-        nvg::StrokeColor(color);
-        nvg::StrokeWidth(width);
-        nvg::Stroke();
-        nvg::ClosePath();
+
     }
 
     vec3 projectAngle(CSceneVehicleVisState@ visState, float r, float theta) {
@@ -145,7 +152,6 @@ class Protractor {
     void renderIce(CSceneVehicleVisState@ visState, float vel, vec3 vec_vel) {
         renderAngle( // player pointer
             visState,
-            visState.Dir,
             ICE_PP_S,
             ICE_PP_L,
             ICE_PP_W,
@@ -163,7 +169,6 @@ class Protractor {
         for (int i = 0; i < lines.Length; i++) {
             renderAngle(
             visState,
-            vel,
             ICE_G_S,
             ICE_G_L,
             ICE_G_W,
@@ -178,7 +183,6 @@ class Protractor {
         for (int i = 0; i < lines.Length; i++) {
             renderAngle(
             visState,
-            vel,
             ICE_G_S,
             ICE_G_L,
             ICE_G_W,
@@ -192,7 +196,6 @@ class Protractor {
         float angle = gearStateManager.getIdealAngle(vel);
         renderAngle(
         visState,
-        vec_vel,
         ICE_G_S,
         ICE_G_L,
         ICE_G_W,
@@ -244,20 +247,10 @@ class Protractor {
     }
 
     void renderSurface(CSceneVehicleVisState@ visState, float vel, vec3 vec_vel, int min_slide_gear, array<vec2> ideal_sidespeed_arr) {
-        vec4 color = ICE_PP_COLOR;
         float sideSpeed = vel * Math::Sin(Math::Angle(visState.Dir, vec_vel));
-        if (visState.CurGear < min_slide_gear || visState.CurGear >= min_slide_gear && getSlipTotal(visState) == 0) {
-            color = FS_B_COLOR;
-        } else {
-            color = getPlayerPointerColor(sideSpeed, ideal_sidespeed_arr);
-        }
+        vec4 color = getPlayerPointerColor(sideSpeed, ideal_sidespeed_arr);
             
-        // float ideal_angle = getSideSpeedAngle(vel, ideal_sidespeed) + HALF_PI;
-        // vec4 color = getPlayerPointerColor(ideal_angle, calcVecAngle(visState.Dir, vec_vel));
-
         float slip = getSlip(visState.Left, vec_vel);
-
-        float playerPointerOpacity = 0;
 
         if (visState.CurGear >= min_slide_gear) {
             vec2 upper, lower;
@@ -291,7 +284,6 @@ class Protractor {
                     if (lower.y != -1) {
                         renderAngle( // ideal angle
                             visState,
-                            vec_vel,
                             ICE_PP_S,
                             ICE_PP_L / PLAYER_FRACTION,
                             ICE_PP_W,
@@ -305,7 +297,6 @@ class Protractor {
                     if (upper.y != -1) {
                         renderAngle( // ideal angle
                             visState,
-                            vec_vel,
                             ICE_PP_S,
                             ICE_PP_L / PLAYER_FRACTION,
                             ICE_PP_W,
@@ -323,7 +314,6 @@ class Protractor {
                     if (cur.x != upper.x && cur.x != lower.x) {
                         renderAngle( // ideal angle
                             visState,
-                            vec_vel,
                             ICE_PP_S,
                             ICE_PP_L / PLAYER_FRACTION,
                             ICE_PP_W,
@@ -336,9 +326,20 @@ class Protractor {
             }
         }
 
+        
+        if (SHOW_BAD_SLIDE && (visState.CurGear < min_slide_gear && getSlipTotal(visState) > 0 || visState.CurGear >= min_slide_gear && getSlipTotal(visState) == 0)) {
+            color = FS_B_COLOR;
+            playerFadeOpacity = Math::Min(1, playerFadeOpacity + PLAYER_OPACITY_DERIVATIVE);
+        } else if (FADE_WHEN_OVERSLIDE && Math::Abs(sideSpeed) > ideal_sidespeed_arr[ideal_sidespeed_arr.Length - 1].x * FADE_OVERSLIDE_MULT) {
+            playerFadeOpacity = Math::Max(0, playerFadeOpacity - PLAYER_OPACITY_DERIVATIVE);
+        } else if (visState.CurGear >= min_slide_gear && (SHOW_BAD_SLIDE || getSlipTotal(visState) == 4)) {
+            playerFadeOpacity = Math::Min(1, playerFadeOpacity + PLAYER_OPACITY_DERIVATIVE);
+        } else {
+            playerFadeOpacity = Math::Max(0, playerFadeOpacity - PLAYER_OPACITY_DERIVATIVE);
+        }
+
         renderAngle( // player pointer
             visState,
-            vec_vel,
             ICE_PP_S,
             ICE_PP_L,
             ICE_PP_W,

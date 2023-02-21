@@ -111,3 +111,21 @@ float PLASTIC_TM = 4;
 
 [Setting category="Theta mults" name="Meta: Theta mult derivative" drag min=0.1 max=0.5]
 float THETA_MULT_DERIVATIVE = 0.35;
+
+[Setting category="General" name="Show warning line on early slide/noslide"]
+bool SHOW_BAD_SLIDE = false;
+
+[Setting category="General" name="Meta: Player Pointer Opacity Derivative" drag min=0.01 max=0.5]
+float PLAYER_OPACITY_DERIVATIVE = 0.05;
+
+[Setting category="General" name="Fade out on overslide"]
+bool FADE_WHEN_OVERSLIDE = true;
+
+[Setting category="General" name="Overslide fade location" drag min=1 max=3]
+float FADE_OVERSLIDE_MULT = 1.5;
+
+[Setting category="General" name="Number of layers" drag min=1 max=10]
+int NUM_LAYERS;
+
+[Setting category="General" name="Layer height" drag min=0.1 max=1]
+float LAYER_HEIGHT = 0.1;
