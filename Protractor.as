@@ -190,7 +190,7 @@ class Protractor {
             return;
         }
         is_cam3 = isCam3(visState);
-
+        handleRunStart();
         setThetaMult(visState);
         float vel = visState.WorldVel.Length();
         vec3 vec_vel = visState.WorldVel / vel;
