@@ -1,21 +1,7 @@
 class Protractor {
-    vec3 vel, sepPlane;
-
-    int radius = 1;
-
-    int NUM_SECTIONS = 100;
-
-    int tssIdx = 0;
-    int tssMax = 20;
-    int tssCount = 0;
-    int tssCountMax = 5;
+    vec3 vel;
 
     float slipAngle = 0;
-
-    int numWheels = 8;
-    int curWheel = 0;
-    int numWheelTrailPoints = 50;
-    int curWheelTrailPoint = 0;
 
     int current_run_starttime = 0;
 
@@ -85,6 +71,23 @@ class Protractor {
         vec3 offset,
         vec4 color
     ) {
+        if (SHOW_LINE_BACKGROUND) {
+            vec4 c = color * LINE_BACKGROUND_COLOR_FRAC + (1 - LINE_BACKGROUND_COLOR_FRAC) * LINE_BACKGROUND_COLOR;
+            c.w = color.w;
+            _renderAngle(visState, start, length, width * LINE_BACKGROUND_WIDTH, theta, offset, c);
+        }        
+        _renderAngle(visState, start, length, width, theta, offset, color);
+    }
+
+    void _renderAngle(
+        CSceneVehicleVisState@ visState,
+        float start,
+        float length,
+        float width,
+        float theta,
+        vec3 offset,
+        vec4 color
+    ) {
         theta = processTheta(theta);
 
         int layers = NUM_LAYERS; 
@@ -109,10 +112,10 @@ class Protractor {
             nvg::LineTo(Camera::ToScreenSpace(v_end));
             nvg::StrokeColor(ApplyOpacityToColor(color, playerFadeOpacity));
             nvg::StrokeWidth(width);
+            nvg::LineCap(nvg::LineCapType::Round);
             nvg::Stroke();
             nvg::ClosePath();
         }
-
     }
 
     vec3 projectAngle(CSceneVehicleVisState@ visState, float r, float theta) {
@@ -191,9 +194,6 @@ class Protractor {
         setThetaMult(visState);
         float vel = visState.WorldVel.Length();
         vec3 vec_vel = visState.WorldVel / vel;
-        iso4 loc = Camera::GetCurrent().Location;
-        vec3 cameraLoc = vec3(loc.tx, loc.ty, loc.tz);
-        vec3 diff = visState.Position - cameraLoc;
 
         if (vel < 5) {
             return;
@@ -203,11 +203,7 @@ class Protractor {
             surface_normalized = visState.FLGroundContactMaterial;
         }
 
-        sepPlane = Math::Cross(diff, visState.Up);
-        sepPlane /= sepPlane.Length();
-
         slipAngle = normalizeSlipAngle(calcVecAngle(visState.Left, visState.WorldVel), visState.FrontSpeed);
-        tssCount = (tssCount + 1) % tssCountMax;
 
         gearStateManager.handleUpdate(slipAngle, visState.WorldVel.Length(),
             visState.CurGear, VehicleState::GetRPM(visState));

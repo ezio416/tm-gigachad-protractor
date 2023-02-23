@@ -7,7 +7,7 @@ vec4 NORMAL_UPSHIFT(0, 108.0/255.0, 103.0/255.0, 0.5);
 [Setting category="Display" name="Danger gearup color indicator" color]
 vec4 DANGER_UPSHIFT(241.0/255.0, 148.0/255.0, 180.0/255.0, 0.5);
 
-[Setting category="General" name="Assist line length fraction" drag min=1 max=10]
+[Setting category="Display" name="Assist line length fraction" drag min=1 max=10]
 float PLAYER_FRACTION = 4;
 
 [Setting category="Ice" name="Ice Player pointer start" drag min=0 max=16]
@@ -16,7 +16,7 @@ float ICE_PP_S = .918;
 [Setting category="Ice" name="Ice Player pointer length" drag min=0 max=16]
 float ICE_PP_L = 1.5;
 
-[Setting category="General" name="Player pointer line width" drag min=1 max=10]
+[Setting category="Display" name="Player pointer line width" drag min=1 max=10]
 float FS_PP_W = 1;
 
 [Setting category="Ice" name="Ice assist line length fraction" drag min=1 max=10] 
@@ -105,3 +105,15 @@ bool RESET_TO_FRONT = false;
 
 [Setting category="General" name="Reset pointer for back"]
 bool RESET_TO_BACK = false;
+
+[Setting category="Display" name="Line background color" color]
+vec4 LINE_BACKGROUND_COLOR = vec4(0, 0, 0, 1);
+
+[Setting category="Display" name="Show line background"]
+bool SHOW_LINE_BACKGROUND = true;
+
+[Setting category="Display" name="Line background width" drag min=1.05 max=2]
+float LINE_BACKGROUND_WIDTH = 1.1;
+
+[Setting category="Display" name="Line background color fraction (lower = darker)" drag min=0 max=1]
+float LINE_BACKGROUND_COLOR_FRAC = 0.1;
