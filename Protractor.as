@@ -225,7 +225,7 @@ class Protractor {
     void renderIce(CSceneVehicleVisState@ visState, float vel, vec3 vec_vel) {
         ICE_MODE = true;
         float angle = Math::Angle(vec_vel, visState.Dir);
-        if (angle < HALF_PI / 2) {
+        if (angle < HALF_PI / 2 || angle > HALF_PI * 1.5) {
             playerFadeOpacity = Math::Max(0, playerFadeOpacity - PLAYER_OPACITY_DERIVATIVE);
         } else {
             playerFadeOpacity = Math::Min(1, playerFadeOpacity + PLAYER_OPACITY_DERIVATIVE);
@@ -241,7 +241,7 @@ class Protractor {
             visState,
             ICE_PP_S,
             ICE_PP_L,
-            ICE_PP_W,
+            FS_PP_W,
             t,
             vec3(0, 0, 0),
             ICE_PP_COLOR
@@ -262,8 +262,8 @@ class Protractor {
             renderAngle(
             visState,
             ICE_PP_S,
-            ICE_PP_L / PLAYER_FRACTION,
-            ICE_PP_W,
+            ICE_PP_L / ICE_PLAYER_FRACTION,
+            FS_PP_W,
             t,
             vec3(0, 0, 0),
             color
@@ -282,8 +282,8 @@ class Protractor {
             renderAngle(
             visState,
             ICE_PP_S,
-            ICE_PP_L / PLAYER_FRACTION,
-            ICE_PP_W,
+            ICE_PP_L / ICE_PLAYER_FRACTION,
+            FS_PP_W,
             t,
             vec3(0, 0, 0),
             color
@@ -300,8 +300,8 @@ class Protractor {
         renderAngle(
             visState,
             ICE_PP_S,
-            ICE_PP_L / PLAYER_FRACTION,
-            ICE_PP_W,
+            ICE_PP_L / ICE_PLAYER_FRACTION,
+            FS_PP_W,
             t,
             vec3(0, 0, 0),
             ICE_PP_COLOR
@@ -402,7 +402,7 @@ class Protractor {
                             visState,
                             start,
                             length / PLAYER_FRACTION,
-                            ICE_PP_W,
+                            FS_PP_W,
                             (getSideSpeedAngle(vel, lower.x * i)),
                             vec3(0, 0, 0),
                             ApplyOpacityToColor(getColor(lower.y), 1 - pos)
@@ -415,7 +415,7 @@ class Protractor {
                             visState,
                             start,
                             length / PLAYER_FRACTION,
-                            ICE_PP_W,
+                            FS_PP_W,
                             (getSideSpeedAngle(vel, upper.x * i)),
                             vec3(0, 0, 0),
                             ApplyOpacityToColor(getColor(upper.y), pos)
@@ -432,7 +432,7 @@ class Protractor {
                             visState,
                             start,
                             length / PLAYER_FRACTION,
-                            ICE_PP_W,
+                            FS_PP_W,
                             (getSideSpeedAngle(vel, cur.x * i)),
                             vec3(0, 0, 0),
                             ApplyOpacityToColor(getColor(cur.y), min_brightness)
@@ -444,7 +444,7 @@ class Protractor {
 
         
         if (SHOW_BAD_SLIDE && (visState.CurGear < min_slide_gear && getSlipTotal(visState) > 0 || visState.CurGear >= min_slide_gear && getSlipTotal(visState) == 0)) {
-            color = FS_B_COLOR;
+            color = COLOR_0;
             playerFadeOpacity = Math::Min(1, playerFadeOpacity + PLAYER_OPACITY_DERIVATIVE);
         } else if (FADE_WHEN_OVERSLIDE && Math::Abs(sideSpeed) > ideal_sidespeed_arr[ideal_sidespeed_arr.Length - 1].x * FADE_OVERSLIDE_MULT) {
             playerFadeOpacity = Math::Max(0, playerFadeOpacity - PLAYER_OPACITY_DERIVATIVE);
@@ -458,7 +458,7 @@ class Protractor {
             visState,
             start,
             length,
-            ICE_PP_W,
+            FS_PP_W,
             slip,
             vec3(0, 0, 0),
             ApplyOpacityToColor(color, playerPointerOpacity)

@@ -14,28 +14,16 @@ float PLAYER_FRACTION = 4;
 float ICE_PP_S = .918;
 
 [Setting category="Ice" name="Ice Player pointer length" drag min=0 max=16]
-float ICE_PP_L = 4.8;
+float ICE_PP_L = 1.5;
 
-[Setting category="General" name="Ice Player pointer width" drag min=1 max=10]
-float ICE_PP_W = 1;
+[Setting category="General" name="Player pointer line width" drag min=1 max=10]
+float FS_PP_W = 1;
 
-[Setting category="Ice" name="Ice Player pointer color" color]
+[Setting category="Ice" name="Ice assist line length fraction" drag min=1 max=10] 
+float ICE_PLAYER_FRACTION = 2;
+
+[Setting category="Ice" name="Ice player pointer color" color]
 vec4 ICE_PP_COLOR = vec4(0, 0, 0, 1);
-
-[Setting category="Other surfaces" name="Gear pointer start" drag min=0 max=2]
-float FS_G_S = 0.5;
-
-[Setting category="Other surfaces" name="Gear pointer length" drag min=0 max=2]
-float FS_G_L = 1;
-
-[Setting category="Other surfaces" name="Gear pointer width" drag min=0 max=2]
-float FS_G_W = 1;
-
-[Setting category="Other surfaces" name="Gear bad slide color" drag min=0 max=2]
-vec4 FS_B_COLOR = vec4(1, 0, 0, 1);
-
-[Setting category="Other surfaces" name="Gear good slide color" drag min=0 max=2]
-vec4 FS_G_COLOR = vec4(0, 1, 0, 1);
 
 [Setting category="Colors" name="Optimal color" color]
 vec4 COLOR_100(0, 0, 1, 1);
@@ -88,7 +76,7 @@ int NUM_LAYERS = 1;
 [Setting category="Display" name="Layer height" drag min=0.1 max=1]
 float LAYER_HEIGHT = 0.1;
 
-[Setting category="General" name="SD start length" drag min=0 max=16]
+[Setting category="General" name="SD start offset" drag min=0 max=16]
 float SD_POINTER_S = 3.8;
 
 [Setting category="General" name="SD pointer length" drag min=0 max=16]
@@ -109,7 +97,7 @@ float CAM3_E_L = 100;
 [Setting category="General" name="Display on back of car"]
 bool FLIP_DISPLAY = false;
 
-[Setting category="General" name="Ice: Display on front of car"]
+[Setting category="Ice" name="Ice: Display on front of car"]
 bool FLIP_DISPLAY_ICE = false;
 
 [Setting category="General" name="Reset pointer for front"]
