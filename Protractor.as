@@ -17,6 +17,10 @@ class Protractor {
     int numWheelTrailPoints = 50;
     int curWheelTrailPoint = 0;
 
+    int current_run_starttime = 0;
+
+    EPlugSurfaceMaterialId surface_normalized;
+
     array<float> slip_arr(100);
     int slip_pos = 0;
 
@@ -32,6 +36,18 @@ class Protractor {
     Protractor() {
     }
 
+    void OnSettingsChanged() {
+        if (RESET_TO_FRONT) {
+            SD_POINTER_S = 3.8;
+            SD_POINTER_L = 8;
+        }
+
+        if (RESET_TO_BACK) {
+            SD_POINTER_S = 1.731;
+            SD_POINTER_L = 2.69;
+        }
+    }
+
     void setThetaMult(CSceneVehicleVisState@ visState) {
         float target = getTargetThetaMultFactor(visState);
         if (target < 0 || target == theta_mult) {
@@ -45,6 +61,13 @@ class Protractor {
 
     }
 
+    float processTheta(float theta) {
+        theta *= theta_mult;
+        if (FLIP_DISPLAY) 
+            theta = 2 * HALF_PI + theta;
+        return theta;
+    }
+
     void renderAngle(
         CSceneVehicleVisState@ visState,
         float start,
@@ -54,7 +77,7 @@ class Protractor {
         vec3 offset,
         vec4 color
     ) {
-        theta *= theta_mult;
+        theta = processTheta(theta);
 
         int layers = NUM_LAYERS; 
         if (is_cam3 > 0) {
@@ -73,14 +96,10 @@ class Protractor {
                 return;
             } 
 
-            if (theta < -HALF_PI || theta > HALF_PI) {
-                return;
-            }
-
             nvg::BeginPath();
             nvg::MoveTo(Camera::ToScreenSpace(v_start));
             nvg::LineTo(Camera::ToScreenSpace(v_end));
-            nvg::StrokeColor(ApplyOpacityToColor(color, playerFadeOpacity));
+            nvg::StrokeColor(ApplyOpacityToColor(color, 1));
             nvg::StrokeWidth(width);
             nvg::Stroke();
             nvg::ClosePath();
@@ -143,6 +162,16 @@ class Protractor {
             return 0;
         }
     }
+    
+    void handleRunStart() {
+        if (getPlayerStartTime() == current_run_starttime) {
+            // Continuing a run. 
+            return;
+        } else {
+            current_run_starttime = getPlayerStartTime();
+            playerFadeOpacity = 0;
+        }
+    }
 
     void render() {
         CSceneVehicleVisState@ visState = getVisState();
@@ -162,6 +191,10 @@ class Protractor {
             return;
         }
 
+        if (visState.FLGroundContactMaterial != EPlugSurfaceMaterialId::XXX_Null) {
+            surface_normalized = visState.FLGroundContactMaterial;
+        }
+
         sepPlane = Math::Cross(diff, visState.Up);
         sepPlane /= sepPlane.Length();
 
@@ -171,11 +204,11 @@ class Protractor {
         gearStateManager.handleUpdate(slipAngle, visState.WorldVel.Length(),
             visState.CurGear, VehicleState::GetRPM(visState));
 
-        if (isIceSurface(visState.FLGroundContactMaterial) && visState.FLIcing01 > 0) {
+        if (isIceSurface(surface_normalized) && visState.FLIcing01 > 0) {
             renderIce(visState, vel, vec_vel);
-        } else if (isTarmacSurface(visState.FLGroundContactMaterial)) {
+        } else if (isTarmacSurface(surface_normalized)) {
             renderSurface(visState, vel, vec_vel, 5, tarmac_fs_arr);
-        } else if (isPlasticDirtOrGrass(visState.FLGroundContactMaterial)) {
+        } else if (isPlasticDirtOrGrass(surface_normalized)) {
             renderSurface(visState, vel, vec_vel, 4, gdp_arr);
         }
         

@@ -125,7 +125,7 @@ bool FADE_WHEN_OVERSLIDE = true;
 float FADE_OVERSLIDE_MULT = 1.5;
 
 [Setting category="General" name="Number of layers" drag min=1 max=10]
-int NUM_LAYERS = 3;
+int NUM_LAYERS = 1;
 
 [Setting category="General" name="Layer height" drag min=0.1 max=1]
 float LAYER_HEIGHT = 0.1;
@@ -147,3 +147,12 @@ float CAM3_E_S = 2.792;
 
 [Setting category="Cam3" name="External cam3 length" drag min=0.1 max=100]
 float CAM3_E_L = 100;
+
+[Setting category="General" name="Display on back of car"]
+bool FLIP_DISPLAY = false;
+
+[Setting category="General" name="Reset pointer for front"]
+bool RESET_TO_FRONT = false;
+
+[Setting category="General" name="Reset pointer for back"]
+bool RESET_TO_BACK = false;

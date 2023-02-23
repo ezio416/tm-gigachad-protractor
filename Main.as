@@ -45,3 +45,7 @@ void Render() {
 void Main() {
   @protractor = Protractor();
 }
+
+void OnSettingsChanged() {
+  protractor.OnSettingsChanged();
+}

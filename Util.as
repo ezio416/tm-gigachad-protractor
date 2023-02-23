@@ -156,3 +156,25 @@ float getThetaMultForSurface(EPlugSurfaceMaterialId surface) {
   }
   return -1000;
 }
+
+CSmArenaClient@ getPlayground() {
+    return cast < CSmArenaClient > (GetApp().CurrentPlayground);
+}
+
+
+int getPlayerStartTime() {
+    return getPlayer().StartTime;
+}
+    CSmPlayer@ getPlayer() {
+    auto playground = getPlayground();
+    if (playground!is null) {
+        if (playground.GameTerminals.Length > 0) {
+            CGameTerminal @ terminal = cast < CGameTerminal > (playground.GameTerminals[0]);
+            CSmPlayer @ player = cast < CSmPlayer > (terminal.GUIPlayer);
+            if (player!is null) {
+                return player;
+            }   
+        }
+    }
+    return null;
+}
