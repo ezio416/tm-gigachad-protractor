@@ -10,7 +10,8 @@ bool isIceSurface(EPlugSurfaceMaterialId surface) {
 bool isPlasticSurface(EPlugSurfaceMaterialId surface) {
   return 
     surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Plastic || 
-    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Rubber; // found on edges of some plastic items, e.g., the mesh roof decor thing
+    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Rubber ||  // found on edges of some plastic items, e.g., the mesh roof decor thing
+    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Water;  // ??? is this a good fit? 
 }
 
 bool isDirtSurface(EPlugSurfaceMaterialId surface) {
