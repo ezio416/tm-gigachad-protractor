@@ -56,7 +56,7 @@ class Protractor {
             return theta;
         }
         if (RENDER_MODE == RenderMode::BACKWARDS)
-            theta *= BACKWARDS_TM_REDUCTION;
+            theta *= -BACKWARDS_TM_REDUCTION;
 
         theta *= theta_mult;
         if (FLIP_DISPLAY ^^ (RENDER_MODE == RenderMode::BACKWARDS)) 
