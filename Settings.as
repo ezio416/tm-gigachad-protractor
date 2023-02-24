@@ -55,6 +55,9 @@ float GRASS_TM = 4;
 [Setting category="Theta mults" name="Plastic Theta Mult" drag min=1 max=16]
 float PLASTIC_TM = 4;
 
+[Setting category="Theta mults" name="Backwards Theta Mult Reduction" drag min=0.1 max=1]
+float BACKWARDS_TM_REDUCTION = 0.5;
+
 [Setting category="Advanced" name="Advanced: Theta mult derivative" drag min=0.1 max=0.5]
 float THETA_MULT_DERIVATIVE = 0.35;
 

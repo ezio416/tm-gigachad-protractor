@@ -17,7 +17,7 @@ class Protractor {
     // opacity settings
     float playerPointerOpacity, playerFadeOpacity;
 
-    bool ICE_MODE = false;
+    RenderMode RENDER_MODE = RenderMode::NORMAL;
 
     GearStateManager gearStateManager();
 
@@ -50,16 +50,19 @@ class Protractor {
     }
 
     float processTheta(float theta) {
-        if (!ICE_MODE) {
-            theta *= theta_mult;
-            if (FLIP_DISPLAY) 
-                theta = 2 * HALF_PI + theta;
-            return theta;
-        } else {
+        if (RENDER_MODE == RenderMode::ICE) {
             if (FLIP_DISPLAY_ICE) 
                 theta = 4 * HALF_PI - theta;
             return theta;
         }
+        if (RENDER_MODE == RenderMode::BACKWARDS)
+            theta *= BACKWARDS_TM_REDUCTION;
+
+        theta *= theta_mult;
+        if (FLIP_DISPLAY ^^ (RENDER_MODE == RenderMode::BACKWARDS)) 
+            theta = 2 * HALF_PI + theta;
+
+        return theta;
     }
 
     void renderAngle(
@@ -195,7 +198,7 @@ class Protractor {
         float vel = visState.WorldVel.Length();
         vec3 vec_vel = visState.WorldVel / vel;
 
-        if (vel < 5) {
+        if (vel < 20) {
             return;
         }
 
@@ -209,17 +212,37 @@ class Protractor {
             visState.CurGear, VehicleState::GetRPM(visState));
 
         if (isIceSurface(surface_normalized) && visState.FLIcing01 > 0) {
+            RENDER_MODE = RenderMode::ICE;
             renderIce(visState, vel, vec_vel);
-        } else if (isTarmacSurface(surface_normalized)) {
+            return;
+        }
+
+        if (visState.FrontSpeed < 0) {
+            RENDER_MODE = RenderMode::BACKWARDS;
+            if (isPlasticDirtOrGrass(surface_normalized)) {
+                renderSurface(visState, vel, vec_vel, -1, b_dirt_arr);
+                return;
+
+            }
+            if (isTarmacSurface(surface_normalized)) {
+                renderSurface(visState, vel, vec_vel, -1, b_tarmac_arr);
+                return;
+            }
+        }
+
+        RENDER_MODE = RenderMode::NORMAL;
+        if (isTarmacSurface(surface_normalized)) {
             renderSurface(visState, vel, vec_vel, 5, tarmac_fs_arr);
-        } else if (isPlasticDirtOrGrass(surface_normalized)) {
+            return;
+        }
+        if (isPlasticDirtOrGrass(surface_normalized)) {
             renderSurface(visState, vel, vec_vel, 4, gdp_arr);
+            return;
         }
         
     }
 
     void renderIce(CSceneVehicleVisState@ visState, float vel, vec3 vec_vel) {
-        ICE_MODE = true;
         float angle = Math::Angle(vec_vel, visState.Dir);
         if (angle < HALF_PI / 2 || angle > HALF_PI * 1.5) {
             playerFadeOpacity = Math::Max(0, playerFadeOpacity - PLAYER_OPACITY_DERIVATIVE);
@@ -346,7 +369,6 @@ class Protractor {
     }
 
     void renderSurface(CSceneVehicleVisState@ visState, float vel, vec3 vec_vel, int min_slide_gear, array<vec2> ideal_sidespeed_arr) {
-        ICE_MODE = false;
         float sideSpeed = vel * Math::Sin(Math::Angle(visState.Dir, vec_vel));
         vec4 color = getPlayerPointerColor(sideSpeed, ideal_sidespeed_arr);
         float slip = getSlip(visState.Left, vec_vel);
