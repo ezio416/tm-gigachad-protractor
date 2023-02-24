@@ -124,7 +124,9 @@ CSmArenaClient@ getPlayground() {
 
 
 int getPlayerStartTime() {
-    return getPlayer().StartTime;
+    if(getPlayer() !is null)
+        return getPlayer().StartTime;
+    else return 0;
 }
 
 CSmPlayer@ getPlayer() {
