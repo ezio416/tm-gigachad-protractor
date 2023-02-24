@@ -1,8 +1,5 @@
 Protractor @ protractor;
-float g_dt = 0;
 float HALF_PI = 1.57079632679;
-string surface_override = "";
-
 
 string getMapUid() {
   auto app = cast < CTrackMania > (GetApp());

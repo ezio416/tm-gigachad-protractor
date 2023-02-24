@@ -1,35 +1,37 @@
 bool isIceSurface(EPlugSurfaceMaterialId surface) {
-  return (surface_override == "ice") || (surface_override == "") && 
-    (surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Ice ||
-    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::RoadIce ||
-    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Snow);
+    return 
+      surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Ice ||
+      surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Concrete ||
+      surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::RoadIce ||
+      surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Snow;
 }
 
 
 bool isPlasticSurface(EPlugSurfaceMaterialId surface) {
-  return (surface_override == "plastic") || (surface_override == "") && 
-    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Plastic;
+  return 
+    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Plastic || 
+    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Rubber; // found on edges of some plastic items, e.g., the mesh roof decor thing
 }
 
 bool isDirtSurface(EPlugSurfaceMaterialId surface) {
-  return (surface_override == "dirt") || (surface_override == "") && 
-    (surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Dirt ||
-    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::DirtRoad);
+  return 
+    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Dirt ||
+    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::DirtRoad;
 }
 
 bool isTarmacSurface(EPlugSurfaceMaterialId surface) {
-  return (surface_override == "tarmac") || (surface_override == "") && 
-    (surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Concrete ||
+  return
+    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Concrete ||
     surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Asphalt ||
     surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::RoadSynthetic ||
     surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::TechMagnetic ||
-    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::TechSuperMagnetic);
+    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::TechSuperMagnetic || 
+    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::ResonantMetal;
 }
 
 bool isGrassSurface(EPlugSurfaceMaterialId surface) {
-    return (surface_override == "grass") || (surface_override == "") && 
-    (surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Grass ||
-    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Green);
+    return surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Grass ||
+    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Green;
 }
 
 bool isPlasticDirtOrGrass(EPlugSurfaceMaterialId surface) {
@@ -81,48 +83,6 @@ float calcVecAngle(vec3 vec1, vec3 vec2) {
   return angle;
 }
 
-float apply_derivative(float target, float current, float start, float dx) {
-  float base = Math::Abs((start - target)) / (2 ** (4 + 5));
-
-    if (dx == 0) {
-        if (current < target) {
-            return base / (8);
-        } else {
-            return -base / (8);
-        }
-    }
-    float mid_bound = (start + target) / 2;
-    float next = dx + base;
-    float prev = dx - base; 
-
-      if (current < target) {
-        if ((current + next) < mid_bound) {
-          return next; 
-        } else {
-          return prev;
-        }
-      } else {
-        if ((current + next) > mid_bound) {
-          return prev;
-        } else {
-          return next;
-        }
-      }
-  }
-
-
-float calculateSlip(CSceneVehicleVisState@ visState) {
-  vec3 aim = visState.Left;
-  vec3 vel = visState.WorldVel;
-
-  float slipAngle = calcVecAngle(aim, vel); 
-
-  if (visState.FLIcing01 > 0 && isIceSurface(visState.FLGroundContactMaterial)) {
-      slipAngle = normalizeSlipAngle(slipAngle, visState.FrontSpeed);
-  }
-
-  return slipAngle;
-}
 
 float getTargetThetaMultFactor(CSceneVehicleVisState@ visState) {
   if (visState.FLIcing01 > 0) {
@@ -165,16 +125,17 @@ CSmArenaClient@ getPlayground() {
 int getPlayerStartTime() {
     return getPlayer().StartTime;
 }
-    CSmPlayer@ getPlayer() {
-    auto playground = getPlayground();
-    if (playground!is null) {
-        if (playground.GameTerminals.Length > 0) {
-            CGameTerminal @ terminal = cast < CGameTerminal > (playground.GameTerminals[0]);
-            CSmPlayer @ player = cast < CSmPlayer > (terminal.GUIPlayer);
-            if (player!is null) {
-                return player;
-            }   
-        }
+
+CSmPlayer@ getPlayer() {
+auto playground = getPlayground();
+if (playground!is null) {
+    if (playground.GameTerminals.Length > 0) {
+        CGameTerminal @ terminal = cast < CGameTerminal > (playground.GameTerminals[0]);
+        CSmPlayer @ player = cast < CSmPlayer > (terminal.GUIPlayer);
+        if (player!is null) {
+            return player;
+        }   
     }
-    return null;
+}
+return null;
 }
