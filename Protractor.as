@@ -198,7 +198,7 @@ class Protractor {
         float vel = visState.WorldVel.Length();
         vec3 vec_vel = visState.WorldVel / vel;
 
-        if (vel < 20) {
+        if (vel < 10) {
             return;
         }
 
