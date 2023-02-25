@@ -55,7 +55,7 @@ class Protractor {
                 theta = 4 * HALF_PI - theta;
             return theta;
         }
-        if (SIMPLIFIED_VIEW && RENDER_MODE == RenderMode::NORMAL) {
+        if (SIMPLIFIED_VIEW && RENDER_MODE == RenderMode::NORMAL && is_cam3 == 0) {
             return 2 * HALF_PI - (theta);
         }
 
@@ -93,7 +93,7 @@ class Protractor {
         vec3 offset,
         vec4 color
     ) {
-        if (SIMPLIFIED_VIEW && RENDER_MODE == RenderMode::NORMAL) {
+        if (SIMPLIFIED_VIEW && RENDER_MODE == RenderMode::NORMAL && is_cam3 == 0) {
             renderWheelWheelView(visState, start, length, width, theta, offset, color);
             return;
         } else {
@@ -129,6 +129,10 @@ class Protractor {
         vec3 offset,
         vec4 color
     ) {
+        if (is_cam3 > 0 && !DRAW_CAM3_IN_SIMPLIFIED_VIEW) {
+            return;
+        }
+        
         if (SHOW_LINE_BACKGROUND) {
             vec4 c = color * LINE_BACKGROUND_COLOR_FRAC + (1 - LINE_BACKGROUND_COLOR_FRAC) * LINE_BACKGROUND_COLOR;
             c.w = color.w;
@@ -148,7 +152,7 @@ class Protractor {
     ) {
         theta = processTheta(theta);
 
-        if (SIMPLIFIED_VIEW && RENDER_MODE == RenderMode::NORMAL) {
+        if (SIMPLIFIED_VIEW && RENDER_MODE == RenderMode::NORMAL && is_cam3 == 0) {
             color = ApplyOpacityToColor(color, SIMPLIFIED_OPACITY_MULT);
             width = SIMPLIFIED_LINE_THICKNESS_OVERRIDE;
         }

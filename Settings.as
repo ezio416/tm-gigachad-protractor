@@ -141,3 +141,6 @@ float SIMPLIFIED_OPACITY_MULT = 0.117;
 
 [Setting category="Simplified view" name="Simplified view line thickness" drag min=1 max=20]
 float SIMPLIFIED_LINE_THICKNESS_OVERRIDE = 10;
+
+[Setting category="Simplified view" name="Draw Cam 3 lines in simplified view" drag min=1 max=20]
+bool DRAW_CAM3_IN_SIMPLIFIED_VIEW = false;
