@@ -55,6 +55,9 @@ class Protractor {
                 theta = 4 * HALF_PI - theta;
             return theta;
         }
+        if (REAR_WHEEL_VIEW) {
+            return 2 * HALF_PI - (theta * REAR_WHEEL_THETA_MULT);
+        }
         if (RENDER_MODE == RenderMode::BACKWARDS)
             theta *= -BACKWARDS_TM_REDUCTION;
 
@@ -63,6 +66,20 @@ class Protractor {
             theta = 2 * HALF_PI + theta;
 
         return theta;
+    }
+
+    void renderAngleConditional(
+        CSceneVehicleVisState@ visState,
+        float start,
+        float length,
+        float width,
+        float theta,
+        vec3 offset,
+        vec4 color,
+        bool conditional
+    ) {
+        if (conditional)
+            renderAngle(visState, start, length, width, theta, offset, color);
     }
 
     void renderAngle(
@@ -74,13 +91,32 @@ class Protractor {
         vec3 offset,
         vec4 color
     ) {
-        if (SHOW_LINE_BACKGROUND) {
-            vec4 c = color * LINE_BACKGROUND_COLOR_FRAC + (1 - LINE_BACKGROUND_COLOR_FRAC) * LINE_BACKGROUND_COLOR;
-            c.w = color.w;
-            _renderAngle(visState, start, length, width * LINE_BACKGROUND_WIDTH, theta, offset, c);
-        }        
-        _renderAngle(visState, start, length, width, theta, offset, color);
+        if (REAR_WHEEL_VIEW) {
+            renderWheelWheelView(visState, start, length, width, theta, offset, color);
+            return;
+        } else {
+            _renderAngle(visState, start, length, width, theta, offset, color);
+        }
     }
+
+    void renderWheelWheelView(
+            CSceneVehicleVisState@ visState,
+            float start,
+            float length,
+            float width,
+            float theta,
+            vec3 offset,
+            vec4 color
+        ) {
+            vec3 o = offset;
+            start = REAR_WHEEL_START;
+            length = REAR_WHEEL_LENGTH;
+            o.x += REAR_WHEEL_VIEW_X;
+            for (int i = -1; i <= 1; i += 2) {
+                o.z = offset.z - (i * REAR_WHEEL_VIEW_Z); 
+                _renderAngle(visState, start, length, width, theta, o, color);
+            }
+        }
 
     void _renderAngle(
         CSceneVehicleVisState@ visState,
@@ -91,7 +127,28 @@ class Protractor {
         vec3 offset,
         vec4 color
     ) {
+        if (SHOW_LINE_BACKGROUND) {
+            vec4 c = color * LINE_BACKGROUND_COLOR_FRAC + (1 - LINE_BACKGROUND_COLOR_FRAC) * LINE_BACKGROUND_COLOR;
+            c.w = color.w;
+            __renderAngle(visState, start, length, width * LINE_BACKGROUND_WIDTH, theta, offset, c);
+        }        
+        __renderAngle(visState, start, length, width, theta, offset, color);
+    }
+
+    void __renderAngle(
+        CSceneVehicleVisState@ visState,
+        float start,
+        float length,
+        float width,
+        float theta,
+        vec3 offset,
+        vec4 color
+    ) {
         theta = processTheta(theta);
+
+        if (REAR_WHEEL_VIEW) {
+            color.w *= REAR_WHEEL_OPACITY_MULT;
+        }
 
         int layers = NUM_LAYERS; 
         if (is_cam3 > 0) {
@@ -416,27 +473,29 @@ class Protractor {
 
 
                     if (lower.y != -1) {
-                        renderAngle( // ideal angle
+                        renderAngleConditional( // ideal angle
                             visState,
                             start,
                             length / PLAYER_FRACTION,
                             FS_PP_W,
                             (getSideSpeedAngle(vel, lower.x * i)),
                             vec3(0, 0, 0),
-                            ApplyOpacityToColor(getColor(lower.y), 1 - pos)
+                            ApplyOpacityToColor(getColor(lower.y), 1 - pos),
+                            !REAR_WHEEL_VIEW
                         );
                         playerPointerOpacity = Math::Max(playerPointerOpacity, (1 - pos));
                     }
 
                     if (upper.y != -1) {
-                        renderAngle( // ideal angle
+                        renderAngleConditional( // ideal angle
                             visState,
                             start,
                             length / PLAYER_FRACTION,
                             FS_PP_W,
                             (getSideSpeedAngle(vel, upper.x * i)),
                             vec3(0, 0, 0),
-                            ApplyOpacityToColor(getColor(upper.y), pos)
+                            ApplyOpacityToColor(getColor(upper.y), pos),
+                            !REAR_WHEEL_VIEW
                         );
                         playerPointerOpacity = Math::Max(playerPointerOpacity, pos);
                     }
@@ -446,14 +505,15 @@ class Protractor {
                 for (int j = 0; j < ideal_sidespeed_arr.Length; j++) {
                     cur = ideal_sidespeed_arr[j];
                     if (cur.x != upper.x && cur.x != lower.x) {
-                        renderAngle( // ideal angle
+                        renderAngleConditional( // ideal angle
                             visState,
                             start,
                             length / PLAYER_FRACTION,
                             FS_PP_W,
                             (getSideSpeedAngle(vel, cur.x * i)),
                             vec3(0, 0, 0),
-                            ApplyOpacityToColor(getColor(cur.y), min_brightness)
+                            ApplyOpacityToColor(getColor(cur.y), min_brightness),
+                            !REAR_WHEEL_VIEW
                         );
                     }
                 }

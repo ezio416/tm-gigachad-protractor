@@ -120,3 +120,24 @@ float LINE_BACKGROUND_WIDTH = 1.1;
 
 [Setting category="Display" name="Line background color fraction (lower = darker)" drag min=0 max=1]
 float LINE_BACKGROUND_COLOR_FRAC = 0.1;
+
+[Setting category="Rear wheel view" name="Rear wheel view"]
+bool REAR_WHEEL_VIEW = true;
+
+[Setting category="Rear wheel view" name="Rear wheel view X offset" drag min=-2 max=2]
+float REAR_WHEEL_VIEW_X = -1.5;
+
+[Setting category="Rear wheel view" name="Rear wheel view Z offset" drag min=0.1 max=2]
+float REAR_WHEEL_VIEW_Z = 0.867;
+
+[Setting category="Rear wheel view" name="Rear wheel view pointer start" drag min=0.1 max=1]
+float REAR_WHEEL_START = 0.1;
+
+[Setting category="Rear wheel view" name="Rear wheel view pointer length" drag min=0.5 max=2]
+float REAR_WHEEL_LENGTH = 1.5;
+
+[Setting category="Theta mults" name="Rear wheel pointer theta mult" drag min=1 max=2]
+float REAR_WHEEL_THETA_MULT = 1;
+
+[Setting category="Rear wheel view" name="Rear wheel opacity override" drag min=0 max=1]
+float REAR_WHEEL_OPACITY_MULT = 0.25;
