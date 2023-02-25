@@ -55,8 +55,8 @@ float GRASS_TM = 4;
 [Setting category="Theta mults" name="Plastic Theta Mult" drag min=1 max=16]
 float PLASTIC_TM = 4;
 
-[Setting category="Theta mults" name="Backwards Theta Mult Reduction" drag min=0.1 max=1]
-float BACKWARDS_TM_REDUCTION = 0.5;
+[Setting category="Theta mults" name="Backwards Theta Mult" drag min=0.1 max=2]
+float BACKWARDS_TM = 1;
 
 [Setting category="Advanced" name="Advanced: Theta mult derivative" drag min=0.1 max=0.5]
 float THETA_MULT_DERIVATIVE = 0.35;
@@ -64,8 +64,8 @@ float THETA_MULT_DERIVATIVE = 0.35;
 [Setting category="General" name="Show warning line on early slide/noslide"]
 bool SHOW_BAD_SLIDE = false;
 
-[Setting category="Advanced" name="Advanced: Player Pointer Opacity Derivative" drag min=0.01 max=0.5]
-float PLAYER_OPACITY_DERIVATIVE = 0.05;
+[Setting category="Advanced" name="Advanced: Player Pointer Opacity Derivative" drag min=0.001 max=0.01]
+float PLAYER_OPACITY_DERIVATIVE = 0.003;
 
 [Setting category="General" name="Fade out on overslide"]
 bool FADE_WHEN_OVERSLIDE = true;
@@ -121,23 +121,23 @@ float LINE_BACKGROUND_WIDTH = 1.1;
 [Setting category="Display" name="Line background color fraction (lower = darker)" drag min=0 max=1]
 float LINE_BACKGROUND_COLOR_FRAC = 0.1;
 
-[Setting category="Rear wheel view" name="Rear wheel view"]
-bool REAR_WHEEL_VIEW = true;
+[Setting category="Simplified view" name="Simplified view"]
+bool SIMPLIFIED_VIEW = false;
 
-[Setting category="Rear wheel view" name="Rear wheel view X offset" drag min=-2 max=2]
-float REAR_WHEEL_VIEW_X = -1.5;
+[Setting category="Simplified view" name="Simplified view X offset" drag min=-2 max=2]
+float SIMPLIFIED_VIEW_X = -1.5;
 
-[Setting category="Rear wheel view" name="Rear wheel view Z offset" drag min=0.1 max=2]
-float REAR_WHEEL_VIEW_Z = 0.867;
+[Setting category="Simplified view" name="Simplified view Z offset" drag min=0.1 max=2]
+float SIMPLIFIED_VIEW_Z = 0.867;
 
-[Setting category="Rear wheel view" name="Rear wheel view pointer start" drag min=0.1 max=1]
-float REAR_WHEEL_START = 0.1;
+[Setting category="Simplified view" name="Simplified view pointer start" drag min=0.1 max=1]
+float SIMPLIFIED_START = 0.1;
 
-[Setting category="Rear wheel view" name="Rear wheel view pointer length" drag min=0.5 max=2]
-float REAR_WHEEL_LENGTH = 1.5;
+[Setting category="Simplified view" name="Simplified view pointer length" drag min=0.5 max=2]
+float SIMPLIFIED_LENGTH = 1.5;
 
-[Setting category="Theta mults" name="Rear wheel pointer theta mult" drag min=1 max=2]
-float REAR_WHEEL_THETA_MULT = 1;
+[Setting category="Simplified view" name="Simplified opacity override" drag min=0 max=1]
+float SIMPLIFIED_OPACITY_MULT = 0.117;
 
-[Setting category="Rear wheel view" name="Rear wheel opacity override" drag min=0 max=1]
-float REAR_WHEEL_OPACITY_MULT = 0.25;
+[Setting category="Simplified view" name="Simplified view line thickness" drag min=1 max=20]
+float SIMPLIFIED_LINE_THICKNESS_OVERRIDE = 10;

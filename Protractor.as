@@ -55,11 +55,13 @@ class Protractor {
                 theta = 4 * HALF_PI - theta;
             return theta;
         }
-        if (REAR_WHEEL_VIEW) {
-            return 2 * HALF_PI - (theta * REAR_WHEEL_THETA_MULT);
+        if (SIMPLIFIED_VIEW && RENDER_MODE == RenderMode::NORMAL) {
+            return 2 * HALF_PI - (theta);
         }
-        if (RENDER_MODE == RenderMode::BACKWARDS)
-            theta *= -BACKWARDS_TM_REDUCTION;
+
+        if (RENDER_MODE == RenderMode::BACKWARDS) {
+            theta *= -1;
+        }
 
         theta *= theta_mult;
         if (FLIP_DISPLAY ^^ (RENDER_MODE == RenderMode::BACKWARDS)) 
@@ -91,7 +93,7 @@ class Protractor {
         vec3 offset,
         vec4 color
     ) {
-        if (REAR_WHEEL_VIEW) {
+        if (SIMPLIFIED_VIEW && RENDER_MODE == RenderMode::NORMAL) {
             renderWheelWheelView(visState, start, length, width, theta, offset, color);
             return;
         } else {
@@ -109,11 +111,11 @@ class Protractor {
             vec4 color
         ) {
             vec3 o = offset;
-            start = REAR_WHEEL_START;
-            length = REAR_WHEEL_LENGTH;
-            o.x += REAR_WHEEL_VIEW_X;
+            start = SIMPLIFIED_START;
+            length = SIMPLIFIED_LENGTH;
+            o.x += SIMPLIFIED_VIEW_X;
             for (int i = -1; i <= 1; i += 2) {
-                o.z = offset.z - (i * REAR_WHEEL_VIEW_Z); 
+                o.z = offset.z - (i * SIMPLIFIED_VIEW_Z); 
                 _renderAngle(visState, start, length, width, theta, o, color);
             }
         }
@@ -146,8 +148,9 @@ class Protractor {
     ) {
         theta = processTheta(theta);
 
-        if (REAR_WHEEL_VIEW) {
-            color.w *= REAR_WHEEL_OPACITY_MULT;
+        if (SIMPLIFIED_VIEW && RENDER_MODE == RenderMode::NORMAL) {
+            color = ApplyOpacityToColor(color, SIMPLIFIED_OPACITY_MULT);
+            width = SIMPLIFIED_LINE_THICKNESS_OVERRIDE;
         }
 
         int layers = NUM_LAYERS; 
@@ -481,7 +484,7 @@ class Protractor {
                             (getSideSpeedAngle(vel, lower.x * i)),
                             vec3(0, 0, 0),
                             ApplyOpacityToColor(getColor(lower.y), 1 - pos),
-                            !REAR_WHEEL_VIEW
+                            !SIMPLIFIED_VIEW
                         );
                         playerPointerOpacity = Math::Max(playerPointerOpacity, (1 - pos));
                     }
@@ -495,7 +498,7 @@ class Protractor {
                             (getSideSpeedAngle(vel, upper.x * i)),
                             vec3(0, 0, 0),
                             ApplyOpacityToColor(getColor(upper.y), pos),
-                            !REAR_WHEEL_VIEW
+                            !SIMPLIFIED_VIEW
                         );
                         playerPointerOpacity = Math::Max(playerPointerOpacity, pos);
                     }
@@ -513,7 +516,7 @@ class Protractor {
                             (getSideSpeedAngle(vel, cur.x * i)),
                             vec3(0, 0, 0),
                             ApplyOpacityToColor(getColor(cur.y), min_brightness),
-                            !REAR_WHEEL_VIEW
+                            !SIMPLIFIED_VIEW
                         );
                     }
                 }
@@ -524,7 +527,7 @@ class Protractor {
         if (SHOW_BAD_SLIDE && (visState.CurGear < min_slide_gear && getSlipTotal(visState) > 0 || visState.CurGear >= min_slide_gear && getSlipTotal(visState) == 0)) {
             color = COLOR_0;
             playerFadeOpacity = Math::Min(1, playerFadeOpacity + PLAYER_OPACITY_DERIVATIVE);
-        } else if (FADE_WHEN_OVERSLIDE && Math::Abs(sideSpeed) > ideal_sidespeed_arr[ideal_sidespeed_arr.Length - 1].x * FADE_OVERSLIDE_MULT) {
+        } else if (FADE_WHEN_OVERSLIDE && Math::Abs(sideSpeed) > ideal_sidespeed_arr[ideal_sidespeed_arr.Length - 1].x * FADE_OVERSLIDE_MULT) { 
             playerFadeOpacity = Math::Max(0, playerFadeOpacity - PLAYER_OPACITY_DERIVATIVE);
         } else if (visState.CurGear >= min_slide_gear && (SHOW_BAD_SLIDE || getSlipTotal(visState) == 4)) {
             playerFadeOpacity = Math::Min(1, playerFadeOpacity + PLAYER_OPACITY_DERIVATIVE);

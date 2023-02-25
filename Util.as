@@ -90,6 +90,14 @@ float getTargetThetaMultFactor(CSceneVehicleVisState@ visState) {
     return 1;
   }
 
+  if (visState.FrontSpeed < 0) {
+    return BACKWARDS_TM;
+  }
+
+  if (SIMPLIFIED_VIEW) {
+    return 1;
+  }
+
   float sum = 
     getThetaMultForSurface(visState.FLGroundContactMaterial)
     + getThetaMultForSurface(visState.FRGroundContactMaterial)
