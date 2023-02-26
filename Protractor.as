@@ -129,7 +129,7 @@ class Protractor {
         vec3 offset,
         vec4 color
     ) {
-        if (is_cam3 > 0 && !DRAW_CAM3_IN_SIMPLIFIED_VIEW) {
+        if (is_cam3 > 0 && (!DRAW_CAM3_IN_SIMPLIFIED_VIEW) && SIMPLIFIED_VIEW) {
             return;
         }
         
