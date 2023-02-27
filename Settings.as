@@ -26,10 +26,10 @@ float ICE_PLAYER_FRACTION = 2;
 vec4 ICE_PP_COLOR = vec4(0, 0, 0, 1);
 
 [Setting category="Colors" name="Optimal color" color]
-vec4 COLOR_100(0, 0, 1, 1);
+vec4 COLOR_100(0, 1, 0, 1);
 
 [Setting category="Colors" name="90% color" color]
-vec4 COLOR_90(0, 1, 0, 1);
+vec4 COLOR_90(0, 0, 1, 1);
 
 [Setting category="Colors" name="50% color" color]
 vec4 COLOR_50(1, 0, 0, 1);
