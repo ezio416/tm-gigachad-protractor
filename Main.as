@@ -14,7 +14,9 @@ string getMapUid() {
 }
 
 CSceneVehicleVisState@ getVisState() {
-  return VehicleState::ViewingPlayerState();
+  // auto l = VehicleState::GetAllVis(GetApp().GameScene);
+// return l[2].AsyncState;
+    return VehicleState::ViewingPlayerState();
 }
 
 void Render() {

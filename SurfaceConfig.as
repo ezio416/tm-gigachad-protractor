@@ -13,6 +13,9 @@ vec4 getColor(int idx) {
 
 }
 
+vec4 tarmac_range(5.5, 90, 15.5, 280);
+vec4 grass_range(1.2, 55.5, 21.5, 220);
+
 array<vec2> tarmac_fs_arr = {
     vec2(0.0, 3),
     vec2(4.5, 2),
