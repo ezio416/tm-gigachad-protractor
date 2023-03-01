@@ -32,7 +32,7 @@ Required objects:
 // base: 0 m/s/ms
 
 float tarmac_min = (400.0) / 3.6;
-float tarmac_target = 5.55;
+float tarmac_target = 5.575;
 vec4 tarmac_base = vec4((400 / 3.6), 6.5, 1000 / 3.6, 17);
 vec4 tarmac_outer = vec4((400 / 3.6), 11, 1000 / 3.6, 26.5);
 
