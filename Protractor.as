@@ -296,11 +296,14 @@ class Protractor {
 
         RENDER_MODE = RenderMode::NORMAL;
         if (isTarmacSurface(surface_normalized)) {
-            renderSurfaceNew(visState, vel, vec_vel, 5, tarmac_fs_arr, tarmac_range);
+            if (vel < tarmac_min) {
+                return;
+            }
+            renderSurfaceNew(visState, vel, vec_vel, tarmac_min, tarmac_target, tarmac_base, tarmac_outer);
             return;
         }
         if (isPlasticDirtOrGrass(surface_normalized)) {
-            renderSurfaceNew(visState, vel, vec_vel, 5, tarmac_fs_arr, grass_range);
+            // renderSurfaceNew(visState, vel, vec_vel, 5, tarmac_fs_arr, grass_range);
             return;
         }
         
@@ -550,9 +553,51 @@ class Protractor {
         );
     }
 
-    void renderSurfaceNew(CSceneVehicleVisState@ visState, float vel, vec3 vec_vel, int min_slide_gear, array<vec2> ideal_sidespeed_arr, vec4 i) {
+    void renderSurfaceNew(CSceneVehicleVisState@ visState, float vel, vec3 vec_vel, float min_vel, float target_ss, vec4 base, vec4 outer) {
+        float base_ss = Math::Lerp(base.y, base.w, Math::InvLerp(base.x, base.z, vel));
+        float outer_ss = Math::Lerp(outer.y, outer.w, Math::InvLerp(outer.x, outer.z, vel));
+
         float sideSpeed = vel * Math::Sin(Math::Angle(visState.Dir, vec_vel));
-        vec4 color = getPlayerPointerColor(sideSpeed, ideal_sidespeed_arr);
+        float abs_sidespeed = Math::Abs(sideSpeed);
+
+        bool BAD_SLIDE = false;
+        int OP_RES = 0;
+
+        if (vel < min_vel) {
+            if (SHOW_BAD_SLIDE && getSlipTotal(visState) > 0) {
+                OP_RES = 1;
+                BAD_SLIDE = true;
+            } else {
+                OP_RES = -1;
+            }
+        } else {
+            if (getSlipTotal(visState) == 0) {
+                if (SHOW_BAD_SLIDE) {
+                    OP_RES = 1;
+                    BAD_SLIDE = true;
+                } else {
+                    OP_RES = -1;
+                }
+            } else {
+                if (abs_sidespeed > outer_ss * FADE_OVERSLIDE_MULT) {
+                    OP_RES = -1;
+                } else {
+                    OP_RES = 1;
+                }
+            }
+        }
+
+
+        if (OP_RES > 0) {
+            playerFadeOpacity = Math::Min(1, playerFadeOpacity + PLAYER_OPACITY_DERIVATIVE);
+        } else {
+            playerFadeOpacity = Math::Max(0, playerFadeOpacity - PLAYER_OPACITY_DERIVATIVE);
+        }
+
+        if (playerFadeOpacity == 0) {
+            return;
+        }
+
         float slip = getSlip(visState.Left, vec_vel);
 
         float start = SD_POINTER_S;
@@ -568,48 +613,22 @@ class Protractor {
             }
         }
 
-        float ideal_sidespeed = i.x;
-        float limit_sidespeed = Math::Lerp(i.x, i.z, Math::InvLerp(i.y, i.w, vel));
-
-        print(tostring(limit_sidespeed));
+        array<vec2> targets = {vec2(target_ss, 0), vec2(base_ss, 1), vec2(outer_ss, 2)};
 
         for (int i = -1; i <= 1; i += 2) {
-            renderAngleConditional( // ideal angle
-                visState,
-                start,
-                length / PLAYER_FRACTION,
-                FS_PP_W,
-                (getSideSpeedAngle(vel, ideal_sidespeed * i)),
-                vec3(0, 0, 0),
-                ApplyOpacityToColor(getColor(0), min_brightness),
-                !SIMPLIFIED_VIEW
-            );
-
-            renderAngleConditional( // ideal angle
-                visState,
-                start,
-                length / PLAYER_FRACTION,
-                FS_PP_W,
-                (getSideSpeedAngle(vel, limit_sidespeed * i)),
-                vec3(0, 0, 0),
-                ApplyOpacityToColor(getColor(1), min_brightness),
-                !SIMPLIFIED_VIEW
-            );
+            for (int j = 0; j < targets.Length; j++) {
+                renderAngleConditional( // ideal angle
+                    visState,
+                    start,
+                    length / PLAYER_FRACTION,
+                    FS_PP_W,
+                    (getSideSpeedAngle(vel, targets[j].x * i)),
+                    vec3(0, 0, 0),
+                    ApplyOpacityToColor(getColor(targets[j].y), playerFadeOpacity),
+                    !SIMPLIFIED_VIEW
+                );
+            }
         }
-
-        // if (SHOW_BAD_SLIDE && (visState.CurGear < min_slide_gear && getSlipTotal(visState) > 0 || visState.CurGear >= min_slide_gear && getSlipTotal(visState) == 0)) {
-        //     color = COLOR_0;
-        //     playerFadeOpacity = Math::Min(1, playerFadeOpacity + PLAYER_OPACITY_DERIVATIVE);
-        // } else if (FADE_WHEN_OVERSLIDE && Math::Abs(sideSpeed) > ideal_sidespeed_arr[ideal_sidespeed_arr.Length - 1].x * FADE_OVERSLIDE_MULT) { 
-        //     playerFadeOpacity = Math::Max(0, playerFadeOpacity - PLAYER_OPACITY_DERIVATIVE);
-        // } else if (visState.CurGear >= min_slide_gear && (SHOW_BAD_SLIDE || getSlipTotal(visState) == 4)) {
-        //     playerFadeOpacity = Math::Min(1, playerFadeOpacity + PLAYER_OPACITY_DERIVATIVE);
-        // } else {
-        //     playerFadeOpacity = Math::Max(0, playerFadeOpacity - PLAYER_OPACITY_DERIVATIVE);
-        // }
-
-        playerFadeOpacity = 1;
-        playerPointerOpacity = 1;
 
         renderAngle( // player pointer
             visState,
@@ -618,7 +637,7 @@ class Protractor {
             FS_PP_W,
             slip,
             vec3(0, 0, 0),
-            ApplyOpacityToColor(color, playerPointerOpacity)
+            ApplyOpacityToColor(COLOR_0, playerFadeOpacity)
         );
     }
 

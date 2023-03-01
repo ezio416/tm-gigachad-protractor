@@ -13,8 +13,28 @@ vec4 getColor(int idx) {
 
 }
 
-vec4 tarmac_range(5.5, 90, 15.5, 280);
-vec4 grass_range(1.2, 55.5, 21.5, 220);
+/*
+
+Surface configuration: 
+
+Types: 
+  * float: literal side speed
+  * vec4: Format (low_speed, low_side_speed, high_speed, high_side_speed)
+
+Required objects:
+  * [surface]_min (float): Minimum speed for tool activation (in m/s)
+  * [surface]_target (float): Optimal side speed 
+  * [surface]_base (vec4): Where you accelerate more than noslide. 
+  * [surface]_outer (vec4): Where you accelerate more than 0. 
+*/
+
+// outer: 0.005 m/s/ms 
+// base: 0 m/s/ms
+
+float tarmac_min = (400.0) / 3.6;
+float tarmac_target = 5.55;
+vec4 tarmac_base = vec4((400 / 3.6), 6.5, 1000 / 3.6, 17);
+vec4 tarmac_outer = vec4((400 / 3.6), 11, 1000 / 3.6, 26.5);
 
 array<vec2> tarmac_fs_arr = {
     vec2(0.0, 3),
