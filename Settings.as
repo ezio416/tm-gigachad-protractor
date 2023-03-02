@@ -38,7 +38,7 @@ vec4 COLOR_50(1, 0, 0, 1);
 vec4 COLOR_0(0, 0, 0, 1);
 
 [Setting category="General" name="Min line brightness" drag min=0 max=1]
-float min_brightness = 0.1;
+float MIN_BRIGHTNESS = 0.1;
 
 [Setting category="General" name="Slip smoothing" drag min=1 max=100]
 int SLIP_SMOOTHING = 1;
@@ -144,3 +144,9 @@ float SIMPLIFIED_LINE_THICKNESS_OVERRIDE = 10;
 
 [Setting category="Simplified view" name="Draw Cam 3 lines in simplified view" drag min=1 max=20]
 bool DRAW_CAM3_IN_SIMPLIFIED_VIEW = false;
+
+[Setting category="General" name="Draw base acceleration line"]
+bool DRAW_BASE = true;
+
+[Setting category="General" name="Draw outer acceleration line"]
+bool DRAW_OUTER = true;

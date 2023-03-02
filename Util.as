@@ -107,6 +107,14 @@ float getTargetThetaMultFactor(CSceneVehicleVisState@ visState) {
 
 }
 
+float getSlipTotal(CSceneVehicleVisState@ visState) {
+    return visState.FLSlipCoef + visState.FRSlipCoef + visState.RLSlipCoef + visState.RRSlipCoef;
+}
+
+float getSideSpeedAngle(float vel, float target_sidespeed) {
+    return Math::Asin(target_sidespeed / vel);
+}
+
 float getThetaMultForSurface(EPlugSurfaceMaterialId surface) {
   if (isIceSurface(surface)) {
     return 1;
@@ -136,6 +144,7 @@ int getPlayerStartTime() {
         return getPlayer().StartTime;
     else return 0;
 }
+
 
 CSmPlayer@ getPlayer() {
 auto playground = getPlayground();

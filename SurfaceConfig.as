@@ -36,14 +36,6 @@ float tarmac_target = 5.575;
 vec4 tarmac_base = vec4((400 / 3.6), 6.5, 1000 / 3.6, 17);
 vec4 tarmac_outer = vec4((400 / 3.6), 11, 1000 / 3.6, 26.5);
 
-array<vec2> tarmac_fs_arr = {
-    vec2(0.0, 3),
-    vec2(4.5, 2),
-    vec2(5.5, 0),
-    vec2(6.5, 1),
-    vec2(8.0, 2),
-    vec2(12.5, 3)
-};
 
 array<vec2> gdp_arr = {
     vec2(0.0, 3),
