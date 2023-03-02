@@ -10,7 +10,6 @@ vec4 getColor(int idx) {
             return COLOR_0;
     }
     return COLOR_0;
-
 }
 
 /*
@@ -36,15 +35,10 @@ float tarmac_target = 5.575;
 vec4 tarmac_base = vec4((400 / 3.6), 6.5, 1000 / 3.6, 17);
 vec4 tarmac_outer = vec4((400 / 3.6), 11, 1000 / 3.6, 26.5);
 
-
-array<vec2> gdp_arr = {
-    vec2(0.0, 3),
-    vec2(.75, 2),
-    vec2(1.2, 0),
-    vec2(5.0, 1),
-    vec2(10, 2),
-    vec2(20, 3)
-};
+float grass_min = (200.0) / 3.6;
+float grass_target = 1.6;
+vec4 grass_base = vec4(121, 8.8, 220, 21.75);
+vec4 grass_outer = vec4(72, 15.5, 220, 32.6);
 
 array<vec2> b_dirt_arr = {
     vec2(0, 3),

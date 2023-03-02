@@ -266,12 +266,10 @@ class Protractor {
         if (visState.FrontSpeed < 0) {
             RENDER_MODE = RenderMode::BACKWARDS;
             if (isPlasticDirtOrGrass(surface_normalized)) {
-                // renderSurface(visState, vel, vec_vel, -1, b_dirt_arr);
                 return;
 
             }
             if (isTarmacSurface(surface_normalized)) {
-                // renderSurface(visState, vel, vec_vel, -1, b_tarmac_arr);
                 return;
             }
         }
@@ -285,7 +283,7 @@ class Protractor {
             return;
         }
         if (isPlasticDirtOrGrass(surface_normalized)) {
-            // renderSurfaceNew(visState, vel, vec_vel, 5, tarmac_fs_arr, grass_range);
+            renderSurface(visState, vel, vec_vel, grass_min, grass_target, grass_base, grass_outer);
             return;
         }
 
