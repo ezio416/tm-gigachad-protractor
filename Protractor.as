@@ -279,11 +279,15 @@ class Protractor {
             if (vel < tarmac_min) {
                 return;
             }
-            renderSurface(visState, vel, vec_vel, tarmac_min, tarmac_target, tarmac_base, tarmac_outer);
+            renderSurface(visState, vel, vec_vel, tarmac_min, tarmac_target, tarmac_good, tarmac_base, tarmac_outer);
+            return;
+        }
+        if (isPlasticSurface(surface_normalized)) {
+            renderSurface(visState, vel, vec_vel, plastic_min, plastic_target, plastic_good, plastic_base, plastic_outer);
             return;
         }
         if (isPlasticDirtOrGrass(surface_normalized)) {
-            renderSurface(visState, vel, vec_vel, grass_min, grass_target, grass_base, grass_outer);
+            renderSurface(visState, vel, vec_vel, grass_min, grass_target, grass_good, grass_base, grass_outer);
             return;
         }
 
@@ -372,24 +376,28 @@ class Protractor {
             ICE_PP_COLOR
         );
     }
-    vec4 getPlayerPointerColor(float sideSpeed, float target, float base, float outer) {
+    vec4 getPlayerPointerColor(float sideSpeed, float target, float good, float base, float outer) {
             float pos;
             int lcol, ucol;
             if (sideSpeed < target) {
                 pos = Math::InvLerp(0, target, sideSpeed);
                 lcol = 2;
                 ucol = 0;
-            } else if (sideSpeed < base) {
+            } else if (sideSpeed < good) {
                 pos = Math::InvLerp(target, base, sideSpeed);
                 lcol = 0;
                 ucol = 1;
-            } else if (sideSpeed < outer) {
-                pos = Math::InvLerp(base, outer, sideSpeed);
+            } else if (sideSpeed < base) {
+                pos = Math::InvLerp(target, base, sideSpeed);
                 lcol = 1;
                 ucol = 2;
+            } else if (sideSpeed < outer) {
+                pos = Math::InvLerp(base, outer, sideSpeed);
+                lcol = 2;
+                ucol = 3;
             } else {
                 pos = Math::InvLerp(outer, outer * FADE_OVERSLIDE_MULT, sideSpeed);
-                lcol = 2;
+                lcol = 3;
                 ucol = 3;
             }
             vec4 c = (getColor(lcol) * (1 - pos)) + (getColor(ucol) * pos);
@@ -408,16 +416,18 @@ class Protractor {
         return ret / SLIP_SMOOTHING;
     }
 
-    array < vec2 > getLinesToBeRendered(float ideal, float base, float outer) {
+    array < vec2 > getLinesToBeRendered(float ideal, float good, float base, float outer) {
         array < vec2 > out_arr;
         if (SIMPLIFIED_VIEW) {
             return out_arr;
         }
         out_arr.InsertLast(vec2(ideal, 0));
+        if (DRAW_GOOD)
+            out_arr.InsertLast(vec2(good, 1));
         if (DRAW_BASE)
-            out_arr.InsertLast(vec2(base, 1));
+            out_arr.InsertLast(vec2(base, 2));
         if (DRAW_OUTER)
-            out_arr.InsertLast(vec2(outer, 2));
+            out_arr.InsertLast(vec2(outer, 3));
         return out_arr;
     }
 
@@ -437,7 +447,8 @@ class Protractor {
         return vec2(start, length);
     }
 
-    void renderSurface(CSceneVehicleVisState @ visState, float vel, vec3 vec_vel, float min_vel, float target_ss, vec4 base, vec4 outer) {
+    void renderSurface(CSceneVehicleVisState @ visState, float vel, vec3 vec_vel, float min_vel, float target_ss, vec4 good, vec4 base, vec4 outer) {
+        float good_ss = Math::Lerp(good.y, good.w, Math::InvLerp(good.x, good.z, vel));
         float base_ss = Math::Lerp(base.y, base.w, Math::InvLerp(base.x, base.z, vel));
         float outer_ss = Math::Lerp(outer.y, outer.w, Math::InvLerp(outer.x, outer.z, vel));
 
@@ -446,7 +457,7 @@ class Protractor {
         float slip = getSlip(visState.Left, vec_vel);
 
         vec2 startAndLength = getStartAndLength();
-        array < vec2 > targets = getLinesToBeRendered(target_ss, base_ss, outer_ss);
+        array < vec2 > targets = getLinesToBeRendered(target_ss, good_ss, base_ss, outer_ss);
 
         bool BAD_SLIDE = false;
         int OP_RES = 0;
@@ -485,7 +496,7 @@ class Protractor {
         }
 
         float lower, upper, targetOpacity;
-
+        int polarity = slip < 0 ? -1 : 1;
         for (int i = -1; i <= 1; i += 2) {
             lower = 0;
             for (int j = 0; j < targets.Length; j++) {
@@ -499,7 +510,7 @@ class Protractor {
                     FS_PP_W,
                     (getSideSpeedAngle(vel, targets[j].x * i)),
                     vec3(0, 0, 0),
-                    ApplyOpacityToColor(getColor(targets[j].y), targetOpacity)
+                    ApplyOpacityToColor(getColor(targets[j].y), i == polarity ? targetOpacity : MIN_BRIGHTNESS)
                 );
             }
         }
@@ -511,10 +522,7 @@ class Protractor {
             FS_PP_W,
             slip,
             vec3(0, 0, 0),
-            ApplyOpacityToColor(getPlayerPointerColor(sideSpeed, target_ss, base_ss, outer_ss), playerFadeOpacity)
+            ApplyOpacityToColor(getPlayerPointerColor(sideSpeed, target_ss, good_ss, base_ss, outer_ss), playerFadeOpacity)
         );
     }
-
-
-
 }

@@ -32,13 +32,21 @@ Required objects:
 
 float tarmac_min = (400.0) / 3.6;
 float tarmac_target = 5.575;
+vec4 tarmac_good = vec4((400 / 3.6), 6, 1000 / 3.6, 12);
 vec4 tarmac_base = vec4((400 / 3.6), 6.5, 1000 / 3.6, 17);
 vec4 tarmac_outer = vec4((400 / 3.6), 11, 1000 / 3.6, 26.5);
 
 float grass_min = (200.0) / 3.6;
 float grass_target = 1.6;
-vec4 grass_base = vec4(121, 8.8, 220, 21.75);
-vec4 grass_outer = vec4(72, 15.5, 220, 32.6);
+vec4 grass_good = vec4(55, 3, 220, 8);
+vec4 grass_base = vec4(55, 8.8, 220, 21.75);
+vec4 grass_outer = vec4(55, 15.5, 220, 32.6);
+
+float plastic_min = (200.0) / 3.6;
+float plastic_target = 1.37;
+vec4  plastic_good = vec4(55, 3, 220, 8);
+vec4  plastic_base = vec4(55, 7.9, 220, 26.5);
+vec4  plastic_outer = vec4(55, 14, 220, 39.55);
 
 array<vec2> b_dirt_arr = {
     vec2(0, 3),

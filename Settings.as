@@ -145,6 +145,9 @@ float SIMPLIFIED_LINE_THICKNESS_OVERRIDE = 10;
 [Setting category="Simplified view" name="Draw Cam 3 lines in simplified view" drag min=1 max=20]
 bool DRAW_CAM3_IN_SIMPLIFIED_VIEW = false;
 
+[Setting category="General" name="Draw good acceleration line"]
+bool DRAW_GOOD = true;
+
 [Setting category="General" name="Draw base acceleration line"]
 bool DRAW_BASE = true;
 
