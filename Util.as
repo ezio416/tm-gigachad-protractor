@@ -159,3 +159,20 @@ if (playground!is null) {
 }
 return null;
 }
+
+vec2 approximateSideSpeed(const array<vec2> data, float speed) {
+    vec2 lower = data[0];
+    vec2 upper = data[data.Length - 1];
+    for (uint i = 0; i < data.Length; i++) {
+        vec2 entry = data[i];
+        if (entry.x < speed && entry.x > lower.x) {
+            lower = entry;
+        }
+        if (entry.x > speed && entry.x < upper.x) {
+            upper = entry;
+        }
+    }
+    float t = Math::InvLerp(lower.x, upper.x, speed);
+    vec2 interpolated = Math::Lerp(lower.y, upper.y, t);
+    return interpolated;
+}
