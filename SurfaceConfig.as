@@ -14,8 +14,8 @@ Format of vec2: (speed, target_sidespeed)
 */
 
 array<vec2> tarmac_ideal = {
-    vec2(111, 3.75),
-    vec2(118, 3.75),
+    vec2(111, 5.9),
+    vec2(118, 5.9),
     vec2(118.5, 5.9),
     vec2(129, 5.9),
     vec2(129.5, 5.5),
