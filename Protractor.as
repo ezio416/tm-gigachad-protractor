@@ -14,6 +14,8 @@ class Protractor {
 
     int is_cam3 = 0;
 
+    bool BAD_SLIDE = false;
+
     // opacity settings
     float playerPointerOpacity, playerFadeOpacity;
 
@@ -303,18 +305,29 @@ class Protractor {
         }
     }
 
-    void renderPlayerPointer(CSceneVehicleVisState@ visState, float pointer_start, float pointer_length, float pointer_width, float theta, vec3 offset, vec4 color) {
-        renderAngle( // player pointer
-            visState,
-            pointer_start,
-            pointer_length,
-            pointer_width,
-            theta,
-            offset,
-            color
-        );
-        
-        if (!SHOW_GEARS_IN_POINTER || (!SHOW_POINTER_IN_FIFTH_GEAR && visState.CurGear == 5) || visState.CurGear <= 1) {
+    void renderPlayerPointer(CSceneVehicleVisState@ visState, float pointer_start, float pointer_length, float pointer_width, float theta, vec3 offset, vec4 color) {    
+        if (!SHOW_GEARS_IN_POINTER || ALWAYS_DRAW_BASE_POINTER || (HIDE_GEAR_POINTER_FIFTH && visState.CurGear == 5))
+        {
+            if (BAD_SLIDE && SHOW_BAD_SLIDE) {
+                color = COLOR_50;
+            }
+            
+            renderAngle( // player pointer
+                visState,
+                pointer_start,
+                pointer_length,
+                pointer_width,
+                theta,
+                offset,
+                ApplyOpacityToColor(color, playerFadeOpacity)
+            );
+            if (!SHOW_GEARS_IN_POINTER || (HIDE_GEAR_POINTER_FIFTH && visState.CurGear == 5)) {
+                return;
+            }
+            offset.y += GEAR_PLAYER_OFFSET;
+        }
+
+        if (visState.CurGear <= 1) {
             return;
         }
 
@@ -322,13 +335,10 @@ class Protractor {
 
         float abs_max = 13000;
         float abs_min = 7000;
-        float rpm = gearStateManager.expectedRpm;
+        float rpm = Math::Clamp(gearStateManager.expectedRpm, abs_min, abs_max);
 
         float rpm_pos = Math::InvLerp(abs_min, abs_max, rpm) * pointer_length;
         float geardown_pos = Math::InvLerp(abs_min, abs_max, gearStateManager.GEARDOWN_RPM_THRESH) * pointer_length;
-        float gearup_pos = Math::InvLerp(abs_min, abs_max, gearStateManager.GEARUP_RPM_THRESH) * pointer_length;
-
-        offset.y += GEAR_PLAYER_OFFSET;
 
         if (rpm < gearStateManager.GEARDOWN_RPM_THRESH) {
             float color_pos = Math::InvLerp(abs_min, gearStateManager.GEARDOWN_RPM_THRESH, rpm);
@@ -340,7 +350,7 @@ class Protractor {
                 pointer_width,
                 theta,
                 offset,
-                color
+                ApplyOpacityToColor(color, playerFadeOpacity)
             );
         } else if (rpm < gearStateManager.GEARUP_RPM_THRESH) {
             renderAngle( // player pointer
@@ -350,7 +360,7 @@ class Protractor {
                 pointer_width,
                 theta,
                 offset,
-                NORMAL_UPSHIFT
+                ApplyOpacityToColor(NORMAL_UPSHIFT, playerFadeOpacity)
             );
         } else {
             float color_pos = Math::InvLerp(gearStateManager.GEARUP_RPM_THRESH, abs_max, rpm);
@@ -362,7 +372,7 @@ class Protractor {
                 pointer_width,
                 theta,
                 offset,
-                color
+                ApplyOpacityToColor(color, playerFadeOpacity)
             );
         }
         gearStateManager.gearupUpperLimit();
@@ -539,12 +549,6 @@ class Protractor {
         vec2 startAndLength = getStartAndLength();
         array < vec2 > targets = getLinesToBeRendered(target_ss, good_ss, base_ss, outer_ss);
         
-        if (SHOW_GEARS_IN_POINTER) {
-            // hack
-            SIMPLIFIED_OPACITY_MULT = 1;
-            playerPointerOpacity = 1;
-            playerFadeOpacity = 1;
-        }
         renderPlayerPointer(
             visState,
             startAndLength.x,
@@ -555,7 +559,7 @@ class Protractor {
             ApplyOpacityToColor(getPlayerPointerColor(sideSpeed, target_ss, good_ss, base_ss, outer_ss), 1)
         );
 
-        bool BAD_SLIDE = false;
+        BAD_SLIDE = false;
         int OP_RES = 0;
         if (speed < min_vel) {
             if (SHOW_BAD_SLIDE && getSlipTotal(visState) > 0) {
@@ -610,15 +614,5 @@ class Protractor {
                 );
             }
         }
-
-        // renderPlayerPointer(
-        //     visState,
-        //     startAndLength.x,
-        //     startAndLength.y,
-        //     FS_PP_W,
-        //     slip,
-        //     vec3(0, 0, 0),
-        //     ApplyOpacityToColor(getPlayerPointerColor(sideSpeed, target_ss, good_ss, base_ss, outer_ss), playerFadeOpacity)
-        // );
     }
 }

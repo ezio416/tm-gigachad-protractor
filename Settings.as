@@ -166,7 +166,10 @@ bool DRAW_OUTER = true;
 bool SHOW_GEARS_IN_POINTER = true;
 
 [Setting category="General" name="Hide gears when in gear 5"]
-bool SHOW_POINTER_IN_FIFTH_GEAR = false;
+bool HIDE_GEAR_POINTER_FIFTH = true;
 
 [Setting category="ALSKFJ" name="Gear pointer offset" drag min=0 max=1]
 float GEAR_PLAYER_OFFSET = 0.02;
+
+[Setting category="General" name="Draw base pointer when drawing gear pointer"]
+bool ALWAYS_DRAW_BASE_POINTER = false;

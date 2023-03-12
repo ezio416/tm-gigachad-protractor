@@ -171,7 +171,7 @@ class GearStateManager {
             case 4:
                 return 125;
             case 5:
-                return 70;
+                return 90;
         }
         return 0;
     }

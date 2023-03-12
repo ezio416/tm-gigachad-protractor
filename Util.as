@@ -49,10 +49,6 @@ bool isSupportedSurface(EPlugSurfaceMaterialId surface) {
 }
 
 vec4 ApplyOpacityToColor(vec4 inColor, float opacity) {
-  if (Math::IsInf(opacity) || Math::IsNaN(opacity) || opacity < 0 || opacity > 1) {
-    inColor.w = 0;
-    return inColor;
-  }
   vec4 outColor = inColor;
   outColor.w = Math::Min(opacity, outColor.w);
   outColor.w = Math::Max(outColor.w, 0);
