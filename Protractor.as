@@ -265,32 +265,107 @@ class Protractor {
 
         if (visState.FrontSpeed < 0) {
             RENDER_MODE = RenderMode::BACKWARDS;
-            if (isPlasticDirtOrGrass(surface_normalized)) {
+            if (isGrassSurface(surface_normalized)) {
+                renderSurface(visState, vel, vec_vel, backwards_min, bw_grass_ideal, bw_grass_zero);
                 return;
-
+            }
+            if (isDirtSurface(surface_normalized)) {
+                renderSurface(visState, vel, vec_vel, backwards_min, bw_dirt_ideal, bw_dirt_zero);
+                return;
+            }
+            if (isPlasticSurface(surface_normalized)) {
+                // just using grass ideals for plastic BW for now
+                renderSurface(visState, vel, vec_vel, backwards_min, bw_grass_ideal, bw_grass_zero);
+                return;
             }
             if (isTarmacSurface(surface_normalized)) {
+                renderSurface(visState, vel, vec_vel, backwards_min, bw_tarmac_ideal, bw_tarmac_zero);
                 return;
             }
         }
 
         RENDER_MODE = RenderMode::NORMAL;
-        if (isTarmacSurface(surface_normalized)) {
-            if (vel < tarmac_min) {
-                return;
-            }
-            renderSurface(visState, vel, vec_vel, tarmac_min, tarmac_target, tarmac_good, tarmac_base, tarmac_outer);
+        if (isGrassSurface(surface_normalized)) {
+            renderSurface(visState, vel, vec_vel, other_min, grass_ideal, grass_zero);
+            return;
+        }
+        if (isDirtSurface(surface_normalized)) {
+            renderSurface(visState, vel, vec_vel, other_min, dirt_ideal, dirt_zero);
             return;
         }
         if (isPlasticSurface(surface_normalized)) {
-            renderSurface(visState, vel, vec_vel, plastic_min, plastic_target, plastic_good, plastic_base, plastic_outer);
+            renderSurface(visState, vel, vec_vel, other_min, plastic_ideal, plastic_zero);
             return;
         }
-        if (isPlasticDirtOrGrass(surface_normalized)) {
-            renderSurface(visState, vel, vec_vel, grass_min, grass_target, grass_good, grass_base, grass_outer);
+        if (isTarmacSurface(surface_normalized)) {
+            renderSurface(visState, vel, vec_vel, tarmac_min, tarmac_ideal, tarmac_zero);
+            return;
+        }
+    }
+
+    void renderPlayerPointer(CSceneVehicleVisState@ visState, float pointer_start, float pointer_length, float pointer_width, float theta, vec3 offset, vec4 color) {
+        renderAngle( // player pointer
+            visState,
+            pointer_start,
+            pointer_length,
+            pointer_width,
+            theta,
+            offset,
+            color
+        );
+        
+        if (!SHOW_GEARS_IN_POINTER || (!SHOW_POINTER_IN_FIFTH_GEAR && visState.CurGear == 5) || visState.CurGear <= 1) {
             return;
         }
 
+        // make a graph of [absolute min] *** [geardown max] ************* [gearup min] [absolute max]
+
+        float abs_max = 13000;
+        float abs_min = 7000;
+        float rpm = gearStateManager.expectedRpm;
+
+        float rpm_pos = Math::InvLerp(abs_min, abs_max, rpm) * pointer_length;
+        float geardown_pos = Math::InvLerp(abs_min, abs_max, gearStateManager.GEARDOWN_RPM_THRESH) * pointer_length;
+        float gearup_pos = Math::InvLerp(abs_min, abs_max, gearStateManager.GEARUP_RPM_THRESH) * pointer_length;
+
+        offset.y += GEAR_PLAYER_OFFSET;
+
+        if (rpm < gearStateManager.GEARDOWN_RPM_THRESH) {
+            float color_pos = Math::InvLerp(abs_min, gearStateManager.GEARDOWN_RPM_THRESH, rpm);
+            vec4 color = DANGER_UPSHIFT * (1 - color_pos) + NORMAL_UPSHIFT * color_pos;
+            renderAngle( // player pointer
+                visState,
+                pointer_start + rpm_pos,
+                geardown_pos - rpm_pos,
+                pointer_width,
+                theta,
+                offset,
+                color
+            );
+        } else if (rpm < gearStateManager.GEARUP_RPM_THRESH) {
+            renderAngle( // player pointer
+                visState,
+                pointer_start + geardown_pos,
+                rpm_pos,
+                pointer_width,
+                theta,
+                offset,
+                NORMAL_UPSHIFT
+            );
+        } else {
+            float color_pos = Math::InvLerp(gearStateManager.GEARUP_RPM_THRESH, abs_max, rpm);
+            vec4 color = DANGER_UPSHIFT * color_pos + NORMAL_UPSHIFT * (1 - color_pos);
+            renderAngle( // player pointer
+                visState,
+                pointer_start + geardown_pos,
+                rpm_pos,
+                pointer_width,
+                theta,
+                offset,
+                color
+            );
+        }
+        gearStateManager.gearupUpperLimit();
     }
 
     void renderIce(CSceneVehicleVisState @ visState, float vel, vec3 vec_vel) {
@@ -307,7 +382,7 @@ class Protractor {
         } else {
             t = -HALF_PI;
         }
-        renderAngle( // player pointer
+        renderPlayerPointer( // player pointer
             visState,
             ICE_PP_S,
             ICE_PP_L,
@@ -400,6 +475,10 @@ class Protractor {
                 lcol = 3;
                 ucol = 3;
             }
+
+            if (lcol == ucol) {
+                return COLOR_0;
+            }
             vec4 c = (getColor(lcol) * (1 - pos)) + (getColor(ucol) * pos);
             return c;
     }
@@ -447,21 +526,38 @@ class Protractor {
         return vec2(start, length);
     }
 
-    void renderSurface(CSceneVehicleVisState @ visState, float vel, vec3 vec_vel, float min_vel, float target_ss, vec4 good, vec4 base, vec4 outer) {
-        float good_ss = Math::Lerp(good.y, good.w, Math::InvLerp(good.x, good.z, vel));
-        float base_ss = Math::Lerp(base.y, base.w, Math::InvLerp(base.x, base.z, vel));
-        float outer_ss = Math::Lerp(outer.y, outer.w, Math::InvLerp(outer.x, outer.z, vel));
+    void renderSurface(CSceneVehicleVisState @ visState, float speed, vec3 vec_vel, float min_vel, array<vec2> ideal_ss, array<vec2> zero_ss) {
+        float target_ss = approximateSideSpeed(ideal_ss, speed);
+        float outer_ss = approximateSideSpeed(zero_ss, speed);
+        float good_ss = Math::Lerp(outer_ss, target_ss, GOOD_THRESH);
+        float base_ss = Math::Lerp(outer_ss, target_ss, BASE_THRESH);
 
-        float sideSpeed = vel * Math::Sin(Math::Angle(visState.Dir, vec_vel));
+        float sideSpeed = speed * Math::Sin(Math::Angle(visState.Dir, vec_vel));
         float abs_sidespeed = Math::Abs(sideSpeed);
         float slip = getSlip(visState.Left, vec_vel);
 
         vec2 startAndLength = getStartAndLength();
         array < vec2 > targets = getLinesToBeRendered(target_ss, good_ss, base_ss, outer_ss);
+        
+        if (SHOW_GEARS_IN_POINTER) {
+            // hack
+            SIMPLIFIED_OPACITY_MULT = 1;
+            playerPointerOpacity = 1;
+            playerFadeOpacity = 1;
+        }
+        renderPlayerPointer(
+            visState,
+            startAndLength.x,
+            startAndLength.y,
+            FS_PP_W,
+            slip,
+            vec3(0, 0, 0),
+            ApplyOpacityToColor(getPlayerPointerColor(sideSpeed, target_ss, good_ss, base_ss, outer_ss), 1)
+        );
 
         bool BAD_SLIDE = false;
         int OP_RES = 0;
-        if (vel < min_vel) {
+        if (speed < min_vel) {
             if (SHOW_BAD_SLIDE && getSlipTotal(visState) > 0) {
                 OP_RES = 1;
                 BAD_SLIDE = true;
@@ -508,21 +604,21 @@ class Protractor {
                     startAndLength.x,
                     startAndLength.y / PLAYER_FRACTION,
                     FS_PP_W,
-                    (getSideSpeedAngle(vel, targets[j].x * i)),
+                    (getSideSpeedAngle(speed, targets[j].x * i)),
                     vec3(0, 0, 0),
                     ApplyOpacityToColor(getColor(targets[j].y), i == polarity ? targetOpacity : MIN_BRIGHTNESS)
                 );
             }
         }
 
-        renderAngle(
-            visState,
-            startAndLength.x,
-            startAndLength.y,
-            FS_PP_W,
-            slip,
-            vec3(0, 0, 0),
-            ApplyOpacityToColor(getPlayerPointerColor(sideSpeed, target_ss, good_ss, base_ss, outer_ss), playerFadeOpacity)
-        );
+        // renderPlayerPointer(
+        //     visState,
+        //     startAndLength.x,
+        //     startAndLength.y,
+        //     FS_PP_W,
+        //     slip,
+        //     vec3(0, 0, 0),
+        //     ApplyOpacityToColor(getPlayerPointerColor(sideSpeed, target_ss, good_ss, base_ss, outer_ss), playerFadeOpacity)
+        // );
     }
 }

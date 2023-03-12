@@ -2,10 +2,12 @@
 bool g_visible = true;
 
 [Setting category="Display" name="Normal gearup color indicator" color]
-vec4 NORMAL_UPSHIFT(0, 108.0/255.0, 103.0/255.0, 0.5);
+// vec4 NORMAL_UPSHIFT(0, 108.0/255.0, 103.0/255.0, 0.5);
+vec4 NORMAL_UPSHIFT(1, 1, 1, 1);
 
 [Setting category="Display" name="Danger gearup color indicator" color]
-vec4 DANGER_UPSHIFT(241.0/255.0, 148.0/255.0, 180.0/255.0, 0.5);
+// vec4 DANGER_UPSHIFT(241.0/255.0, 148.0/255.0, 180.0/255.0, 0.5);
+vec4 DANGER_UPSHIFT(1, 0, 0, 1);
 
 [Setting category="Display" name="Assist line length fraction" drag min=1 max=10]
 float PLAYER_FRACTION = 4;
@@ -148,8 +150,23 @@ bool DRAW_CAM3_IN_SIMPLIFIED_VIEW = false;
 [Setting category="General" name="Draw good acceleration line"]
 bool DRAW_GOOD = true;
 
+[Setting category="General" name="'Good' speedslide threshold" drag min=0.1 max=0.995]
+float GOOD_THRESH = 0.9;
+
 [Setting category="General" name="Draw base acceleration line"]
 bool DRAW_BASE = true;
 
-[Setting category="General" name="Draw outer acceleration line"]
+[Setting category="General" name="'Base' speedslide threshold" drag min=0.1 max=0.9]
+float BASE_THRESH = 0.5; 
+
+[Setting category="General" name="Draw zero-acceleration line"]
 bool DRAW_OUTER = true;
+
+[Setting category="General" name="Show gears in pointer line"] 
+bool SHOW_GEARS_IN_POINTER = true;
+
+[Setting category="General" name="Hide gears when in gear 5"]
+bool SHOW_POINTER_IN_FIFTH_GEAR = false;
+
+[Setting category="ALSKFJ" name="Gear pointer offset" drag min=0 max=1]
+float GEAR_PLAYER_OFFSET = 0.02;

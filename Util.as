@@ -49,9 +49,14 @@ bool isSupportedSurface(EPlugSurfaceMaterialId surface) {
 }
 
 vec4 ApplyOpacityToColor(vec4 inColor, float opacity) {
+  if (Math::IsInf(opacity) || Math::IsNaN(opacity) || opacity < 0 || opacity > 1) {
+    inColor.w = 0;
+    return inColor;
+  }
   vec4 outColor = inColor;
   outColor.w = Math::Min(opacity, outColor.w);
   outColor.w = Math::Max(outColor.w, 0);
+
   return outColor;
 }
 
@@ -160,7 +165,7 @@ if (playground!is null) {
 return null;
 }
 
-vec2 approximateSideSpeed(const array<vec2> data, float speed) {
+float approximateSideSpeed(const array<vec2> data, float speed) {
     vec2 lower = data[0];
     vec2 upper = data[data.Length - 1];
     for (uint i = 0; i < data.Length; i++) {
@@ -173,6 +178,20 @@ vec2 approximateSideSpeed(const array<vec2> data, float speed) {
         }
     }
     float t = Math::InvLerp(lower.x, upper.x, speed);
-    vec2 interpolated = Math::Lerp(lower.y, upper.y, t);
+    float interpolated = Math::Lerp(lower.y, upper.y, t);
     return interpolated;
+}
+
+vec4 getColor(int idx) {
+    switch (idx) {
+        case 0:
+            return COLOR_100;
+        case 1:
+            return COLOR_90;
+        case 2:
+            return COLOR_50;
+        case 3:
+            return COLOR_0;
+    }
+    return COLOR_0;
 }

@@ -8,11 +8,14 @@ class GearStateManager {
     array<float> geardown_scores(); 
     array<float> geardown_true_scores();
 
+    float expectedRpm;
+    float expectedTrueRpm;
+
     GearStateManager() {
         SCORE_MAX = 2000;
         FRAMES_AVERAGED = 5;
-        GEARUP_RPM_THRESH = 10000;
-        GEARDOWN_RPM_THRESH = 7000;
+        GEARUP_RPM_THRESH = 11000;
+        GEARDOWN_RPM_THRESH = 7500;
 
         current_idx = 0; 
 
@@ -90,8 +93,8 @@ class GearStateManager {
 
     void handleUpdate(float inSlip, float inSpeed, int inGear, float inEngineRpm) {
         int idx = getAndIncrementIdx();
-        float expectedRpm = getExpectedRpm(inSpeed, inGear, inSlip, false);
-        float expectedTrueRpm = getExpectedRpm(inSpeed, inGear, inSlip, true);
+        expectedRpm = getExpectedRpm(inSpeed, inGear, inSlip, false);
+        expectedTrueRpm = getExpectedRpm(inSpeed, inGear, inSlip, true);
         
         if (expectedRpm > GEARUP_RPM_THRESH) {
             gearup_scores[idx] = Math::Max(expectedRpm, GEARUP_RPM_THRESH) - GEARUP_RPM_THRESH;
@@ -160,9 +163,9 @@ class GearStateManager {
             case 0:
                 return -375;
             case 1:
-                return 400;
+                return 425;
             case 2:
-                return 260;
+                return 265;
             case 3:
                 return 180;
             case 4:
