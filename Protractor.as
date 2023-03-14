@@ -21,6 +21,8 @@ class Protractor {
 
     RenderMode RENDER_MODE = RenderMode::NORMAL;
 
+    float gearPointerFlip = 1;
+
     GearStateManager gearStateManager();
 
     Protractor() {}
@@ -305,13 +307,28 @@ class Protractor {
         }
     }
 
+    void handleGearPointerFlip(float theta) {
+        if (GEAR_ON_BOTH_SIDES) {
+            gearPointerFlip = 1;
+            return;
+        }
+        if (Math::Abs(theta) > THETA_FLIP_THRESH) {
+            gearPointerFlip = (theta < 0 ? -1 : 1);
+        }
+    }
+
     void renderPlayerPointer(CSceneVehicleVisState@ visState, float pointer_start, float pointer_length, float pointer_width, float theta, vec3 offset, vec4 color) {    
-        if (!SHOW_GEARS_IN_POINTER || ALWAYS_DRAW_BASE_POINTER || (HIDE_GEAR_POINTER_FIFTH && visState.CurGear == 5))
-        {
+        // if (!SHOW_GEARS_IN_POINTER || ALWAYS_DRAW_BASE_POINTER || (HIDE_GEAR_POINTER_FIFTH && visState.CurGear == 5))
+        // {
+
+            vec3 offset_apply(0, 0, 0);
+
+            handleGearPointerFlip(theta);
+
             if (BAD_SLIDE && SHOW_BAD_SLIDE) {
                 color = COLOR_50;
             }
-            
+
             renderAngle( // player pointer
                 visState,
                 pointer_start,
@@ -324,8 +341,10 @@ class Protractor {
             if (!SHOW_GEARS_IN_POINTER || (HIDE_GEAR_POINTER_FIFTH && visState.CurGear == 5)) {
                 return;
             }
-            offset.y += GEAR_PLAYER_OFFSET;
-        }
+            offset_apply.x += Math::Sin(theta) * GEAR_PLAYER_OFFSET;
+            offset_apply.z += gearPointerFlip * Math::Cos(theta) * GEAR_PLAYER_OFFSET;
+            // offset.z += (theta < 0 ? -1 : 1) * Math::Cos(theta) * GEAR_PLAYER_OFFSET;
+        // }
 
         if (visState.CurGear <= 1) {
             return;
@@ -333,49 +352,50 @@ class Protractor {
 
         // make a graph of [absolute min] *** [geardown max] ************* [gearup min] [absolute max]
 
-        float abs_max = 13000;
-        float abs_min = 7000;
-        float rpm = Math::Clamp(gearStateManager.expectedRpm, abs_min, abs_max);
+        for (int i = 1; (i >= (GEAR_ON_BOTH_SIDES ? -1 : 1)); i -= 2) {
+            float abs_max = 13000;
+            float abs_min = 7000;
+            float rpm = Math::Clamp(gearStateManager.expectedRpm, abs_min, abs_max);
 
-        float rpm_pos = Math::InvLerp(abs_min, abs_max, rpm) * pointer_length;
-        float geardown_pos = Math::InvLerp(abs_min, abs_max, gearStateManager.GEARDOWN_RPM_THRESH) * pointer_length;
+            float rpm_pos = Math::InvLerp(abs_min, abs_max, rpm) * pointer_length;
+            float geardown_pos = Math::InvLerp(abs_min, abs_max, gearStateManager.GEARDOWN_RPM_THRESH) * pointer_length;
 
-        if (rpm < gearStateManager.GEARDOWN_RPM_THRESH) {
-            float color_pos = Math::InvLerp(abs_min, gearStateManager.GEARDOWN_RPM_THRESH, rpm);
-            vec4 color = DANGER_UPSHIFT * (1 - color_pos) + NORMAL_UPSHIFT * color_pos;
-            renderAngle( // player pointer
-                visState,
-                pointer_start + rpm_pos,
-                geardown_pos - rpm_pos,
-                pointer_width,
-                theta,
-                offset,
-                ApplyOpacityToColor(color, playerFadeOpacity)
-            );
-        } else if (rpm < gearStateManager.GEARUP_RPM_THRESH) {
-            renderAngle( // player pointer
-                visState,
-                pointer_start + geardown_pos,
-                rpm_pos,
-                pointer_width,
-                theta,
-                offset,
-                ApplyOpacityToColor(NORMAL_UPSHIFT, playerFadeOpacity)
-            );
-        } else {
-            float color_pos = Math::InvLerp(gearStateManager.GEARUP_RPM_THRESH, abs_max, rpm);
-            vec4 color = DANGER_UPSHIFT * color_pos + NORMAL_UPSHIFT * (1 - color_pos);
-            renderAngle( // player pointer
-                visState,
-                pointer_start + geardown_pos,
-                rpm_pos,
-                pointer_width,
-                theta,
-                offset,
-                ApplyOpacityToColor(color, playerFadeOpacity)
-            );
+            if (rpm < gearStateManager.GEARDOWN_RPM_THRESH) {
+                float color_pos = Math::InvLerp(abs_min, gearStateManager.GEARDOWN_RPM_THRESH, rpm);
+                vec4 color = DANGER_UPSHIFT * (1 - color_pos) + NORMAL_UPSHIFT * color_pos;
+                renderAngle( // player pointer
+                    visState,
+                    pointer_start + rpm_pos,
+                    geardown_pos - rpm_pos,
+                    pointer_width,
+                    theta,
+                    i * offset_apply,
+                    ApplyOpacityToColor(color, playerFadeOpacity)
+                );
+            } else if (rpm < gearStateManager.GEARUP_RPM_THRESH) {
+                renderAngle( // player pointer
+                    visState,
+                    pointer_start + geardown_pos,
+                    rpm_pos,
+                    pointer_width,
+                    theta,
+                    i * offset_apply,
+                    ApplyOpacityToColor(NORMAL_UPSHIFT, playerFadeOpacity)
+                );
+            } else {
+                float color_pos = Math::InvLerp(gearStateManager.GEARUP_RPM_THRESH, abs_max, rpm);
+                vec4 color = DANGER_UPSHIFT * color_pos + NORMAL_UPSHIFT * (1 - color_pos);
+                renderAngle( // player pointer
+                    visState,
+                    pointer_start + geardown_pos,
+                    rpm_pos,
+                    pointer_width,
+                    i * theta,
+                    offset,
+                    ApplyOpacityToColor(color, playerFadeOpacity)
+                );
+            }
         }
-        gearStateManager.gearupUpperLimit();
     }
 
     void renderIce(CSceneVehicleVisState @ visState, float vel, vec3 vec_vel) {

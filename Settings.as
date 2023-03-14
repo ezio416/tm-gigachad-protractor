@@ -173,3 +173,9 @@ float GEAR_PLAYER_OFFSET = 0.02;
 
 [Setting category="General" name="Draw base pointer when drawing gear pointer"]
 bool ALWAYS_DRAW_BASE_POINTER = false;
+
+[Setting category="Advanced" name="Gear theta flip threshold (in rads)"]
+float THETA_FLIP_THRESH = 0.1;
+
+[Setting category="Gears" name="Show gear view on both sides"]
+bool GEAR_ON_BOTH_SIDES = true;

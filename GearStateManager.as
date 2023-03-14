@@ -14,7 +14,7 @@ class GearStateManager {
     GearStateManager() {
         SCORE_MAX = 2000;
         FRAMES_AVERAGED = 5;
-        GEARUP_RPM_THRESH = 11000;
+        GEARUP_RPM_THRESH = 10500;
         GEARDOWN_RPM_THRESH = 7500;
 
         current_idx = 0; 
@@ -165,7 +165,7 @@ class GearStateManager {
             case 1:
                 return 425;
             case 2:
-                return 265;
+                return 275; // 270 is from grass - different across surfaces?
             case 3:
                 return 180;
             case 4:
