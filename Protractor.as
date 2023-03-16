@@ -371,7 +371,7 @@ class Protractor {
             offset,
             ApplyOpacityToColor(color, playerFadeOpacity)
         );
-        if (!SHOW_GEARS_IN_POINTER || (HIDE_GEAR_POINTER_FIFTH && visState.CurGear == 5)) {
+        if (!SHOW_GEARS_IN_POINTER || (HIDE_GEAR_POINTER_FIFTH && visState.CurGear == 5) || (isPreview() && PREVIEW_GEAR == 5)) {
             return;
         }
         offset_apply.x += Math::Sin(theta) * GEAR_PLAYER_OFFSET;
