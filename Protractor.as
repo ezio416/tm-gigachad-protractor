@@ -27,15 +27,21 @@ class Protractor {
 
     Protractor() {}
 
+    int prev = 0;
+
     void OnSettingsChanged() {
-        if (RESET_TO_FRONT) {
+        if (RESET_TO_FRONT && prev <= 0) {
             SD_POINTER_S = 3.8;
             SD_POINTER_L = 8;
+            RESET_TO_BACK = false;
+            prev = 1;
         }
 
-        if (RESET_TO_BACK) {
+        if (RESET_TO_BACK && prev >= 0) {
             SD_POINTER_S = 1.731;
             SD_POINTER_L = 2.69;
+            RESET_TO_FRONT = false;
+            prev = -1;
         }
     }
 
@@ -237,6 +243,31 @@ class Protractor {
         }
     }
 
+    void handleNormalizeSurface(CSceneVehicleVisState @ visState) {
+        if (PREVIEW_TARMAC) {
+            surface_normalized = EPlugSurfaceMaterialId::Asphalt;
+        } else if (PREVIEW_DIRT) {
+            surface_normalized = EPlugSurfaceMaterialId::Dirt;
+        } else if (PREVIEW_PLASTIC) {
+            surface_normalized = EPlugSurfaceMaterialId::Plastic;
+        } else if (PREVIEW_GRASS) {
+            surface_normalized = EPlugSurfaceMaterialId::Grass;
+        } else if (PREVIEW_ICE) {
+            surface_normalized = EPlugSurfaceMaterialId::Ice;
+        } else {
+            if (visState.FLGroundContactMaterial != EPlugSurfaceMaterialId::XXX_Null) {
+                surface_normalized = visState.FLGroundContactMaterial;
+            }
+        }
+    }
+    
+    void isPreviewOpacityCheck() {
+        if (isPreview()) {
+            playerFadeOpacity = 1;
+            playerPointerOpacity = 1;
+        }
+    }
+
     void render() {
         CSceneVehicleVisState @ visState = getVisState();
         if (visState == null) {
@@ -244,22 +275,27 @@ class Protractor {
         }
         is_cam3 = isCam3(visState);
         handleRunStart();
+        isPreviewOpacityCheck();
         setThetaMult(visState);
-        float vel = visState.WorldVel.Length();
+        handleNormalizeSurface(visState);
+
+        float vel;
+
+        if (isPreview()) {
+            vel = PREVIEW_SPEED / 3.6;
+        } else {
+            vel = visState.WorldVel.Length();
+            slipAngle = normalizeSlipAngle(calcVecAngle(visState.Left, visState.WorldVel), visState.FrontSpeed);
+        }
+
         vec3 vec_vel = visState.WorldVel / vel;
 
         if (vel < 10) {
             return;
         }
 
-        if (visState.FLGroundContactMaterial != EPlugSurfaceMaterialId::XXX_Null) {
-            surface_normalized = visState.FLGroundContactMaterial;
-        }
-
-        slipAngle = normalizeSlipAngle(calcVecAngle(visState.Left, visState.WorldVel), visState.FrontSpeed);
-
         gearStateManager.handleUpdate(slipAngle, vel,
-            visState.CurGear, VehicleState::GetRPM(visState));
+            (isPreview() ? PREVIEW_GEAR : visState.CurGear), VehicleState::GetRPM(visState));
 
         if (isIceSurface(surface_normalized) && visState.FLIcing01 > 0) {
             RENDER_MODE = RenderMode::ICE;
@@ -267,7 +303,7 @@ class Protractor {
             return;
         }
 
-        if (visState.FrontSpeed < 0) {
+        if (visState.FrontSpeed < 0 || (isPreview() && PREVIEW_SPEED < 0)) {
             RENDER_MODE = RenderMode::BACKWARDS;
             if (isGrassSurface(surface_normalized)) {
                 renderSurface(visState, vel, vec_vel, backwards_min, bw_grass_ideal, bw_grass_zero);
@@ -318,37 +354,28 @@ class Protractor {
     }
 
     void renderPlayerPointer(CSceneVehicleVisState@ visState, float pointer_start, float pointer_length, float pointer_width, float theta, vec3 offset, vec4 color) {    
-        // if (!SHOW_GEARS_IN_POINTER || ALWAYS_DRAW_BASE_POINTER || (HIDE_GEAR_POINTER_FIFTH && visState.CurGear == 5))
-        // {
+        vec3 offset_apply(0, 0, 0);
 
-            vec3 offset_apply(0, 0, 0);
+        handleGearPointerFlip(theta);
 
-            handleGearPointerFlip(theta);
+        if (BAD_SLIDE && SHOW_BAD_SLIDE && !isPreview()) {
+            color = COLOR_50;
+        }
 
-            if (BAD_SLIDE && SHOW_BAD_SLIDE) {
-                color = COLOR_50;
-            }
-
-            renderAngle( // player pointer
-                visState,
-                pointer_start,
-                pointer_length,
-                pointer_width,
-                theta,
-                offset,
-                ApplyOpacityToColor(color, playerFadeOpacity)
-            );
-            if (!SHOW_GEARS_IN_POINTER || (HIDE_GEAR_POINTER_FIFTH && visState.CurGear == 5)) {
-                return;
-            }
-            offset_apply.x += Math::Sin(theta) * GEAR_PLAYER_OFFSET;
-            offset_apply.z += gearPointerFlip * Math::Cos(theta) * GEAR_PLAYER_OFFSET;
-            // offset.z += (theta < 0 ? -1 : 1) * Math::Cos(theta) * GEAR_PLAYER_OFFSET;
-        // }
-
-        if (visState.CurGear <= 1) {
+        renderAngle( // player pointer
+            visState,
+            pointer_start,
+            pointer_length,
+            pointer_width,
+            theta,
+            offset,
+            ApplyOpacityToColor(color, playerFadeOpacity)
+        );
+        if (!SHOW_GEARS_IN_POINTER || (HIDE_GEAR_POINTER_FIFTH && visState.CurGear == 5)) {
             return;
         }
+        offset_apply.x += Math::Sin(theta) * GEAR_PLAYER_OFFSET;
+        offset_apply.z += gearPointerFlip * Math::Cos(theta) * GEAR_PLAYER_OFFSET;
 
         // make a graph of [absolute min] *** [geardown max] ************* [gearup min] [absolute max]
 
@@ -390,8 +417,8 @@ class Protractor {
                     pointer_start + geardown_pos,
                     rpm_pos,
                     pointer_width,
-                    i * theta,
-                    offset,
+                    theta,
+                    i * offset_apply,
                     ApplyOpacityToColor(color, playerFadeOpacity)
                 );
             }
@@ -482,38 +509,42 @@ class Protractor {
         );
     }
     vec4 getPlayerPointerColor(float sideSpeed, float target, float good, float base, float outer) {
-            float pos;
-            int lcol, ucol;
-            if (sideSpeed < target) {
-                pos = Math::InvLerp(0, target, sideSpeed);
-                lcol = 2;
-                ucol = 0;
-            } else if (sideSpeed < good) {
-                pos = Math::InvLerp(target, base, sideSpeed);
-                lcol = 0;
-                ucol = 1;
-            } else if (sideSpeed < base) {
-                pos = Math::InvLerp(target, base, sideSpeed);
-                lcol = 1;
-                ucol = 2;
-            } else if (sideSpeed < outer) {
-                pos = Math::InvLerp(base, outer, sideSpeed);
-                lcol = 2;
-                ucol = 3;
-            } else {
-                pos = Math::InvLerp(outer, outer * FADE_OVERSLIDE_MULT, sideSpeed);
-                lcol = 3;
-                ucol = 3;
-            }
+        float pos;
+        int lcol, ucol;
+        if (sideSpeed < target) {
+            pos = Math::InvLerp(0, target, sideSpeed);
+            lcol = 2;
+            ucol = 0;
+        } else if (sideSpeed < good) {
+            pos = Math::InvLerp(target, base, sideSpeed);
+            lcol = 0;
+            ucol = 1;
+        } else if (sideSpeed < base) {
+            pos = Math::InvLerp(target, base, sideSpeed);
+            lcol = 1;
+            ucol = 2;
+        } else if (sideSpeed < outer) {
+            pos = Math::InvLerp(base, outer, sideSpeed);
+            lcol = 2;
+            ucol = 3;
+        } else {
+            pos = Math::InvLerp(outer, outer * FADE_OVERSLIDE_MULT, sideSpeed);
+            lcol = 3;
+            ucol = 3;
+        }
 
-            if (lcol == ucol) {
-                return COLOR_0;
-            }
-            vec4 c = (getColor(lcol) * (1 - pos)) + (getColor(ucol) * pos);
-            return c;
+        if (lcol == ucol) {
+            return COLOR_0;
+        }
+        vec4 c = (getColor(lcol) * (1 - pos)) + (getColor(ucol) * pos);
+        return c;
     }
 
-    float getSlip(vec3 left, vec3 vel) {
+    float getSlipSmoothed(vec3 left, vec3 vel) {
+        if (isPreview()) {
+            return PREVIEW_SLIP;
+        }
+
         float slip = calcVecAngle(left, vel);
         slip_arr[slip_pos % SLIP_SMOOTHING] = slip;
         slip_pos += 1;
@@ -561,10 +592,9 @@ class Protractor {
         float outer_ss = approximateSideSpeed(zero_ss, speed);
         float good_ss = Math::Lerp(outer_ss, target_ss, GOOD_THRESH);
         float base_ss = Math::Lerp(outer_ss, target_ss, BASE_THRESH);
-
-        float sideSpeed = speed * Math::Sin(Math::Angle(visState.Dir, vec_vel));
+        float slip = previewSlip(getSlipSmoothed(visState.Left, vec_vel));
+        float sideSpeed = speed * Math::Sin(previewSlip(Math::Angle(visState.Dir, vec_vel)));
         float abs_sidespeed = Math::Abs(sideSpeed);
-        float slip = getSlip(visState.Left, vec_vel);
 
         vec2 startAndLength = getStartAndLength();
         array < vec2 > targets = getLinesToBeRendered(target_ss, good_ss, base_ss, outer_ss);
@@ -576,7 +606,7 @@ class Protractor {
             FS_PP_W,
             slip,
             vec3(0, 0, 0),
-            ApplyOpacityToColor(getPlayerPointerColor(sideSpeed, target_ss, good_ss, base_ss, outer_ss), 1)
+            ApplyOpacityToColor(getPlayerPointerColor(abs_sidespeed, target_ss, good_ss, base_ss, outer_ss), 1)
         );
 
         BAD_SLIDE = false;
@@ -621,9 +651,9 @@ class Protractor {
             lower = 0;
             for (int j = 0; j < targets.Length; j++) {
                 upper = targets[j].x;
-                targetOpacity = Math::Max(Math::InvLerp(lower, upper, sideSpeed), MIN_BRIGHTNESS);
+                targetOpacity = Math::Max(Math::InvLerp(lower, upper, abs_sidespeed), MIN_BRIGHTNESS);
                 lower = upper;
-                renderAngle( // ideal angle
+                renderAngle(
                     visState,
                     startAndLength.x,
                     startAndLength.y / PLAYER_FRACTION,

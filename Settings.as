@@ -168,14 +168,35 @@ bool SHOW_GEARS_IN_POINTER = true;
 [Setting category="General" name="Hide gears when in gear 5"]
 bool HIDE_GEAR_POINTER_FIFTH = true;
 
-[Setting category="ALSKFJ" name="Gear pointer offset" drag min=0 max=1]
-float GEAR_PLAYER_OFFSET = 0.02;
-
-[Setting category="General" name="Draw base pointer when drawing gear pointer"]
-bool ALWAYS_DRAW_BASE_POINTER = false;
+[Setting category="Advanced" name="Gear pointer offset" drag min=0 max=1]
+float GEAR_PLAYER_OFFSET = 0.2;
 
 [Setting category="Advanced" name="Gear theta flip threshold (in rads)"]
 float THETA_FLIP_THRESH = 0.1;
 
-[Setting category="Gears" name="Show gear view on both sides"]
+[Setting category="General" name="Show gear view on both sides"]
 bool GEAR_ON_BOTH_SIDES = true;
+
+[Setting category="Preview" name="Preview tarmac"]
+bool PREVIEW_TARMAC = false; 
+
+[Setting category="Preview" name="Preview grass"]
+bool PREVIEW_GRASS = false; 
+
+[Setting category="Preview" name="Preview dirt"]
+bool PREVIEW_DIRT = false; 
+
+[Setting category="Preview" name="Preview plastic"]
+bool PREVIEW_PLASTIC = false; 
+
+[Setting category="Preview" name="Preview ice"]
+bool PREVIEW_ICE = false; 
+
+[Setting category="Preview" name="Preview speed" drag min=0 max=1000]
+float PREVIEW_SPEED = 500;
+
+[Setting category="Preview" name="Preview slip" drag min=-1.5 max=1.5]
+float PREVIEW_SLIP = 0.1;
+
+[Setting category="Preview" name="Preview gear" drag min=1 max=5]
+int PREVIEW_GEAR = 5;

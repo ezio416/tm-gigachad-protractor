@@ -191,3 +191,15 @@ vec4 getColor(int idx) {
     }
     return COLOR_0;
 }
+
+bool isPreview() {
+  return PREVIEW_DIRT || PREVIEW_GRASS || PREVIEW_ICE || PREVIEW_PLASTIC || PREVIEW_TARMAC;
+}
+
+float previewSlip(float in_slip) {
+  if (isPreview()) {
+    return PREVIEW_SLIP;
+  } else {
+    return in_slip;
+  }
+}
