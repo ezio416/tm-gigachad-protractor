@@ -27,21 +27,24 @@ class Protractor {
 
     Protractor() {}
 
-    int prev = 0;
-
     void OnSettingsChanged() {
-        if (RESET_TO_FRONT && prev <= 0) {
+        if (RESET_TO_FRONT) {
             SD_POINTER_S = 3.8;
             SD_POINTER_L = 8;
-            RESET_TO_BACK = false;
-            prev = 1;
+            RESET_TO_FRONT = false;
         }
 
-        if (RESET_TO_BACK && prev >= 0) {
+        if (RESET_TO_BACK) {
             SD_POINTER_S = 1.731;
             SD_POINTER_L = 2.69;
-            RESET_TO_FRONT = false;
-            prev = -1;
+            RESET_TO_BACK = false;
+        }
+
+        if (ICE_RESET_TO_FRONT_CORNER) {
+            ICE_RESET_TO_FRONT_CORNER = false;
+            ICE_POINTER_X_OFFSET = 1.7;
+            ICE_POINTER_Z_OFFSET = -.7;
+            ICE_POINTER_ANGLE_OFFSET = -.6;
         }
     }
 
@@ -144,6 +147,8 @@ class Protractor {
 
         if (RENDER_MODE == RenderMode::ICE) {
             offset.x += ICE_POINTER_X_OFFSET;
+            offset.z += ICE_POINTER_Z_OFFSET;
+            theta += ICE_POINTER_ANGLE_OFFSET;
         }
 
 

@@ -105,8 +105,17 @@ bool FLIP_DISPLAY = false;
 [Setting category="Ice" name="Ice: Display on front of car"]
 bool FLIP_DISPLAY_ICE = true;
 
-[Setting category="Ice" name="Ice: Pointer X offset" drag min=-2 max=2]
+[Setting category="Ice" name="Ice: Pointer X offset" drag min=-3 max=3]
 float ICE_POINTER_X_OFFSET = 0;
+
+[Setting category="Ice" name="Ice: Pointer Z offset" drag min=-3 max=3]
+float ICE_POINTER_Z_OFFSET = 0;
+
+[Setting category="Ice" name="Ice: Pointer angle offset" drag min=-1.41 max=1.41]
+float ICE_POINTER_ANGLE_OFFSET = 0;
+
+[Setting category="Ice" name="Set pointer to front corner"] 
+bool ICE_RESET_TO_FRONT_CORNER = false;
 
 [Setting category="General" name="Reset pointer for front"]
 bool RESET_TO_FRONT = false;
