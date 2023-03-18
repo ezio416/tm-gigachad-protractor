@@ -142,6 +142,11 @@ class Protractor {
             return;
         }
 
+        if (RENDER_MODE == RenderMode::ICE) {
+            offset.x += ICE_POINTER_X_OFFSET;
+        }
+
+
         if (SHOW_LINE_BACKGROUND) {
             vec4 c = color * LINE_BACKGROUND_COLOR_FRAC + (1 - LINE_BACKGROUND_COLOR_FRAC) * LINE_BACKGROUND_COLOR;
             c.w = color.w;
@@ -354,7 +359,6 @@ class Protractor {
     }
 
     void renderPlayerPointer(CSceneVehicleVisState@ visState, float pointer_start, float pointer_length, float pointer_width, float theta, vec3 offset, vec4 color) {    
-        vec3 offset_apply(0, 0, 0);
 
         handleGearPointerFlip(theta);
 
@@ -378,6 +382,8 @@ class Protractor {
             || (RENDER_MODE == RenderMode::ICE && !SHOW_VERBOSE_GEARS_ICE)) {
             return;
         }
+
+        vec3 offset_apply(0, 0, 0);
         offset_apply.x += Math::Sin(theta) * GEAR_PLAYER_OFFSET;
         offset_apply.z += gearPointerFlip * Math::Cos(theta) * GEAR_PLAYER_OFFSET;
 
@@ -438,9 +444,8 @@ class Protractor {
             playerFadeOpacity = (1 - Math::InvLerp(HALF_PI * 1.5, HALF_PI * 2, angle));
         }
 
-
         float t = 0;
-        if (Math::Angle(vec_vel, visState.Left) > HALF_PI) {
+        if (Math::Angle(vec_vel, visState.Left) > HALF_PI || isPreview()) {
             t = HALF_PI;
         } else {
             t = -HALF_PI;
@@ -464,7 +469,7 @@ class Protractor {
         for (int i = 0; i < lines.Length; i++) {
             slip = Math::Angle(visState.Dir, vel);
             t = slip - lines[i] - HALF_PI;
-            if (Math::Angle(vel, visState.Left) > HALF_PI) {
+            if (Math::Angle(vel, visState.Left) > HALF_PI || isPreview()) {
                 t *= -1;
             }
             renderAngle(
@@ -483,7 +488,7 @@ class Protractor {
         for (int i = 0; i < lines.Length; i++) {
             slip = Math::Angle(visState.Dir, vel);
             t = slip - lines[i] - HALF_PI;
-            if (Math::Angle(vel, visState.Left) > HALF_PI) {
+            if (Math::Angle(vel, visState.Left) > HALF_PI || isPreview()) {
                 t *= -1;
             }
             renderAngle(
@@ -501,7 +506,7 @@ class Protractor {
         float angle = gearStateManager.getIdealAngle(vel);
         float slip = Math::Angle(visState.Dir, vec_vel);
         float t = slip - angle - HALF_PI;
-        if (Math::Angle(vec_vel, visState.Left) > HALF_PI) {
+        if (Math::Angle(vec_vel, visState.Left) > HALF_PI || isPreview()) {
             t *= -1;
         }
         renderAngle(

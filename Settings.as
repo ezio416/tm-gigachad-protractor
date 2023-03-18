@@ -105,6 +105,9 @@ bool FLIP_DISPLAY = false;
 [Setting category="Ice" name="Ice: Display on front of car"]
 bool FLIP_DISPLAY_ICE = true;
 
+[Setting category="Ice" name="Ice: Pointer X offset" drag min=-2 max=2]
+float ICE_POINTER_X_OFFSET = 0;
+
 [Setting category="General" name="Reset pointer for front"]
 bool RESET_TO_FRONT = false;
 
