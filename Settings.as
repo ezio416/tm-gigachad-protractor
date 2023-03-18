@@ -215,3 +215,27 @@ int PREVIEW_GEAR = 5;
 
 [Setting category="General" name="Show full gear lines on ice"]
 bool SHOW_VERBOSE_GEARS_ICE = false;
+
+[Setting category="Noodlebob" name="Enable noodlebob"]
+bool ENABLE_NOODLEBOB = false;
+
+[Setting category="Noodlebob" name="Number of derivatives" drag min=2 max=10]
+int NUM_DERIVATIVES = 4;
+
+[Setting category="Noodlebob" name="Smoothing frames" drag min=5 max=100]
+int SMOOTHING = 66;
+
+[Setting category="Noodlebob" name="Forward projection number of points" drag min=2 max=20]
+int NUM_NOODLEBOB_POINTS = 9;
+
+[Setting category="Noodlebob" name="Noodlebob start offset" drag min=0 max=3]
+int NOODLEBOB_START_OFFSET = 0;
+
+[Setting category="Noodlebob" name="Forward projection scale" drag min=0.01 max=1]
+float NOODLEBOB_SCALE = .072;
+
+[Setting category="Noodlebob" name="Noodlebob color" color]
+vec4 NOODLEBOB_COLOR = vec4(0, 0, 0, 0.25);
+
+[Setting category="Noodlebob" name="Noodlebob width" drag min=1 max=20]
+float NOODLEBOB_WIDTH = 5;

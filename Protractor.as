@@ -24,6 +24,7 @@ class Protractor {
     float gearPointerFlip = 1;
 
     GearStateManager gearStateManager();
+    ForwardProjection fowardProjection();
 
     Protractor() {}
 
@@ -288,6 +289,7 @@ class Protractor {
         isPreviewOpacityCheck();
         setThetaMult(visState);
         handleNormalizeSurface(visState);
+        fowardProjection.updateAndRender(visState);
 
         float vel;
 
