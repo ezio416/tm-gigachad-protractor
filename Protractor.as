@@ -371,7 +371,11 @@ class Protractor {
             offset,
             ApplyOpacityToColor(color, playerFadeOpacity)
         );
-        if (!SHOW_GEARS_IN_POINTER || (HIDE_GEAR_POINTER_FIFTH && visState.CurGear == 5) || (isPreview() && PREVIEW_GEAR == 5)) {
+        if (
+            !SHOW_GEARS_IN_POINTER
+            || (HIDE_GEAR_POINTER_FIFTH && visState.CurGear == 5) 
+            || (isPreview() && PREVIEW_GEAR == 5)
+            || (RENDER_MODE == RenderMode::ICE && !SHOW_VERBOSE_GEARS_ICE)) {
             return;
         }
         offset_apply.x += Math::Sin(theta) * GEAR_PLAYER_OFFSET;
@@ -427,11 +431,13 @@ class Protractor {
 
     void renderIce(CSceneVehicleVisState @ visState, float vel, vec3 vec_vel) {
         float angle = Math::Angle(vec_vel, visState.Dir);
-        if (angle < HALF_PI / 2 || angle > HALF_PI * 1.5) {
-            playerFadeOpacity = Math::Max(0, playerFadeOpacity - PLAYER_OPACITY_DERIVATIVE);
-        } else {
-            playerFadeOpacity = Math::Min(1, playerFadeOpacity + PLAYER_OPACITY_DERIVATIVE);
+        if (angle < HALF_PI / 2) {
+            playerFadeOpacity = Math::InvLerp(HALF_PI / 3, HALF_PI / 2, angle);
+        } 
+        if (angle > HALF_PI * 1.5) {
+            playerFadeOpacity = (1 - Math::InvLerp(HALF_PI * 1.5, HALF_PI * 2, angle));
         }
+
 
         float t = 0;
         if (Math::Angle(vec_vel, visState.Left) > HALF_PI) {

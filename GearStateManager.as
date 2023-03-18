@@ -11,6 +11,8 @@ class GearStateManager {
     float expectedRpm;
     float expectedTrueRpm;
 
+    int current_gear;
+
     GearStateManager() {
         SCORE_MAX = 2000;
         FRAMES_AVERAGED = 5;
@@ -23,6 +25,30 @@ class GearStateManager {
         gearup_true_scores = array<float>(FRAMES_AVERAGED, 0);
         geardown_scores = array<float>(FRAMES_AVERAGED, 0);
         geardown_true_scores = array<float>(FRAMES_AVERAGED, 0);
+    }
+
+    /** 
+     * This method doesn't *do* anything! 
+     * It just watches in_gear to decide if a gear change was "expected" or not. 
+     */
+    void handleGearAnalysis(int in_gear, float in_slip) {
+        in_slip = Math::Abs(in_slip);
+        if (in_gear == current_gear) {
+            return;
+        }
+
+        if (in_gear > current_gear) {
+            if (getGearupTrueScore() > getScoreMax()) {
+                print("Expected gearup");
+            } else {
+                if (in_slip < gearupUpperLimit() && in_slip > gearupLowerLimit()) {
+                    print("Unexpected gearup! Gearup score:\t" + tostring(getGearupScore()) + "\tSlip:\t" + tostring(in_slip));
+                } else {
+                    print("Expeted gearup" + "\tSlip:\t" + tostring(in_slip));
+                }
+            }
+        }
+        current_gear = in_gear;
     }
 
     vec4 getGearupColor() {
@@ -113,6 +139,9 @@ class GearStateManager {
             geardown_scores[idx] = 0;
             geardown_true_scores[idx] = 0;
         }
+
+        // handleGearAnalysis(inGear, inSlip);
+
     }
 
     float gearupLowerLimit() {
@@ -120,7 +149,7 @@ class GearStateManager {
     }
 
     float gearupUpperLimit() {
-        return 2.05;
+        return lerpToMidpoint(ice_gearup_upper, getGearupScore());
     }
 
     float geardownLowerLimit() {
@@ -176,11 +205,6 @@ class GearStateManager {
         return 0;
     }
 
-    // Also handling the "ideal angle" line within this class body.
-
-    // These are hand-derived from graphs. 
-    // @ me on twiter if you think this is lazy lol
-
     array<vec2> idealAngles = {
         vec2(0, 1.47),
         vec2(40, 1.47),
@@ -196,19 +220,24 @@ class GearStateManager {
         vec2(150, 1.4)
     };
 
-    float getIdealAngle(float speed) {
-        vec2 lower = idealAngles[0];
-        vec2 upper = idealAngles[1];
 
-        for (int i = 1; i < idealAngles.Length - 1; i++) {
-            if (idealAngles[i].x < speed) {
-                lower = idealAngles[i];
-                upper = idealAngles[i + 1];
+    float getIdealAngle(float speed) {
+        return lerpToMidpoint(idealAngles, speed);
+    }
+
+    float lerpToMidpoint(array<vec2> points, float c) {
+        vec2 lower = points[0];
+        vec2 upper = points[1];
+
+        for (int i = 1; i < points.Length - 1; i++) {
+            if (points[i].x < c) {
+                lower = points[i];
+                upper = points[i + 1];
             } else {
                 break;
             }
         }
-        float pos = Math::InvLerp(lower.x, upper.x, speed);
+        float pos = Math::InvLerp(lower.x, upper.x, c);
         return Math::Lerp(lower.y, upper.y, pos);
     }
 }

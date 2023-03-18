@@ -13,13 +13,13 @@ vec4 DANGER_UPSHIFT(1, 0, 0, 1);
 float PLAYER_FRACTION = 4;
 
 [Setting category="Ice" name="Ice Player pointer start" drag min=0 max=16]
-float ICE_PP_S = .918;
+float ICE_PP_S = 2.856;
 
 [Setting category="Ice" name="Ice Player pointer length" drag min=0 max=16]
 float ICE_PP_L = 1.5;
 
 [Setting category="Display" name="Player pointer line width" drag min=1 max=10]
-float FS_PP_W = 1;
+float FS_PP_W = 4.7;
 
 [Setting category="Ice" name="Ice assist line length fraction" drag min=1 max=10] 
 float ICE_PLAYER_FRACTION = 2;
@@ -103,7 +103,7 @@ float CAM3_E_L = 100;
 bool FLIP_DISPLAY = false;
 
 [Setting category="Ice" name="Ice: Display on front of car"]
-bool FLIP_DISPLAY_ICE = false;
+bool FLIP_DISPLAY_ICE = true;
 
 [Setting category="General" name="Reset pointer for front"]
 bool RESET_TO_FRONT = false;
@@ -200,3 +200,6 @@ float PREVIEW_SLIP = 0.1;
 
 [Setting category="Preview" name="Preview gear" drag min=1 max=5]
 int PREVIEW_GEAR = 5;
+
+[Setting category="General" name="Show full gear lines on ice"]
+bool SHOW_VERBOSE_GEARS_ICE = false;
