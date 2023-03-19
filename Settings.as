@@ -239,3 +239,18 @@ vec4 NOODLEBOB_COLOR = vec4(0, 0, 0, 0.25);
 
 [Setting category="Noodlebob" name="Noodlebob width" drag min=1 max=20]
 float NOODLEBOB_WIDTH = 5;
+
+[Setting category="Noodlebob" name="Enable tarmac"]
+bool NOODLEBOB_TARMAC = false; 
+
+[Setting category="Noodlebob" name="Enable grass"]
+bool NOODLEBOB_GRASS = false; 
+
+[Setting category="Noodlebob" name="Enable dirt"]
+bool NOODLEBOB_DIRT = false; 
+
+[Setting category="Noodlebob" name="Enable plastic"]
+bool NOODLEBOB_PLASTIC = false; 
+
+[Setting category="Noodlebob" name="Enable ice"]
+bool NOODLEBOB_ICE = true; 

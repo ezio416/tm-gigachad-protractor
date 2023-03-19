@@ -3,10 +3,12 @@ class ForwardProjection {
     array<array<vec3>> derivativeArrays;
     array<vec3> prevs;
     
+    int NUM_DERIVATIVES_MAX = 10;
+    int NUM_SMOOTHING_MAX = 100;
+
     ForwardProjection() {
-        for (int i = 0; i < NUM_DERIVATIVES; i++) {
-            array<vec3> arr(SMOOTHING);
-            print(tostring(arr.Length));
+        for (int i = 0; i < NUM_DERIVATIVES_MAX; i++) {
+            array<vec3> arr(NUM_SMOOTHING_MAX);
             derivativeArrays.InsertLast(arr);
         }
     }
@@ -28,8 +30,17 @@ class ForwardProjection {
         derivativeArrays[d_idx][idx] = dx;
     }
 
+    bool shouldRender(CSceneVehicleVisState@ visState) {
+        return 
+            NOODLEBOB_TARMAC && isTarmacSurface(visState.FLGroundContactMaterial)
+            || NOODLEBOB_GRASS && isGrassSurface(visState.FLGroundContactMaterial)
+            || NOODLEBOB_DIRT && isDirtSurface(visState.FLGroundContactMaterial)
+            || NOODLEBOB_PLASTIC && isPlasticSurface(visState.FLGroundContactMaterial)
+            || NOODLEBOB_ICE && isIceSurface(visState.FLGroundContactMaterial);
+    }
+
     void updateAndRender(CSceneVehicleVisState@ visState) {
-        if (!ENABLE_NOODLEBOB || visState.WorldVel.LengthSquared() < (20 ** 2)) {
+        if (!ENABLE_NOODLEBOB || visState.WorldVel.LengthSquared() < (20 ** 2) || !shouldRender(visState)) {
             return;
         }
         vec3 v = visState.WorldVel * NOODLEBOB_SCALE;
