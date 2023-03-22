@@ -16,7 +16,7 @@ class GearStateManager {
     GearStateManager() {
         SCORE_MAX = 2000;
         FRAMES_AVERAGED = 5;
-        GEARUP_RPM_THRESH = 10500;
+        GEARUP_RPM_THRESH = 10000;
         GEARDOWN_RPM_THRESH = 7500;
 
         current_idx = 0; 
