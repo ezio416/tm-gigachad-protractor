@@ -262,16 +262,16 @@ bool FIX_GUIDES_TO_CAR = true;
 bool SHOW_ICE_CUSTOM_ANGLE = true;
 
 [Setting category="Ice" name="Ice custom angle (in degrees)" drag min=0 max=180]
-float ICE_CUSTOM_ANGLE = 90;
+float ICE_CUSTOM_ANGLE = 90.5;
 
 [Setting category="Ice" name="Ice custom angle color" color]
 vec4 ICE_CUSTOM_ANGLE1_COLOR = vec4(1, 0, 1, 1);
 
-[Setting category="Ice" name="Show custom angle2"]
+[Setting category="Ice" name="Show custom angle 2"]
 bool SHOW_ICE_CUSTOM_ANGLE2 = true;
 
-[Setting category="Ice" name="Ice2 custom angle (in degrees)" drag min=0 max=180]
-float ICE_CUSTOM_ANGLE2 = 90;
+[Setting category="Ice" name="Ice custom angle 2 (in degrees)" drag min=0 max=180]
+float ICE_CUSTOM_ANGLE2 = 91.5;
 
-[Setting category="Ice" name="Ice custom angle color2" color]
+[Setting category="Ice" name="Ice custom angle color 2" color]
 vec4 ICE_CUSTOM_ANGLE2_COLOR = vec4(0, 0, 1, 1);
