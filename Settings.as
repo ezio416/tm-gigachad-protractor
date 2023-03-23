@@ -259,19 +259,19 @@ bool NOODLEBOB_ICE = true;
 bool FIX_GUIDES_TO_CAR = true;
 
 [Setting category="Ice" name="Show custom angle"]
-bool SHOW_ICE_CUSTOM_ANGLE = false;
+bool SHOW_ICE_CUSTOM_ANGLE = true;
 
 [Setting category="Ice" name="Ice custom angle (in degrees)" drag min=0 max=180]
-float ICE_CUSTOM_ANGLE = 90.5;
+float ICE_CUSTOM_ANGLE = 90;
 
 [Setting category="Ice" name="Ice custom angle color" color]
 vec4 ICE_CUSTOM_ANGLE1_COLOR = vec4(1, 0, 1, 1);
 
 [Setting category="Ice" name="Show custom angle 2"]
-bool SHOW_ICE_CUSTOM_ANGLE2 = false;
+bool SHOW_ICE_CUSTOM_ANGLE2 = true;
 
 [Setting category="Ice" name="Ice custom angle 2 (in degrees)" drag min=0 max=180]
-float ICE_CUSTOM_ANGLE2 = 91.5;
+float ICE_CUSTOM_ANGLE2 = 92;
 
 [Setting category="Ice" name="Ice custom angle color 2" color]
 vec4 ICE_CUSTOM_ANGLE2_COLOR = vec4(0, 0, 1, 1);
