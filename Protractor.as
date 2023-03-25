@@ -473,13 +473,17 @@ class Protractor {
             vec3(0, 0, 0),
             ICE_PP_COLOR
         );
-        renderIceGearLines(visState, vec_vel);
+        renderIceGearLines(visState, vel, vec_vel);
         renderIceIdealAngle(visState, vel, vec_vel);
         renderIceCustomAngle1(visState, vel, vec_vel);
         renderIceCustomAngle2(visState, vel, vec_vel);
     }
-    void renderIceGearLines(CSceneVehicleVisState @ visState, vec3 vel) {
-        array < float > lines = gearStateManager.getGearUpLines();
+    void renderIceGearLines(CSceneVehicleVisState @ visState, float v, vec3 vel) {
+        array < float > lines;
+        lines.InsertLast(lerpToMidpoint(ice_gearup_1, v));
+        lines.InsertLast(lerpToMidpoint(ice_gearup_2, v));
+        lines.InsertLast(lerpToMidpoint(ice_gearup_3, v));
+        lines.InsertLast(lerpToMidpoint(ice_gearup_4, v));
         float slip, t;
         vec4 color = gearStateManager.getGearupColorProjection();
         for (int i = 0; i < lines.Length; i++) {

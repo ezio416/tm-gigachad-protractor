@@ -32,23 +32,23 @@ class GearStateManager {
      * It just watches in_gear to decide if a gear change was "expected" or not. 
      */
     void handleGearAnalysis(int in_gear, float in_slip) {
-        in_slip = Math::Abs(in_slip);
-        if (in_gear == current_gear) {
-            return;
-        }
+        // in_slip = Math::Abs(in_slip);
+        // if (in_gear == current_gear) {
+        //     return;
+        // }
 
-        if (in_gear > current_gear) {
-            if (getGearupTrueScore() > getScoreMax()) {
-                print("Expected gearup");
-            } else {
-                if (in_slip < gearupUpperLimit() && in_slip > gearupLowerLimit()) {
-                    print("Unexpected gearup! Gearup score:\t" + tostring(getGearupScore()) + "\tSlip:\t" + tostring(in_slip));
-                } else {
-                    print("Expeted gearup" + "\tSlip:\t" + tostring(in_slip));
-                }
-            }
-        }
-        current_gear = in_gear;
+        // if (in_gear > current_gear) {
+        //     if (getGearupTrueScore() > getScoreMax()) {
+        //         print("Expected gearup");
+        //     } else {
+        //         if (in_slip < gearupUpperLimit() && in_slip > gearupLowerLimit()) {
+        //             print("Unexpected gearup! Gearup score:\t" + tostring(getGearupScore()) + "\tSlip:\t" + tostring(in_slip));
+        //         } else {
+        //             print("Expeted gearup" + "\tSlip:\t" + tostring(in_slip));
+        //         }
+        //     }
+        // }
+        // current_gear = in_gear;
     }
 
     vec4 getGearupColor() {
@@ -144,23 +144,8 @@ class GearStateManager {
 
     }
 
-    float gearupLowerLimit() {
-        return 1.49;
-    }
-
-    float gearupUpperLimit() {
-        return lerpToMidpoint(ice_gearup_upper, getGearupScore());
-    }
-
     float geardownLowerLimit() {
         return HALF_PI;
-    }
-
-    array<float> getGearUpLines() {
-        array<float> lines();
-        lines.InsertLast(gearupLowerLimit()); 
-        lines.InsertLast(gearupUpperLimit()); 
-        return lines;
     }
 
     array<float> getGearDownLines() {
@@ -171,13 +156,14 @@ class GearStateManager {
 
 
     bool isInSlipWindow(float inSlip) {
-        inSlip = Math::Abs(inSlip);
-        if (inSlip <= gearupLowerLimit()) {
-            return true;
-        } else if (inSlip >= gearupUpperLimit()) {
-            return true;
-        }
-        return false;
+        return true;
+        // inSlip = Math::Abs(inSlip);
+        // if (inSlip <= gearupLowerLimit()) {
+        //     return true;
+        // } else if (inSlip >= gearupUpperLimit()) {
+        //     return true;
+        // }
+        // return false;
     }
 
     float getExpectedRpm(float inSpeed, int inGear, float inSlip, bool checkSlip) {
@@ -225,19 +211,5 @@ class GearStateManager {
         return lerpToMidpoint(idealAngles, speed);
     }
 
-    float lerpToMidpoint(array<vec2> points, float c) {
-        vec2 lower = points[0];
-        vec2 upper = points[1];
 
-        for (int i = 1; i < points.Length - 1; i++) {
-            if (points[i].x < c) {
-                lower = points[i];
-                upper = points[i + 1];
-            } else {
-                break;
-            }
-        }
-        float pos = Math::InvLerp(lower.x, upper.x, c);
-        return Math::Lerp(lower.y, upper.y, pos);
-    }
 }

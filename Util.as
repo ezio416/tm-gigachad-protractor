@@ -161,6 +161,22 @@ if (playground!is null) {
 return null;
 }
 
+float lerpToMidpoint(array<vec2> points, float c) {
+    vec2 lower = points[0];
+    vec2 upper = points[1];
+
+    for (int i = 1; i < points.Length - 1; i++) {
+        if (points[i].x < c) {
+            lower = points[i];
+            upper = points[i + 1];
+        } else {
+            break;
+        }
+    }
+    float pos = Math::InvLerp(lower.x, upper.x, c);
+    return Math::Lerp(lower.y, upper.y, pos);
+}
+
 float approximateSideSpeed(const array<vec2> data, float speed) {
     vec2 lower = data[0];
     vec2 upper = data[data.Length - 1];
