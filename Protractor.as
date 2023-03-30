@@ -290,7 +290,7 @@ class Protractor {
         setThetaMult(visState);
         handleNormalizeSurface(visState);
         fowardProjection.updateAndRender(visState);
-
+        
         float vel;
 
         if (isPreview()) {
@@ -308,6 +308,7 @@ class Protractor {
 
         gearStateManager.handleUpdate(slipAngle, vel,
             (isPreview() ? PREVIEW_GEAR : visState.CurGear), VehicleState::GetRPM(visState));
+
 
         if (isIceSurface(surface_normalized) && visState.FLIcing01 > 0) {
             RENDER_MODE = RenderMode::ICE;
@@ -485,7 +486,7 @@ class Protractor {
         lines.InsertLast(lerpToMidpoint(ice_gearup_3, v));
         lines.InsertLast(lerpToMidpoint(ice_gearup_4, v));
         float slip, t;
-        vec4 color = gearStateManager.getGearupColorProjection();
+        vec4 color = gearStateManager.getGearupColor();
         for (int i = 0; i < lines.Length; i++) {
             slip = Math::Angle(visState.Dir, vel);
             if (FIX_GUIDES_TO_CAR) {
@@ -508,7 +509,7 @@ class Protractor {
         }
 
         lines = gearStateManager.getGearDownLines();
-        color = gearStateManager.getGeardownColorProjection();
+        color = gearStateManager.getGeardownColor();
         for (int i = 0; i < lines.Length; i++) {
             slip = Math::Angle(visState.Dir, vel);
             if (FIX_GUIDES_TO_CAR) {

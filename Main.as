@@ -1,5 +1,6 @@
 Protractor @ protractor;
 float HALF_PI = 1.57079632679;
+float g_dt = 0;
 
 string getMapUid() {
   auto app = cast < CTrackMania > (GetApp());
@@ -36,6 +37,10 @@ void Render() {
       protractor.render();
     }
   }
+}
+
+void Update(float dt) {
+  g_dt = dt;
 }
 
 

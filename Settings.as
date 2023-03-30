@@ -275,3 +275,33 @@ float ICE_CUSTOM_ANGLE2 = 92;
 
 [Setting category="Ice" name="Ice custom angle color 2" color]
 vec4 ICE_CUSTOM_ANGLE2_COLOR = vec4(0, 0, 1, 1);
+
+[Setting category="Gear Display" name="Graph Width" drag min=50 max=2000]
+int graph_width = 100;
+
+[Setting category="Gear Display" name="Graph Height" drag min=50 max=1000]
+int graph_height = 200;
+
+[Setting category="Gear Display" name="Graph X Offset" drag min=0 max=4000]
+int graph_x_offset = 32;
+
+[Setting category="Gear Display" name="Graph Y Offset" drag min=0 max=2000]
+int graph_y_offset = 600;
+
+[Setting category="Gear Display" name="Border Radius" drag min=0 max=50]
+float BorderRadius = 5.0f;
+
+[Setting category="Gear Display" name="Backdrop Color" color]
+vec4 BackdropColor = vec4(0, 0, 0, 0.7f);
+
+[Setting category="Gear Display" name="Border Color" color]
+vec4 BorderColor = vec4(0, 0, 0, 1);
+
+[Setting category="Gear Display" name="Border Width" drag min=0 max=10]
+float BorderWidth = 1.0f;
+
+[Setting category="Gear Display" name="Milliseconds Averaged" drag min=200 max=1000]
+int MILLISECONDS_AVERAGED = 250;
+
+[Setting category="Gear Display" name="Enable Gear Hud"]
+bool RENDER_GEAR_HUD = true;

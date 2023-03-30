@@ -1,63 +1,57 @@
 class GearStateManager {
-    int FRAMES_AVERAGED, GEARUP_RPM_THRESH, GEARDOWN_RPM_THRESH;
-    float SCORE_MAX;
-
     int current_idx;
-    array<float> gearup_scores();
-    array<float> gearup_true_scores();
-    array<float> geardown_scores(); 
-    array<float> geardown_true_scores();
+    array<float>@ gearup_scores;
+    array<float>@ frame_times;
 
     float expectedRpm;
     float expectedTrueRpm;
 
     int current_gear;
 
+    int GEARUP_RPM_THRESH = 10000;
+    int GEARDOWN_RPM_THRESH = 7500;
+
+    int FRAMES_AVERAGED = 100;
+
+    float SCORE_MAX = GEARUP_RPM_THRESH * 1.5;
+
     GearStateManager() {
-        SCORE_MAX = 2000;
-        FRAMES_AVERAGED = 5;
-        GEARUP_RPM_THRESH = 10000;
-        GEARDOWN_RPM_THRESH = 7500;
-
         current_idx = 0; 
-
-        gearup_scores = array<float>(FRAMES_AVERAGED, 0);
-        gearup_true_scores = array<float>(FRAMES_AVERAGED, 0);
-        geardown_scores = array<float>(FRAMES_AVERAGED, 0);
-        geardown_true_scores = array<float>(FRAMES_AVERAGED, 0);
+        @gearup_scores = array<float>(500, 0);
+        @frame_times = array<float>(500, 0);
     }
 
-    /** 
-     * This method doesn't *do* anything! 
-     * It just watches in_gear to decide if a gear change was "expected" or not. 
-     */
-    void handleGearAnalysis(int in_gear, float in_slip) {
-        // in_slip = Math::Abs(in_slip);
-        // if (in_gear == current_gear) {
-        //     return;
-        // }
+    void renderHud() {
+        if (!RENDER_GEAR_HUD) {
+            return;
+        }
+        nvg::BeginPath();
+        nvg::RoundedRect(graph_x_offset, graph_y_offset, graph_width, graph_height, BorderRadius);
+        nvg::FillColor(BackdropColor);
+        nvg::Fill();
+        nvg::StrokeColor(BorderColor);
+        nvg::StrokeWidth(BorderWidth);
+        nvg::Stroke();
 
-        // if (in_gear > current_gear) {
-        //     if (getGearupTrueScore() > getScoreMax()) {
-        //         print("Expected gearup");
-        //     } else {
-        //         if (in_slip < gearupUpperLimit() && in_slip > gearupLowerLimit()) {
-        //             print("Unexpected gearup! Gearup score:\t" + tostring(getGearupScore()) + "\tSlip:\t" + tostring(in_slip));
-        //         } else {
-        //             print("Expeted gearup" + "\tSlip:\t" + tostring(in_slip));
-        //         }
-        //     }
-        // }
-        // current_gear = in_gear;
+        float height = graph_height * getGearupScore() / getScoreMax();
+        nvg::BeginPath();
+        nvg::RoundedRect(graph_x_offset, graph_y_offset + (graph_height - height), graph_width, height, BorderRadius);
+        nvg::FillColor(vec4(1, 1, 1, 1));
+        nvg::Fill();
+        nvg::StrokeColor(BorderColor);
+        nvg::StrokeWidth(BorderWidth);
+        nvg::Stroke();
+
+
     }
 
     vec4 getGearupColor() {
-        if (getGearupScore() > getScoreMax()) {
-            float mult = Math::Min(getGearupScore(), getScoreMax() * 2) / getScoreMax() - 1;
-            return NORMAL_UPSHIFT * (1 - mult) + DANGER_UPSHIFT * mult;
-        } else {
-            return NORMAL_UPSHIFT * (Math::Min(getGearupScore(), getScoreMax()) / getScoreMax());
-        }
+        if (expectedTrueRpm > GEARUP_RPM_THRESH) {
+            float mult = Math::Min(Math::InvLerp(GEARUP_RPM_THRESH, GEARUP_RPM_THRESH + 3000, expectedTrueRpm), 1);
+            vec4 c = NORMAL_UPSHIFT;
+            c.w *= mult;
+            return c;
+        } return vec4(0, 0, 0, 0);
     }
 
     vec4 getGearupColorProjection() {
@@ -71,15 +65,11 @@ class GearStateManager {
         }
     }
 
-    vec4 getGeardownColorProjection() {
-        if (getGeardownScore() > getScoreMax()) {
-            float mult = Math::Min(getGeardownScore(), getScoreMax() * 2) / getScoreMax() - 1;
-            return vec4(1, 1, 1, 1) - vec4(0, 0.7, .8, 0) * (mult);
-        } else {
-            vec4 c(1, 1, 1, 1);
-            c.w = (Math::Min(getGeardownScore(), getScoreMax()) / getScoreMax());
-            return c;
-        }
+    vec4 getGeardownColor() {
+        if (expectedTrueRpm < GEARDOWN_RPM_THRESH) {
+            float mult = Math::Max(Math::Lerp(GEARDOWN_RPM_THRESH, GEARDOWN_RPM_THRESH - 3000, expectedTrueRpm), 1);
+            return NORMAL_UPSHIFT * mult;
+        } return vec4(0, 0, 0, 0);
     }
 
     float getScoreMax() {
@@ -91,57 +81,31 @@ class GearStateManager {
         for (int i = 0; i < FRAMES_AVERAGED; i++) {
             s += gearup_scores[i];
         }
-        return s;
-    }
-
-    float getGearupTrueScore() {
-        float s = 0;
-        for (int i = 0; i < FRAMES_AVERAGED; i++) {
-            s += gearup_true_scores[i];
-        }
-        return s;
-    }
-
-    
-    float getGeardownScore() {
-        float s = 0;
-        for (int i = 0; i < FRAMES_AVERAGED; i++) {
-            s += geardown_scores[i];
-        }
-        return s;
+        return Math::Min(s, getScoreMax());
     }
 
     int getAndIncrementIdx() {
         int r = current_idx;
-        current_idx = (current_idx + 1) % 5;
+        frame_times[r] = g_dt;
+        current_idx = (current_idx + 1) % FRAMES_AVERAGED;
+
+        if (current_idx == 0) {
+            float sum = 0; 
+            for (int i = 0; i < FRAMES_AVERAGED; i++) {
+                sum += frame_times[i];
+            }
+            FRAMES_AVERAGED = MILLISECONDS_AVERAGED / (sum / FRAMES_AVERAGED);
+        }
         return r;
     }
 
     void handleUpdate(float inSlip, float inSpeed, int inGear, float inEngineRpm) {
         int idx = getAndIncrementIdx();
-        expectedRpm = getExpectedRpm(inSpeed, inGear, inSlip, false);
-        expectedTrueRpm = getExpectedRpm(inSpeed, inGear, inSlip, true);
+        expectedRpm = getExpectedRpm(inSpeed, inGear, inSlip, true);
+        expectedTrueRpm = getExpectedRpm(inSpeed, inGear, inSlip, false);
         
-        if (expectedRpm > GEARUP_RPM_THRESH) {
-            gearup_scores[idx] = Math::Max(expectedRpm, GEARUP_RPM_THRESH) - GEARUP_RPM_THRESH;
-            gearup_true_scores[idx] = Math::Max(expectedTrueRpm, GEARUP_RPM_THRESH) - GEARUP_RPM_THRESH;
-            geardown_scores[idx] = 0;
-            geardown_true_scores[idx] = 0;
-
-        } else if (expectedRpm < GEARDOWN_RPM_THRESH) {
-            geardown_scores[idx] = GEARDOWN_RPM_THRESH - Math::Min(expectedRpm, GEARDOWN_RPM_THRESH);
-            geardown_true_scores[idx] = GEARDOWN_RPM_THRESH - Math::Min(expectedTrueRpm, GEARDOWN_RPM_THRESH);
-            gearup_scores[idx] = 0;
-            gearup_true_scores[idx] = 0;
-        } else {
-            gearup_scores[idx] = 0;
-            gearup_true_scores[idx] = 0;
-            geardown_scores[idx] = 0;
-            geardown_true_scores[idx] = 0;
-        }
-
-        // handleGearAnalysis(inGear, inSlip);
-
+        gearup_scores[idx] = Math::Min(expectedRpm, SCORE_MAX);
+        renderHud();
     }
 
     float geardownLowerLimit() {
@@ -155,19 +119,25 @@ class GearStateManager {
     }
 
 
-    bool isInSlipWindow(float inSlip) {
-        return true;
-        // inSlip = Math::Abs(inSlip);
-        // if (inSlip <= gearupLowerLimit()) {
-        //     return true;
-        // } else if (inSlip >= gearupUpperLimit()) {
-        //     return true;
-        // }
-        // return false;
+    bool inSafeZone(float inSlip, float inSpeed) {
+        inSlip = Math::Abs(inSlip);
+        if (inSlip >= lerpToMidpoint(ice_gearup_1, inSpeed)) {
+            return false;
+        }
+        if (inSlip >= lerpToMidpoint(ice_gearup_2, inSpeed)) {
+            return true;
+        }
+        if (inSlip >= lerpToMidpoint(ice_gearup_3, inSpeed)) {
+            return false;
+        }
+        if (inSlip >= lerpToMidpoint(ice_gearup_4, inSpeed)) {
+            return true;
+        }
+        return false;
     }
 
     float getExpectedRpm(float inSpeed, int inGear, float inSlip, bool checkSlip) {
-        if (!checkSlip || isInSlipWindow(inSlip)) {
+        if (!checkSlip || !inSafeZone(inSlip, inSpeed)) {
             return inSpeed * getExpectedRpmBySpeedMult(inGear);
         }
         return 0;
