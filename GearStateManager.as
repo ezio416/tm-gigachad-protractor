@@ -15,6 +15,9 @@ class GearStateManager {
 
     float SCORE_MAX = GEARUP_RPM_THRESH * 1.5;
 
+    uint64 lastColorFetchTime = 0;
+    float lastColorFetchScore = 0;
+
     GearStateManager() {
         current_idx = 0; 
         @gearup_scores = array<float>(500, 0);
@@ -48,27 +51,19 @@ class GearStateManager {
     vec4 getGearupColor() {
         if (expectedTrueRpm > GEARUP_RPM_THRESH) {
             float mult = Math::Min(Math::InvLerp(GEARUP_RPM_THRESH, GEARUP_RPM_THRESH + 3000, expectedTrueRpm), 1);
-            vec4 c = NORMAL_UPSHIFT;
+            float pos = getGearupScore() / getScoreMax();
+            vec4 c = DANGER_UPSHIFT * pos + NORMAL_UPSHIFT * (1 - pos);
             c.w *= mult;
             return c;
         } return vec4(0, 0, 0, 0);
     }
 
-    vec4 getGearupColorProjection() {
-        if (getGearupScore() > getScoreMax()) {
-            float mult = Math::Min(getGearupScore(), getScoreMax() * 2) / getScoreMax() - 1;
-            return vec4(1, 1, 1, 1) - vec4(0, 0.7, .8, 0) * (mult);
-        } else {
-            vec4 c(1, 1, 1, 1);
-            c.w = (Math::Min(getGearupScore(), getScoreMax()) / getScoreMax());
-            return c;
-        }
-    }
-
     vec4 getGeardownColor() {
         if (expectedTrueRpm < GEARDOWN_RPM_THRESH) {
-            float mult = Math::Max(Math::Lerp(GEARDOWN_RPM_THRESH, GEARDOWN_RPM_THRESH - 3000, expectedTrueRpm), 1);
-            return NORMAL_UPSHIFT * mult;
+            float mult = Math::Min(Math::InvLerp(GEARDOWN_RPM_THRESH, GEARDOWN_RPM_THRESH - 3000, expectedTrueRpm), 1);
+            vec4 c = NORMAL_UPSHIFT;
+            c.w *= mult;
+            return c;
         } return vec4(0, 0, 0, 0);
     }
 
@@ -77,11 +72,16 @@ class GearStateManager {
     }
 
     float getGearupScore() {
+        if (Time::Now == lastColorFetchTime) {
+            return lastColorFetchScore;
+        }
         float s = 0;
         for (int i = 0; i < FRAMES_AVERAGED; i++) {
             s += gearup_scores[i];
         }
-        return Math::Min(s, getScoreMax());
+        lastColorFetchScore = Math::Min(s, getScoreMax());
+        lastColorFetchTime = Time::Now;
+        return lastColorFetchScore;
     }
 
     int getAndIncrementIdx() {
@@ -106,16 +106,6 @@ class GearStateManager {
         
         gearup_scores[idx] = Math::Min(expectedRpm, SCORE_MAX);
         renderHud();
-    }
-
-    float geardownLowerLimit() {
-        return HALF_PI;
-    }
-
-    array<float> getGearDownLines() {
-        array<float> lines();
-        lines.InsertLast(geardownLowerLimit()); 
-        return lines;
     }
 
 

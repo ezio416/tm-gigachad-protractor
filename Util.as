@@ -77,6 +77,12 @@ float normalizeSlipAngle(float slipAngle, float frontSpeed) {
 }
 
 
+float calcAngle(vec3 v1, vec3 v2) {
+  if (isPreview()) {
+    return PREVIEW_SLIP;
+  } return Math::Angle(v1, v2);
+}
+
 float calcVecAngle(vec3 vec1, vec3 vec2) {
   if (vec1.Length() == 0 || vec2.Length() == 0) {
     return 0;
@@ -163,7 +169,16 @@ return null;
 
 float lerpToMidpoint(array<vec2> points, float c) {
     vec2 lower = points[0];
-    vec2 upper = points[1];
+    vec2 upper = points[points.Length - 1];
+
+    if (c < lower.x) {
+      return lower.y;
+    }
+    if (c > upper.x) {
+      return upper.y;
+    }
+
+    upper = points[1];
 
     for (int i = 1; i < points.Length - 1; i++) {
         if (points[i].x < c) {

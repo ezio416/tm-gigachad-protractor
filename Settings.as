@@ -276,6 +276,15 @@ float ICE_CUSTOM_ANGLE2 = 92;
 [Setting category="Ice" name="Ice custom angle color 2" color]
 vec4 ICE_CUSTOM_ANGLE2_COLOR = vec4(0, 0, 1, 1);
 
+[Setting category="Ice" name="Ice line minimum brightness" drag min=0 max=1]
+float ICE_LINE_MIN_BRIGHTNESS = 0.1;
+
+[Setting category="Ice" name="Ice line fade rate (higher = slower)" drag min=0.1 max=1]
+float ICE_LINE_FADE_RATE = 0.3;
+
+[Setting category="Ice" name="Ice ideal angle color" color]
+vec4 ICE_IDEAL_ANGLE_COLOR = vec4(0, 1, 0, 1);
+
 [Setting category="Gear Display" name="Graph Width" drag min=50 max=2000]
 int graph_width = 100;
 

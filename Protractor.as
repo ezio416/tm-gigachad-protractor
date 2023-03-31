@@ -444,18 +444,18 @@ class Protractor {
     }
 
     void renderIce(CSceneVehicleVisState @ visState, float vel, vec3 vec_vel) {
-        float angle = Math::Angle(vec_vel, visState.Dir);
-        if (angle < HALF_PI / 2) {
-            playerFadeOpacity = Math::InvLerp(HALF_PI / 3, HALF_PI / 2, angle);
+        float slip = calcAngle(vec_vel, visState.Dir);
+        if (slip < HALF_PI / 2) {
+            playerFadeOpacity = Math::InvLerp(HALF_PI / 3, HALF_PI / 2, slip);
         } 
-        if (angle > HALF_PI * 1.5) {
-            playerFadeOpacity = (1 - Math::InvLerp(HALF_PI * 1.5, HALF_PI * 2, angle));
+        if (slip > HALF_PI * 1.5) {
+            playerFadeOpacity = (1 - Math::InvLerp(HALF_PI * 1.5, HALF_PI * 2, slip));
         }
 
         float t;
         
         if (FIX_GUIDES_TO_CAR) {
-            t = -angle;
+            t = -slip;
         } else {
             t = -HALF_PI;
         }
@@ -474,66 +474,85 @@ class Protractor {
             vec3(0, 0, 0),
             ICE_PP_COLOR
         );
-        renderIceGearLines(visState, vel, vec_vel);
-        renderIceIdealAngle(visState, vel, vec_vel);
+        renderIceGearLines(visState, vel, vec_vel, slip);
+        renderIceIdealAngle(visState, vel, vec_vel, slip);
         renderIceCustomAngle1(visState, vel, vec_vel);
         renderIceCustomAngle2(visState, vel, vec_vel);
     }
-    void renderIceGearLines(CSceneVehicleVisState @ visState, float v, vec3 vel) {
+
+    vec4 io(vec4 color, float slip, float theta) {
+        vec4 c = color;
+        c.w *= getIceLineBrightness(slip, theta);
+        return c;
+    }
+
+    float getIceLineBrightness(float slip, float theta) {
+        float diff = Math::Abs(slip - theta);
+        float ret = Math::InvLerp(ICE_LINE_FADE_RATE, 0, diff);
+        return Math::Max(ret, ICE_LINE_MIN_BRIGHTNESS);
+    }
+
+    void renderIceGearLines(CSceneVehicleVisState @ visState, float v, vec3 vel, float slip) {
         array < float > lines;
         lines.InsertLast(lerpToMidpoint(ice_gearup_1, v));
         lines.InsertLast(lerpToMidpoint(ice_gearup_2, v));
         lines.InsertLast(lerpToMidpoint(ice_gearup_3, v));
         lines.InsertLast(lerpToMidpoint(ice_gearup_4, v));
-        float slip, t;
-        vec4 color = gearStateManager.getGearupColor();
-        for (int i = 0; i < lines.Length; i++) {
-            slip = Math::Angle(visState.Dir, vel);
-            if (FIX_GUIDES_TO_CAR) {
-                t = -lines[i];
-            } else {
-               t = slip - lines[i] - HALF_PI;
+        float t;
+        vec4 color;
+        if (gearStateManager.expectedTrueRpm > gearStateManager.GEARUP_RPM_THRESH) {
+            color = gearStateManager.getGearupColor();
+            for (int i = 0; i < lines.Length; i++) {
+                if (FIX_GUIDES_TO_CAR) {
+                    t = -lines[i];
+                } else {
+                t = slip - lines[i] - HALF_PI;
+                }
+                if (Math::Angle(vel, visState.Left) > HALF_PI || isPreview()) {
+                    t *= -1;
+                }
+                renderAngle(
+                    visState,
+                    ICE_PP_S,
+                    ICE_PP_L / ICE_PLAYER_FRACTION,
+                    FS_PP_W,
+                    t,
+                    vec3(0, 0, 0),
+                    io(color, slip, t)
+                );
             }
-            if (Math::Angle(vel, visState.Left) > HALF_PI || isPreview()) {
-                t *= -1;
-            }
-            renderAngle(
-                visState,
-                ICE_PP_S,
-                ICE_PP_L / ICE_PLAYER_FRACTION,
-                FS_PP_W,
-                t,
-                vec3(0, 0, 0),
-                color
-            );
         }
 
-        lines = gearStateManager.getGearDownLines();
-        color = gearStateManager.getGeardownColor();
-        for (int i = 0; i < lines.Length; i++) {
-            slip = Math::Angle(visState.Dir, vel);
-            if (FIX_GUIDES_TO_CAR) {
-                t = -lines[i];
-            } else {
-               t = slip - lines[i] - HALF_PI;
+        if (gearStateManager.expectedTrueRpm < gearStateManager.GEARDOWN_RPM_THRESH) {
+
+            array < float > lines;
+            lines.InsertLast(HALF_PI);
+            lines.InsertLast(lerpToMidpoint(ice_gearup_1, v));
+            color = gearStateManager.getGeardownColor();
+            for (int i = 0; i < lines.Length; i++) {
+                slip = Math::Angle(visState.Dir, vel);
+                if (FIX_GUIDES_TO_CAR) {
+                    t = -lines[i];
+                } else {
+                t = slip - lines[i] - HALF_PI;
+                }
+                if (Math::Angle(vel, visState.Left) > HALF_PI || isPreview()) {
+                    t *= -1;
+                }
+                renderAngle(
+                    visState,
+                    ICE_PP_S,
+                    ICE_PP_L / ICE_PLAYER_FRACTION,
+                    FS_PP_W,
+                    t,
+                    vec3(0, 0, 0),
+                    color
+                );
             }
-            if (Math::Angle(vel, visState.Left) > HALF_PI || isPreview()) {
-                t *= -1;
-            }
-            renderAngle(
-                visState,
-                ICE_PP_S,
-                ICE_PP_L / ICE_PLAYER_FRACTION,
-                FS_PP_W,
-                t,
-                vec3(0, 0, 0),
-                color
-            );
         }
     }
-    void renderIceIdealAngle(CSceneVehicleVisState @ visState, float vel, vec3 vec_vel) {
+    void renderIceIdealAngle(CSceneVehicleVisState @ visState, float vel, vec3 vec_vel, float slip) {
         float angle = gearStateManager.getIdealAngle(vel);
-        float slip = Math::Angle(visState.Dir, vec_vel);
         float t;
         
         if (FIX_GUIDES_TO_CAR) {
@@ -545,7 +564,7 @@ class Protractor {
         if (Math::Angle(vec_vel, visState.Left) > HALF_PI || isPreview()) {
             t *= -1;
         }
-        renderIceAngle(visState, vel, vec_vel, COLOR_100, t);
+        renderIceAngle(visState, vel, vec_vel, io(ICE_IDEAL_ANGLE_COLOR, slip, t), t);
     }
 
     void renderIceAngle(CSceneVehicleVisState @ visState, float vel, vec3 vec_vel, vec4 color, float t) {
