@@ -314,3 +314,4 @@ int MILLISECONDS_AVERAGED = 250;
 
 [Setting category="Gear Display" name="Enable Gear Hud"]
 bool RENDER_GEAR_HUD = true;
+

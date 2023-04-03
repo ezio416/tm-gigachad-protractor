@@ -526,8 +526,8 @@ class Protractor {
         if (gearStateManager.expectedTrueRpm < gearStateManager.GEARDOWN_RPM_THRESH) {
 
             array < float > lines;
-            lines.InsertLast(HALF_PI);
             lines.InsertLast(lerpToMidpoint(ice_gearup_1, v));
+            lines.InsertLast(lerpToMidpoint(ice_gearup_4, v));
             color = gearStateManager.getGeardownColor();
             for (int i = 0; i < lines.Length; i++) {
                 slip = Math::Angle(visState.Dir, vel);
@@ -624,15 +624,15 @@ class Protractor {
         float pos;
         int lcol, ucol;
         if (sideSpeed < target) {
-            pos = Math::InvLerp(0, target, sideSpeed);
+            pos = Math::InvLerp(0, target, sideSpeed) ** 4;
             lcol = 2;
             ucol = 0;
         } else if (sideSpeed < good) {
-            pos = Math::InvLerp(target, base, sideSpeed);
+            pos = Math::InvLerp(target, good, sideSpeed);
             lcol = 0;
             ucol = 1;
         } else if (sideSpeed < base) {
-            pos = Math::InvLerp(target, base, sideSpeed);
+            pos = Math::InvLerp(good, base, sideSpeed);
             lcol = 1;
             ucol = 2;
         } else if (sideSpeed < outer) {

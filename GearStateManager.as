@@ -50,7 +50,7 @@ class GearStateManager {
 
     vec4 getGearupColor() {
         if (expectedTrueRpm > GEARUP_RPM_THRESH) {
-            float mult = Math::Min(Math::InvLerp(GEARUP_RPM_THRESH, GEARUP_RPM_THRESH + 3000, expectedTrueRpm), 1);
+            float mult = Math::Min(Math::InvLerp(GEARUP_RPM_THRESH + 500, GEARUP_RPM_THRESH + 3000, expectedTrueRpm), 1);
             float pos = getGearupScore() / getScoreMax();
             vec4 c = DANGER_UPSHIFT * pos + NORMAL_UPSHIFT * (1 - pos);
             c.w *= mult;
