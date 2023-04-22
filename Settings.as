@@ -315,3 +315,24 @@ int MILLISECONDS_AVERAGED = 250;
 [Setting category="Gear Display" name="Enable Gear Hud"]
 bool RENDER_GEAR_HUD = true;
 
+[Setting category="History" name="Enable run history view"]
+bool HISTORY_ENABLED = true;
+
+[Setting category="History" name="Number of run history points to draw" drag min=100 max=1000]
+float HISTORY_MAX = 100; 
+
+[Setting category="History" name="History min width" drag min=1 max=4]
+float HISTORY_WIDTH_MIN = 3;
+
+[Setting category="History" name="History max width" drag min=4 max=16]
+float HISTORY_WIDTH_MAX = 8;
+
+[Setting category="History" name="Start opacity" drag min=0.05 max=1]
+float HISTORY_START_OPACITY = 0.3;
+
+[Setting category="History" name="Decay factor" drag min=1.01 max=10]
+float HISTORY_DECAY_FACTOR = 1.4;
+
+[Setting category="History" name="Start offset" drag min=0 max=3]
+float HISTORY_START_OFFSET = 1.5;
+

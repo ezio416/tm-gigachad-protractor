@@ -25,6 +25,7 @@ class Protractor {
 
     GearStateManager gearStateManager();
     ForwardProjection fowardProjection();
+    HistoryTrail historyTrail(); 
 
     Protractor() {}
 
@@ -367,12 +368,17 @@ class Protractor {
     }
 
     void renderPlayerPointer(CSceneVehicleVisState@ visState, float pointer_start, float pointer_length, float pointer_width, float theta, vec3 offset, vec4 color) {    
-
+        
+        if (HISTORY_ENABLED) {
+            historyTrail.update(theta, color);
+            renderHistoryTrail(visState, pointer_start, pointer_length, pointer_width);
+        }
         handleGearPointerFlip(theta);
 
         if (BAD_SLIDE && SHOW_BAD_SLIDE && !isPreview()) {
             color = COLOR_50;
         }
+
 
         renderAngle( // player pointer
             visState,
@@ -443,6 +449,24 @@ class Protractor {
         }
     }
 
+    void renderHistoryTrail(CSceneVehicleVisState@ visState, float start, float length, float width) {
+        HistoryTrailObject@ o = historyTrail.getAtIdx(0);
+        float slip = o.slip;
+        slip = processTheta(slip);
+        float opacity = HISTORY_START_OPACITY;
+
+        for (int i = 1; i < HISTORY_MAX - 1; i++) {
+            nvg::BeginPath();
+            nvg::MoveTo(Camera::ToScreenSpace(projectAngle(visState, HISTORY_START_OFFSET + start + length, historyTrail.getAtIdx(i).slip * theta_mult)));
+            nvg::LineTo(Camera::ToScreenSpace(projectAngle(visState, HISTORY_START_OFFSET + start + length, historyTrail.getAtIdx(i + 1).slip * theta_mult)));
+            nvg::StrokeColor(ApplyOpacityToColor(historyTrail.getAtIdx(i).color,  playerFadeOpacity * opacity));
+            nvg::StrokeWidth(Math::Lerp(HISTORY_WIDTH_MIN, HISTORY_WIDTH_MAX, 1 - Math::InvLerp(0, HISTORY_START_OPACITY, opacity)));
+            nvg::LineCap(nvg::LineCapType::Round);
+            nvg::Stroke();
+            nvg::ClosePath();
+            opacity = opacity * (1 - (1 / HISTORY_MAX)) ** HISTORY_DECAY_FACTOR; //- (1 / (HISTORY_MAX * 10));
+        }
+    }
     void renderIce(CSceneVehicleVisState @ visState, float vel, vec3 vec_vel) {
         float slip = calcAngle(vec_vel, visState.Dir);
         if (slip < HALF_PI / 2) {
