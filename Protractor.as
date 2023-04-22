@@ -464,7 +464,7 @@ class Protractor {
             nvg::LineCap(nvg::LineCapType::Round);
             nvg::Stroke();
             nvg::ClosePath();
-            opacity = opacity * (1 - (1 / HISTORY_MAX)) ** HISTORY_DECAY_FACTOR; //- (1 / (HISTORY_MAX * 10));
+            opacity = opacity * (1.0 - (1.0 / HISTORY_MAX)) ** HISTORY_DECAY_FACTOR; //- (1 / (HISTORY_MAX * 10));
         }
     }
     void renderIce(CSceneVehicleVisState @ visState, float vel, vec3 vec_vel) {
