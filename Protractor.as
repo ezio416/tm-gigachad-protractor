@@ -456,11 +456,16 @@ class Protractor {
         float opacity = HISTORY_START_OPACITY;
 
         for (int i = 1; i < HISTORY_MAX - 1; i++) {
+            float rel_fade = Math::InvLerp(0, HISTORY_START_OPACITY, opacity); // 0 is least faded, 1 is most faded
+            float stroke_width = Math::Lerp(HISTORY_WIDTH_MIN, HISTORY_WIDTH_MAX, rel_fade);
+            float height_offset = Math::Lerp(HISTORY_START_HEIGHT, HISTORY_END_HEIGHT, rel_fade);
+            
+        
             nvg::BeginPath();
-            nvg::MoveTo(Camera::ToScreenSpace(projectAngle(visState, HISTORY_START_OFFSET + start + length, historyTrail.getAtIdx(i).slip * theta_mult)));
-            nvg::LineTo(Camera::ToScreenSpace(projectAngle(visState, HISTORY_START_OFFSET + start + length, historyTrail.getAtIdx(i + 1).slip * theta_mult)));
+            nvg::MoveTo(Camera::ToScreenSpace(projectAngle(visState, height_offset + HISTORY_START_OFFSET + start + length, historyTrail.getAtIdx(i).slip * theta_mult)));
+            nvg::LineTo(Camera::ToScreenSpace(projectAngle(visState, height_offset + HISTORY_START_OFFSET + start + length, historyTrail.getAtIdx(i + 1).slip * theta_mult)));
             nvg::StrokeColor(ApplyOpacityToColor(historyTrail.getAtIdx(i).color,  playerFadeOpacity * opacity));
-            nvg::StrokeWidth(Math::Lerp(HISTORY_WIDTH_MIN, HISTORY_WIDTH_MAX, 1 - Math::InvLerp(0, HISTORY_START_OPACITY, opacity)));
+            nvg::StrokeWidth(stroke_width);
             nvg::LineCap(nvg::LineCapType::Round);
             nvg::Stroke();
             nvg::ClosePath();

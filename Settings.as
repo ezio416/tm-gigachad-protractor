@@ -319,7 +319,7 @@ bool RENDER_GEAR_HUD = true;
 bool HISTORY_ENABLED = true;
 
 [Setting category="History" name="Number of run history points to draw" drag min=100 max=1000]
-int HISTORY_MAX = 311; 
+int HISTORY_MAX = 400; 
 
 [Setting category="History" name="History min width" drag min=1 max=4]
 float HISTORY_WIDTH_MIN = 1.32;
@@ -328,11 +328,17 @@ float HISTORY_WIDTH_MIN = 1.32;
 float HISTORY_WIDTH_MAX = 12.13;
 
 [Setting category="History" name="Start opacity" drag min=0.05 max=1]
-float HISTORY_START_OPACITY = 0.526;
+float HISTORY_START_OPACITY = 0.115;
 
 [Setting category="History" name="Decay factor" drag min=1.01 max=10]
 float HISTORY_DECAY_FACTOR = 7.583;
 
-[Setting category="History" name="Start offset" drag min=0 max=3]
-float HISTORY_START_OFFSET = 1.5;
+[Setting category="History" name="Start base offset" drag min=0 max=3]
+float HISTORY_START_OFFSET = 1.09;
+
+[Setting category="History" name="Start offset" drag min=-3 max=10]
+float HISTORY_START_HEIGHT = 5.599;
+
+[Setting category="History" name="End offset" drag min=0 max=3]
+float HISTORY_END_HEIGHT = 0.289;
 
