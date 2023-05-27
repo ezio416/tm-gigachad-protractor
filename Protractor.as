@@ -200,6 +200,12 @@ class Protractor {
         }
     }
 
+    void _lineTo(vec3 p) {
+        if (!Camera::IsBehind(p)) {
+        nvg::LineTo(Camera::ToScreenSpace(p));
+        }
+    }
+
     void renderRegion(
         CSceneVehicleVisState @ visState,
         float start,
@@ -222,56 +228,39 @@ class Protractor {
 
         float diff = thetaEnd - thetaStart;
 
+        thetaStart += diff * ICE_REGIONS_INSET;
+        thetaEnd -= diff * ICE_REGIONS_INSET;
+
+        diff = thetaEnd - thetaStart;
+
+
         // We need to draw a shaded region by drawing a closed path outlining 
         // the "region" inbetwixt the lines of interest, then filling it. 
 
         float angle_per_point = (3.1415926535 * 2) / ICE_REGIONS_RESOLUTION;
         int points = Math::Abs(diff) / angle_per_point;
+        for (int i = 0; i < points; i++) {
+            nvg::BeginPath();
+            nvg::MoveTo(Camera::ToScreenSpace(projectOffset(visState, projectAngle(visState, start, thetaStart + (i * angle_per_point)), offset)));
+            _lineTo(projectOffset(visState, projectAngle(visState, start, thetaStart + ((i + 1 ) * angle_per_point)), offset));
+            _lineTo(projectOffset(visState, projectAngle(visState, start + length, thetaStart + ((i + 1 ) * angle_per_point)), offset));
+            _lineTo(projectOffset(visState, projectAngle(visState, start + length, thetaStart + ((i ) * angle_per_point)), offset));
+            _lineTo(projectOffset(visState, projectAngle(visState, start, thetaStart + ((i ) * angle_per_point)), offset));
+            nvg::FillColor(color);
+            nvg::Fill();
+            nvg::ClosePath();
+        }
 
         nvg::BeginPath();
-        nvg::MoveTo(Camera::ToScreenSpace(projectOffset(visState, projectAngle(visState, start, thetaStart), offset)));
-        vec3 p;
-        for (int i = 0; i < points; i++) {
-            p = projectOffset(visState, projectAngle(visState, start, thetaStart + (i * angle_per_point)), offset);
-            if (!Camera::IsBehind(p)) {
-                nvg::LineTo(Camera::ToScreenSpace(p));
-            }
-             
-        }
-
-        p = projectOffset(visState, projectAngle(visState, start, thetaEnd), offset);
-        if (!Camera::IsBehind(p)) {
-        nvg::LineTo(Camera::ToScreenSpace(p));
-        }
-        
-        p = projectOffset(visState, projectAngle(visState, start + length, thetaEnd), offset);
-        if (!Camera::IsBehind(p)) {
-        nvg::LineTo(Camera::ToScreenSpace(p));
-        }
-
-
-        for (int i = points; i > 0; i--) {
-            p = projectOffset(visState, projectAngle(visState, start + length, thetaStart + (i * angle_per_point)), offset);
-            if (!Camera::IsBehind(p)) {
-                nvg::LineTo(Camera::ToScreenSpace(p));
-            }
-        }
-
-        p = projectOffset(visState, projectAngle(visState, start + length, thetaStart), offset);
-        if (!Camera::IsBehind(p)) {
-        nvg::LineTo(Camera::ToScreenSpace(p));
-        }
-
-        p = projectOffset(visState, projectAngle(visState, start, thetaStart), offset);
-        if (!Camera::IsBehind(p)) {
-        nvg::LineTo(Camera::ToScreenSpace(p));
-        }
-        
-        
+        nvg::MoveTo(Camera::ToScreenSpace(projectOffset(visState, projectAngle(visState, start, thetaStart + (points * angle_per_point)), offset)));
+        _lineTo(projectOffset(visState, projectAngle(visState, start, thetaEnd), offset));
+        _lineTo(projectOffset(visState, projectAngle(visState, start + length, thetaEnd), offset));
+        _lineTo(projectOffset(visState, projectAngle(visState, start + length, thetaStart + ((points ) * angle_per_point)), offset));
+        _lineTo(projectOffset(visState, projectAngle(visState, start, thetaStart + ((points ) * angle_per_point)), offset));
         nvg::FillColor(color);
         nvg::Fill();
-        nvg::Stroke();
         nvg::ClosePath();
+
         return;
     }
 
@@ -612,6 +601,13 @@ class Protractor {
 
         color.w = 1;
 
+
+
+        renderIceGearLines(visState, vel, vec_vel, slip);
+        renderIceIdealAngle(visState, vel, vec_vel, slip);
+        renderIceCustomAngle1(visState, vel, vec_vel);
+        renderIceCustomAngle2(visState, vel, vec_vel);
+
         renderPlayerPointer( // player pointer
             visState,
             ICE_PP_S,
@@ -621,11 +617,6 @@ class Protractor {
             vec3(0, 0, 0),
             color
         );
-
-        renderIceGearLines(visState, vel, vec_vel, slip);
-        renderIceIdealAngle(visState, vel, vec_vel, slip);
-        renderIceCustomAngle1(visState, vel, vec_vel);
-        renderIceCustomAngle2(visState, vel, vec_vel);
     }
 
     vec4 io(vec4 color, float slip, float theta) {
@@ -650,11 +641,11 @@ class Protractor {
         renderRegion(
             visState,
             ICE_PP_S * 1.5,
-            ICE_PP_L * 1,
+            ICE_PP_L * 0.3,
             lines[0],
             lines[1],
             vec3(0, 0, 0),
-            ICE_IDEAL_ANGLE_COLOR
+            ICE_REGIONS_GOOD
         );
 
         float t;

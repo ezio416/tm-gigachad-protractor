@@ -291,6 +291,12 @@ bool ICE_REGIONS_SHOW = true;
 [Setting category="Ice" name="Resolution (points per circle)" drag min=2 max=300]
 int ICE_REGIONS_RESOLUTION = 80;
 
+[Setting category="Ice" name="Ice safe region color" color]
+vec4 ICE_REGIONS_GOOD = vec4(0, 1, 0, 0.5);
+
+[Setting category="Ice" name="Ice region inset frac" drag min=0 max=0.5]
+float ICE_REGIONS_INSET = 0.1;
+
 // [Setting category="Gear Display" name="Graph Width" drag min=50 max=2000]
 int graph_width = 100;
 
