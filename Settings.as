@@ -175,7 +175,7 @@ float BASE_THRESH = 0.5;
 bool DRAW_OUTER = true;
 
 [Setting category="General" name="Show gears in pointer line"] 
-bool SHOW_GEARS_IN_POINTER = true;
+bool SHOW_GEARS_IN_POINTER = false;
 
 [Setting category="General" name="Hide gears when in gear 5"]
 bool HIDE_GEAR_POINTER_FIFTH = true;
@@ -285,35 +285,41 @@ float ICE_LINE_FADE_RATE = 0.3;
 [Setting category="Ice" name="Ice ideal angle color" color]
 vec4 ICE_IDEAL_ANGLE_COLOR = vec4(0, 1, 0, 1);
 
-[Setting category="Gear Display" name="Graph Width" drag min=50 max=2000]
+[Setting category="Ice" name="Show regions"]
+bool ICE_REGIONS_SHOW = true;
+
+[Setting category="Ice" name="Resolution (points per circle)" drag min=2 max=300]
+int ICE_REGIONS_RESOLUTION = 80;
+
+// [Setting category="Gear Display" name="Graph Width" drag min=50 max=2000]
 int graph_width = 100;
 
-[Setting category="Gear Display" name="Graph Height" drag min=50 max=1000]
+// [Setting category="Gear Display" name="Graph Height" drag min=50 max=1000]
 int graph_height = 200;
 
-[Setting category="Gear Display" name="Graph X Offset" drag min=0 max=4000]
+// [Setting category="Gear Display" name="Graph X Offset" drag min=0 max=4000]
 int graph_x_offset = 32;
 
-[Setting category="Gear Display" name="Graph Y Offset" drag min=0 max=2000]
+// [Setting category="Gear Display" name="Graph Y Offset" drag min=0 max=2000]
 int graph_y_offset = 600;
 
-[Setting category="Gear Display" name="Border Radius" drag min=0 max=50]
+// [Setting category="Gear Display" name="Border Radius" drag min=0 max=50]
 float BorderRadius = 5.0f;
 
-[Setting category="Gear Display" name="Backdrop Color" color]
+// [Setting category="Gear Display" name="Backdrop Color" color]
 vec4 BackdropColor = vec4(0, 0, 0, 0.7f);
 
-[Setting category="Gear Display" name="Border Color" color]
+// [Setting category="Gear Display" name="Border Color" color]
 vec4 BorderColor = vec4(0, 0, 0, 1);
 
-[Setting category="Gear Display" name="Border Width" drag min=0 max=10]
+// [Setting category="Gear Display" name="Border Width" drag min=0 max=10]
 float BorderWidth = 1.0f;
 
-[Setting category="Gear Display" name="Milliseconds Averaged" drag min=200 max=1000]
+// [Setting category="Gear Display" name="Milliseconds Averaged" drag min=200 max=1000]
 int MILLISECONDS_AVERAGED = 250;
 
-[Setting category="Gear Display" name="Enable Gear Hud"]
-bool RENDER_GEAR_HUD = true;
+// [Setting category="Gear Display" name="Enable Gear Hud"]
+bool RENDER_GEAR_HUD = false;
 
 [Setting category="History" name="Enable run history view"]
 bool HISTORY_ENABLED = true;
@@ -333,7 +339,7 @@ float HISTORY_START_OPACITY = 0.115;
 [Setting category="History" name="Decay factor" drag min=1.01 max=10]
 float HISTORY_DECAY_FACTOR = 7.583;
 
-[Setting category="History" name="Start base offset" drag min=0 max=3]
+[Setting category="History" name="Start base offset" drag min=-3 max=3]
 float HISTORY_START_OFFSET = 1.09;
 
 [Setting category="History" name="Start offset" drag min=-3 max=10]
@@ -341,4 +347,7 @@ float HISTORY_START_HEIGHT = 5.599;
 
 [Setting category="History" name="End offset" drag min=0 max=3]
 float HISTORY_END_HEIGHT = 0.289;
+
+[Setting category="History" name="History distance factor" drag min=0.5 max=5]
+float HISTORY_DISTANCE_FACTOR = 1;
 
