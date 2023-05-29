@@ -207,7 +207,7 @@ bool PREVIEW_ICE = false;
 [Setting category="Preview" name="Preview speed" drag min=0 max=1000]
 float PREVIEW_SPEED = 500;
 
-[Setting category="Preview" name="Preview slip" drag min=-1.5 max=1.5]
+[Setting category="Preview" name="Preview slip" drag min=-3.14 max=3.14]
 float PREVIEW_SLIP = 0.1;
 
 [Setting category="Preview" name="Preview gear" drag min=1 max=5]
@@ -294,8 +294,48 @@ int ICE_REGIONS_RESOLUTION = 80;
 [Setting category="Ice" name="Ice safe region color" color]
 vec4 ICE_REGIONS_GOOD = vec4(0, 1, 0, 0.5);
 
-[Setting category="Ice" name="Ice region inset frac" drag min=0 max=0.5]
-float ICE_REGIONS_INSET = 0.1;
+[Setting category="Ice" name="Draw colored regions for safe zones"]
+bool ICE_REGIONS_RENDER = true;
+
+[Setting category="Ice" name="Draw outline over safe region"]
+bool ICE_REGION_OUTLINE_BOOL = false;
+ 
+[Setting category="Ice" name="Ice region outline color" color]
+vec4 ICE_REGIONS_OUTLINE = vec4(0, 0, 0, 0.5);
+ 
+[Setting category="Ice" name="Ice region outline thickness" drag min=0 max=5]
+float ICE_REGIONS_THICKNESS = 2;
+
+[Setting category="Ice" name="Ice region warning inset frac" drag min=0 max=0.5]
+float ICE_REGIONS_INSET = 0.023;
+
+[Setting category="Ice" name="Ice region start (relative to player pointer)" drag min=0 max=1]
+float ICE_REGION_START = 0.561;
+
+[Setting category="Ice" name="Ice region end (relative to player pointer)" drag min=0 max=1]
+float ICE_REGION_END = .891;
+
+[Setting category="Ice" name="Ice warning region color" color]
+vec4 ICE_REGIONS_WARNING = vec4(222, 235, 52, 255) / 255;
+
+[Setting category="Ice" name="Ice region inset frac" drag min=0 max=0.1]
+float ICE_REGIONS_EDGE_FRAC = 0.1;
+
+[Setting category="Ice" name="Ice radial root inset fraction" drag min=0 max=3]
+float ICE_REGIONS_RADIAL_INSET_FRAC = 0.887;
+
+[Setting category="Ice" name="Ice gradient inner diameter" drag min=0 max=200]
+float ICE_REGIONS_GRADIENT_INNER_DIAMETER = 23.656;
+
+[Setting category="Ice" name="Ice gradient outer diameter" drag min=0 max=200]
+float ICE_REGIONS_GRADIENT_OUTER_DIAMETER = 70.968;
+
+[Setting category="Ice" name="Ice radial dark color frac" drag min=0 max=1]
+float ICE_REGIONS_DARK_COLOR_FRAC = 1;
+
+[Setting category="Ice" name="Ice danger wedge color" color]
+vec4 ICE_REGIONS_DANGER_WEDGE_COLOR = vec4(1, 0, 0, 1);
+
 
 // [Setting category="Gear Display" name="Graph Width" drag min=50 max=2000]
 int graph_width = 100;
