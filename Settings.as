@@ -288,6 +288,9 @@ vec4 ICE_IDEAL_ANGLE_COLOR = vec4(0, 1, 0, 1);
 [Setting category="Ice" name="Show regions"]
 bool ICE_REGIONS_SHOW = true;
 
+[Setting category="Ice" name="Show gear lines"]
+bool ICE_GEAR_LINES_SHOW = false;
+
 [Setting category="Ice" name="Resolution (points per circle)" drag min=2 max=300]
 int ICE_REGIONS_RESOLUTION = 80;
 
@@ -319,7 +322,7 @@ float ICE_REGION_END = .891;
 vec4 ICE_REGIONS_WARNING = vec4(222, 235, 52, 255) / 255;
 
 [Setting category="Ice" name="Ice region inset frac" drag min=0 max=0.1]
-float ICE_REGIONS_EDGE_FRAC = 0.1;
+float ICE_REGIONS_EDGE_FRAC = 0;
 
 [Setting category="Ice" name="Ice radial root inset fraction" drag min=0 max=3]
 float ICE_REGIONS_RADIAL_INSET_FRAC = 0.887;

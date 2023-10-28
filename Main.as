@@ -15,9 +15,12 @@ string getMapUid() {
 }
 
 CSceneVehicleVisState@ getVisState() {
-  // auto l = VehicleState::GetAllVis(GetApp().GameScene);
-// return l[2].AsyncState;
-    return VehicleState::ViewingPlayerState();
+  int pidx = Math::Clamp(PLAYER_IDX, 0, VehicleState::GetAllVis(GetApp().GameScene).Length);
+  auto vs = VehicleState::GetAllVis(GetApp().GameScene)[pidx];
+  if (vs !is null) {
+    return vs.AsyncState;
+  }
+  return null;
 }
 
 void Render() {
@@ -51,3 +54,6 @@ void Main() {
 void OnSettingsChanged() {
   protractor.OnSettingsChanged();
 }
+
+[Setting category="General" name="Player index" drag min=0 max=10]
+int PLAYER_IDX = 0;
