@@ -222,7 +222,8 @@ class Protractor {
         vec4 outlineColor,
         float slip,
         float outlineThickness,
-        bool renderWarnZone
+        bool renderWarnZone,
+        float appliedOpacity
     ) {
  
         // this is to inset [not warning, just to make it look visually good]
@@ -246,11 +247,14 @@ class Protractor {
         vec2 innerPos = Camera::ToScreenSpace(projectAngle(visState, (start), ((thetaStart + thetaEnd) / 2)));
         vec2 radialParams = vec2((radialRoot - innerPos).Length(), (radialRoot - outermostPos).Length());
         radialParams /= 5;
+ 
+        fillColor = ApplyOpacityToColor(fillColor, appliedOpacity);
+        vec4 warnColor = ApplyOpacityToColor(ICE_REGIONS_WARNING, appliedOpacity);
 
         if (renderWarnZone) {
             _renderRegion(visState, start, length, inner_thetaStart, inner_thetaEnd, offset, fillColor, ICE_REGIONS_DARK_COLOR_FRAC, radialRoot, radialParams, outlineColor, outlineThickness);
-            _renderRegion(visState, start, length, thetaStart, inner_thetaStart, offset, ICE_REGIONS_WARNING, ICE_REGIONS_DARK_COLOR_FRAC, radialRoot, radialParams, vec4(0), outlineThickness);
-            _renderRegion(visState, start, length, inner_thetaEnd, thetaEnd, offset, ICE_REGIONS_WARNING, ICE_REGIONS_DARK_COLOR_FRAC, radialRoot, radialParams, vec4(0), outlineThickness);
+            _renderRegion(visState, start, length, thetaStart, inner_thetaStart, offset, warnColor, ICE_REGIONS_DARK_COLOR_FRAC, radialRoot, radialParams, vec4(0), outlineThickness);
+            _renderRegion(visState, start, length, inner_thetaEnd, thetaEnd, offset, warnColor, ICE_REGIONS_DARK_COLOR_FRAC, radialRoot, radialParams, vec4(0), outlineThickness);
         } else {
             _renderRegion(visState, start, length, thetaStart, thetaEnd, offset, fillColor, ICE_REGIONS_DARK_COLOR_FRAC, radialRoot, radialParams, outlineColor, outlineThickness);
 
@@ -785,9 +789,9 @@ class Protractor {
 
         if (ICE_REGIONS_RENDER) {
 
-            float appliedOpactiy;
+            float appliedOpacity;
             if (relativePos >= 0.5) {
-                appliedOpactiy = Math::Min(relativePos - 0.5, 1);
+                appliedOpacity = gearStateManager.getGearupMult();
                 renderRegion(
                     visState,
                     (ICE_PP_S + ICE_PP_L) * ICE_REGION_START,
@@ -795,11 +799,12 @@ class Protractor {
                     lines[0],
                     lines[1],
                     vec3(0, 0, 0),
-                    ApplyOpacityToColor(ICE_REGIONS_GOOD, appliedOpactiy),
-                    ApplyOpacityToColor(ICE_REGIONS_OUTLINE, appliedOpactiy),
+                    ApplyOpacityToColor(ICE_REGIONS_GOOD, appliedOpacity),
+                    ApplyOpacityToColor(ICE_REGIONS_OUTLINE, appliedOpacity),
                     slip,
                     ICE_REGIONS_THICKNESS,
-                    true
+                    true,
+                    appliedOpacity
                 );
                 renderRegion(
                     visState,
@@ -808,11 +813,12 @@ class Protractor {
                     lines[2],
                     lines[3],
                     vec3(0, 0, 0),
-                    ApplyOpacityToColor(ICE_REGIONS_GOOD, appliedOpactiy),
-                    ApplyOpacityToColor(ICE_REGIONS_OUTLINE, appliedOpactiy),
+                    ApplyOpacityToColor(ICE_REGIONS_GOOD, appliedOpacity),
+                    ApplyOpacityToColor(ICE_REGIONS_OUTLINE, appliedOpacity),
                     slip,
                     ICE_REGIONS_THICKNESS,
-                    true
+                    true,
+                    appliedOpacity
                 );
                 renderRegion(
                     visState,
@@ -821,16 +827,17 @@ class Protractor {
                     lines[1],
                     lines[2],
                     vec3(0, 0, 0),
-                    ApplyOpacityToColor(ICE_REGIONS_DANGER_WEDGE_COLOR, appliedOpactiy),
-                    ApplyOpacityToColor(ICE_REGIONS_OUTLINE, appliedOpactiy),
+                    ApplyOpacityToColor(ICE_REGIONS_DANGER_WEDGE_COLOR, appliedOpacity),
+                    ApplyOpacityToColor(ICE_REGIONS_OUTLINE, appliedOpacity),
                     slip,
                     ICE_REGIONS_THICKNESS,
-                    false
+                    false,
+                    appliedOpacity
                 );
 
             }
             else if (relativePos < 0.5) {
-                appliedOpactiy = Math::Min((0.5 - relativePos), 1);
+                appliedOpacity = Math::Min((0.5 - relativePos), 1);
                 renderRegion(
                     visState,
                     (ICE_PP_S + ICE_PP_L) * ICE_REGION_START,
@@ -838,11 +845,12 @@ class Protractor {
                     lines[0],
                     lines[1],
                     vec3(0, 0, 0),
-                    ApplyOpacityToColor(ICE_REGIONS_GOOD, appliedOpactiy),
-                    ApplyOpacityToColor(ICE_REGIONS_OUTLINE, appliedOpactiy),
+                    ApplyOpacityToColor(ICE_REGIONS_GOOD, appliedOpacity),
+                    ApplyOpacityToColor(ICE_REGIONS_OUTLINE, appliedOpacity),
                     slip,
                     ICE_REGIONS_THICKNESS,
-                    true
+                    true,
+                    appliedOpacity
                 );
             }
 

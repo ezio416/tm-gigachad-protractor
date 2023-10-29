@@ -16,7 +16,11 @@ string getMapUid() {
 
 CSceneVehicleVisState@ getVisState() {
   int pidx = Math::Clamp(PLAYER_IDX, 0, VehicleState::GetAllVis(GetApp().GameScene).Length);
-  auto vs = VehicleState::GetAllVis(GetApp().GameScene)[pidx];
+  auto arr = VehicleState::GetAllVis(GetApp().GameScene);
+  if (arr.Length == 0) {
+    return null;
+  }
+  auto vs = arr[pidx];
   if (vs !is null) {
     return vs.AsyncState;
   }
