@@ -339,6 +339,9 @@ float ICE_REGIONS_DARK_COLOR_FRAC = 1;
 [Setting category="Ice" name="Ice danger wedge color" color]
 vec4 ICE_REGIONS_DANGER_WEDGE_COLOR = vec4(1, 0, 0, 1);
 
+[Setting category="Ice" name="Hide history on ice"]
+bool HISTORY_HIDE_ON_ICE = true;
+
 
 // [Setting category="Gear Display" name="Graph Width" drag min=50 max=2000]
 int graph_width = 100;

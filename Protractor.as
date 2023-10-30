@@ -507,7 +507,10 @@ class Protractor {
 
     void renderPlayerPointer(CSceneVehicleVisState @ visState, float pointer_start, float pointer_length, float pointer_width, float theta, vec3 offset, vec4 color) {
 
-        if (HISTORY_ENABLED) {
+        if (HISTORY_ENABLED && 
+        (
+            RENDER_MODE != RenderMode::ICE || !HISTORY_HIDE_ON_ICE
+        )) {
             historyTrail.update(theta, color);
             renderHistoryTrail(visState, pointer_start, pointer_length, pointer_width);
         }

@@ -1,4 +1,6 @@
 Protractor @ protractor;
+DatabaseFunctions @ databasefunctions;
+
 float HALF_PI = 1.57079632679;
 float g_dt = 0;
 
@@ -31,6 +33,9 @@ void Render() {
   if (!g_visible) {
     return;
   }
+  if (databasefunctions.isMapSkipped(getMapUid())) {
+    return;
+  }
 
   if (protractor!is null) {
     auto app = GetApp();
@@ -50,9 +55,25 @@ void Update(float dt) {
   g_dt = dt;
 }
 
+void RenderMenu() {
+  if (UI::BeginMenu(((g_visible || databasefunctions.isMapSkipped(getMapUid())) ? "\\$393" : "\\$999") + Icons::Bars + "\\$z GigaChad Protractor", true)) {
+    if (UI::MenuItem(g_visible ? "\\$999" + Icons::Check + "\\$z Disable GCP" : "\\$393" + Icons::Check + "\\$z Enable GCP")) {
+      g_visible = !g_visible;
+    }
+    if (UI::MenuItem("Disable on this map")) {
+      databasefunctions.disableMap(getMapUid());
+    }
+    if (UI::MenuItem("Enable on this map")) {
+      databasefunctions.enableMap(getMapUid());
+    }
+    UI::EndMenu();
+  }
+}
+
 
 void Main() {
-  @protractor = Protractor();
+  @protractor = Protractor(); 
+  @databasefunctions = DatabaseFunctions();
 }
 
 void OnSettingsChanged() {
