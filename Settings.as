@@ -339,8 +339,6 @@ float ICE_REGIONS_DARK_COLOR_FRAC = 1;
 [Setting category="Ice" name="Ice danger wedge color" color]
 vec4 ICE_REGIONS_DANGER_WEDGE_COLOR = vec4(1, 0, 0, 1);
 
-[Setting category="Ice" name="Hide history on ice"]
-bool HISTORY_HIDE_ON_ICE = true;
 
 
 // [Setting category="Gear Display" name="Graph Width" drag min=50 max=2000]
@@ -403,3 +401,5 @@ float HISTORY_END_HEIGHT = 0.289;
 [Setting category="History" name="History distance factor" drag min=0.5 max=5]
 float HISTORY_DISTANCE_FACTOR = 1;
 
+[Setting category="Ice" name="Hide history on ice"]
+bool HISTORY_HIDE_ON_ICE = true;

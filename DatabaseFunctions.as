@@ -1,6 +1,5 @@
 class DatabaseFunctions {
-    string database_filename = "MultisurfaceAccelerationTool.db";
-    SQLite::Database@ database = SQLite::Database(IO::FromDataFolder("gcp.db"));
+    SQLite::Database@ database = SQLite::Database(IO::FromStorageFolder("gcp.db"));
 
     string prev_map;
     bool prev_res;
