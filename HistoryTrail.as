@@ -12,7 +12,6 @@ class HistoryTrail {
 
     void update(float slip, vec4 color) {
         uint64 now = Time::Now;
-        print((HISTORY_SECONDS / float(HISTORY_POINTS)) * 1000);
         if ((now - lastUpdateTime) > (HISTORY_SECONDS / float(HISTORY_POINTS)) * 1000) {
             historyTrailArr[cur_idx].update(slip, color);
             cur_idx = calcNext(1);
