@@ -608,8 +608,8 @@ class Protractor {
         for (int i = (SIMPLIFIED_VIEW ? -1 : 1); i <= 1; i += 2) {
             off.z = (i * SIMPLIFIED_VIEW_Z);
             opacity = HISTORY_START_OPACITY;
-            for (int i = 1; i < HISTORY_MAX - 2; i++) {
-                next_opacity = opacity * (1.0 - (1.0 / HISTORY_MAX)) ** HISTORY_DECAY_FACTOR; //- (1 / (HISTORY_MAX * 10));
+            for (int i = 1; i < HISTORY_POINTS - 2; i++) {
+                next_opacity = opacity * (1.0 - (1.0 / HISTORY_POINTS)) ** HISTORY_DECAY_FACTOR; //- (1 / (HISTORY_POINTS * 10));
 
                 rel_fade = Math::InvLerp(0, HISTORY_START_OPACITY, opacity);
                 stroke_width = Math::Lerp(HISTORY_WIDTH_MIN, HISTORY_WIDTH_MAX, rel_fade);

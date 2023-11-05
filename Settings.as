@@ -374,8 +374,11 @@ bool RENDER_GEAR_HUD = false;
 [Setting category="History" name="Enable run history view"]
 bool HISTORY_ENABLED = true;
 
-[Setting category="History" name="Number of run history points to draw" drag min=100 max=1000]
-int HISTORY_MAX = 400; 
+[Setting category="History" name="Number of run history points to draw" drag min=1 max=100]
+int HISTORY_POINTS = 60;
+
+[Setting category="History" name="Amount of time to show in history (in seconds)" drag min=0.5 max=5]
+float HISTORY_SECONDS = 1; 
 
 [Setting category="History" name="History min width" drag min=1 max=4]
 float HISTORY_WIDTH_MIN = 1.32;
