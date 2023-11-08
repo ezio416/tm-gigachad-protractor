@@ -146,12 +146,10 @@ array<vec2> bw_dirt_zero = {
 };
 
 array<vec2> bw_tarmac_ideal = {
-    vec2(0, 2.3),
-    vec2(55, 2.4),
-    vec2(60, 2.7),
-    vec2(70, 2.8),
-    vec2(90, 2.9),
-    vec2(130, 3.1)
+    vec2(0, 3.5),
+    vec2(31, 5.4),
+    vec2(40, 8.0),
+    vec2(130, 8.2)
 };
 
 array<vec2> bw_tarmac_zero = {
