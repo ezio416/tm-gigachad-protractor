@@ -21,6 +21,14 @@ array<vec2> tarmac_ideal = {
     vec2(280, 5.85)
 };
 
+array<vec2> tarmac_base = {
+    vec2(111, 6.6),
+    vec2(150.95, 8.920),
+    vec2(244, 13.8), 
+    vec2(265, 15.04),
+    vec2(277.5, 15.75)
+};
+
 array<vec2> tarmac_zero = {
     vec2(111, 11.32),
     vec2(112.64, 11.938),
@@ -33,11 +41,20 @@ array<vec2> tarmac_zero = {
     vec2(277.5, 27.184)
 };
 
+
+
 array<vec2> dirt_ideal = {
     vec2(55, 1.0),
     vec2(100, 1.5),
     vec2(202, 2.15),
     vec2(250, 2.15)
+};
+
+array<vec2> dirt_base = {
+    vec2(55, 4),
+    vec2(86.6, 7.25),
+    vec2(216, 20.13),
+    vec2(250, 21.39)
 };
 
 array<vec2> dirt_zero = {
@@ -62,6 +79,15 @@ array<vec2> plastic_ideal = {
     vec2(250, 2)
 };
 
+array<vec2> plastic_base = {
+    vec2(55, 12),
+    vec2(91.6, 17.65),
+    vec2(106, 18.3),
+    vec2(120, 23.8),
+    vec2(165, 29.5),
+    vec2(275, 36)
+};
+
 array<vec2> plastic_zero = {
     vec2(55, 12.5),
     vec2(70, 16.6),
@@ -73,6 +99,7 @@ array<vec2> plastic_zero = {
     vec2(277.5, 41.45)
 };
 
+
 array<vec2> grass_ideal = {
     vec2(55, 1.0),
     vec2(80, 1.365),
@@ -81,6 +108,13 @@ array<vec2> grass_ideal = {
     vec2(180, 2.0),
     vec2(216, 2.4),
     vec2(250, 2.8)
+};
+
+array<vec2> grass_base = {
+    vec2(55, 4),
+    vec2(86.6, 7.25),
+    vec2(216, 20.13),
+    vec2(250, 21.39)
 };
 
 array<vec2> grass_zero = {
@@ -146,6 +180,6 @@ array<vec2> bw_grass_zero = {
 };
 
 float backwards_min = 15;
-float tarmac_min = 400 / 3.6;
+float tarmac_min = 395 / 3.6;
 float other_min = 200 / 3.6;
 

@@ -458,39 +458,39 @@ class Protractor {
         if (visState.FrontSpeed < 0 || (isPreview() && PREVIEW_SPEED < 0)) {
             RENDER_MODE = RenderMode::BACKWARDS;
             if (isGrassSurface(surface_normalized)) {
-                renderSurface(visState, vel, vec_vel, backwards_min, bw_grass_ideal, bw_grass_zero);
+                renderSurface(visState, vel, vec_vel, backwards_min, bw_grass_ideal, array<vec2>(), bw_grass_zero);
                 return;
             }
             if (isDirtSurface(surface_normalized)) {
-                renderSurface(visState, vel, vec_vel, backwards_min, bw_dirt_ideal, bw_dirt_zero);
+                renderSurface(visState, vel, vec_vel, backwards_min, bw_dirt_ideal, array<vec2>(), bw_dirt_zero);
                 return;
             }
             if (isPlasticSurface(surface_normalized)) {
                 // just using grass ideals for plastic BW for now
-                renderSurface(visState, vel, vec_vel, backwards_min, bw_grass_ideal, bw_grass_zero);
+                renderSurface(visState, vel, vec_vel, backwards_min, bw_grass_ideal, array<vec2>(), bw_grass_zero);
                 return;
             }
             if (isTarmacSurface(surface_normalized)) {
-                renderSurface(visState, vel, vec_vel, backwards_min, bw_tarmac_ideal, bw_tarmac_zero);
+                renderSurface(visState, vel, vec_vel, backwards_min, bw_tarmac_ideal, array<vec2>(), bw_tarmac_zero);
                 return;
             }
         }
 
         RENDER_MODE = RenderMode::NORMAL;
         if (isGrassSurface(surface_normalized)) {
-            renderSurface(visState, vel, vec_vel, other_min, grass_ideal, grass_zero);
+            renderSurface(visState, vel, vec_vel, other_min, grass_ideal, grass_base, grass_zero);
             return;
         }
         if (isDirtSurface(surface_normalized)) {
-            renderSurface(visState, vel, vec_vel, other_min, dirt_ideal, dirt_zero);
+            renderSurface(visState, vel, vec_vel, other_min, dirt_ideal, dirt_base, dirt_zero);
             return;
         }
         if (isPlasticSurface(surface_normalized)) {
-            renderSurface(visState, vel, vec_vel, other_min, plastic_ideal, plastic_zero);
+            renderSurface(visState, vel, vec_vel, other_min, plastic_ideal, plastic_base, plastic_zero);
             return;
         }
         if (isTarmacSurface(surface_normalized)) {
-            renderSurface(visState, vel, vec_vel, tarmac_min, tarmac_ideal, tarmac_zero);
+            renderSurface(visState, vel, vec_vel, tarmac_min, tarmac_ideal, tarmac_base, tarmac_zero);
             return;
         }
     }
@@ -1007,11 +1007,11 @@ class Protractor {
         return vec2(start, length);
     }
 
-    void renderSurface(CSceneVehicleVisState @ visState, float speed, vec3 vec_vel, float min_vel, array < vec2 > ideal_ss, array < vec2 > zero_ss) {
-        float target_ss = approximateSideSpeed(ideal_ss, speed);
-        float outer_ss = approximateSideSpeed(zero_ss, speed);
+    void renderSurface(CSceneVehicleVisState @ visState, float speed, vec3 vec_vel, float min_vel, array < vec2 > ideal_config, array < vec2 > base_config,  array < vec2 > zero_config) {
+        float target_ss = approximateSideSpeed(ideal_config, speed);
+        float outer_ss = approximateSideSpeed(zero_config, speed);
+        float base_ss = approximateSideSpeed(base_config, speed);
         float good_ss = Math::Lerp(outer_ss, target_ss, GOOD_THRESH);
-        float base_ss = Math::Lerp(outer_ss, target_ss, BASE_THRESH);
         float slip = previewSlip(getSlipSmoothed(visState.Left, vec_vel));
         float sideSpeed = speed * Math::Sin(previewSlip(Math::Angle(visState.Dir, vec_vel)));
         float abs_sidespeed = Math::Abs(sideSpeed);

@@ -168,6 +168,9 @@ return null;
 }
 
 float lerpToMidpoint(array<vec2> points, float c) {
+  if (points.Length == 0) {
+    return 0;
+  }
     vec2 lower = points[0];
     vec2 upper = points[points.Length - 1];
 
@@ -193,6 +196,9 @@ float lerpToMidpoint(array<vec2> points, float c) {
 }
 
 float approximateSideSpeed(const array<vec2> data, float speed) {
+  if (data.Length == 0) {
+    return 0;
+  }
     vec2 lower = data[0];
     vec2 upper = data[data.Length - 1];
     for (uint i = 0; i < data.Length; i++) {
