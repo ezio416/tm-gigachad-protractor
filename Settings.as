@@ -406,3 +406,9 @@ float HISTORY_DISTANCE_FACTOR = 1;
 
 [Setting category="Ice" name="Hide history on ice"]
 bool HISTORY_HIDE_ON_ICE = true;
+
+[Setting category="Advanced" name="Perspective constant" drag min=1 max=20]
+float PERSPECTIVE_CONSTANT = 7;
+
+[Setting category="Advanced" name="History Perspective constant" drag min=0.5 max=40]
+float HISTORY_PERSPECTIVE_CONSTANT = 30;

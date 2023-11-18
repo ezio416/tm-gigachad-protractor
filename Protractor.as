@@ -187,13 +187,15 @@ class Protractor {
 
             if (Camera::IsBehind(v_start) || Camera::IsBehind(v_end)) {
                 return;
-            }
-
+            } 
+            vec3 cameraDist = v_start - Camera::GetCurrentPosition();
+            float rendered_width = width / cameraDist.Length();
+            rendered_width *= PERSPECTIVE_CONSTANT; // normalizes width to pixels, approximately, based on vibes
             nvg::BeginPath();
             nvg::MoveTo(Camera::ToScreenSpace(v_start));
             nvg::LineTo(Camera::ToScreenSpace(v_end));
             nvg::StrokeColor(ApplyOpacityToColor(color, playerFadeOpacity));
-            nvg::StrokeWidth(width);
+            nvg::StrokeWidth(rendered_width);
             nvg::LineCap(nvg::LineCapType::Round);
             nvg::Stroke();
             nvg::ClosePath();
@@ -633,11 +635,16 @@ class Protractor {
                     continue;
                 }
 
+                vec3 cameraDist = start_p - Camera::GetCurrentPosition();
+                float rendered_width = stroke_width / cameraDist.Length();
+                rendered_width *= HISTORY_PERSPECTIVE_CONSTANT; // normalizes width to pixels, approximately, based on vibes
+
+
                 nvg::BeginPath();
                 nvg::MoveTo(Camera::ToScreenSpace(start_p));
                 nvg::LineTo(Camera::ToScreenSpace(end_p));
                 nvg::StrokeColor(ApplyOpacityToColor(historyTrail.getAtIdx(i).color, playerFadeOpacity * opacity));
-                nvg::StrokeWidth(stroke_width);
+                nvg::StrokeWidth(rendered_width);
                 nvg::LineCap(nvg::LineCapType::Round);
                 nvg::Stroke();
                 nvg::ClosePath();
