@@ -61,7 +61,7 @@ float PLASTIC_TM = 4;
 float BACKWARDS_TM = 1;
 
 [Setting category="Theta mults" name="Wood Theta Mult" drag min=0.1 max=2]
-float WOOD_TM = 2;
+float WOOD_TM = 1;
 
 [Setting category="Advanced" name="Advanced: Theta mult derivative" drag min=0.1 max=0.5]
 float THETA_MULT_DERIVATIVE = 0.35;
