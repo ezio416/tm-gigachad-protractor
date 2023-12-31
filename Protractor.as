@@ -476,6 +476,7 @@ class Protractor {
                 renderSurface(visState, vel, vec_vel, backwards_min, bw_tarmac_ideal, array<vec2>(), bw_tarmac_zero);
                 return;
             }
+
         }
 
         RENDER_MODE = RenderMode::NORMAL;
@@ -493,6 +494,11 @@ class Protractor {
         }
         if (isTarmacSurface(surface_normalized)) {
             renderSurface(visState, vel, vec_vel, tarmac_min, tarmac_ideal, tarmac_base, tarmac_zero);
+            return;
+        }
+
+        if (isWoodSurface(surface_normalized)) {
+            renderSurface(visState, vel, vec_vel, wood_min, wood_p1, wood_valley, wood_p2);
             return;
         }
     }
@@ -1019,6 +1025,7 @@ class Protractor {
         float outer_ss = approximateSideSpeed(zero_config, speed);
         float base_ss = approximateSideSpeed(base_config, speed);
         float good_ss = Math::Lerp(outer_ss, target_ss, GOOD_THRESH);
+
         float slip = previewSlip(getSlipSmoothed(visState.Left, vec_vel));
         float sideSpeed = speed * Math::Sin(previewSlip(Math::Angle(visState.Dir, vec_vel)));
         float abs_sidespeed = Math::Abs(sideSpeed);

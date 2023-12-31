@@ -177,7 +177,32 @@ array<vec2> bw_grass_zero = {
     vec2(130, 27.4)
 };
 
+array<vec2> wood_p1 = {
+    vec2(13.23, 0.0792),
+    vec2(48.96, 3.25),
+    vec2(55.32, 4.23),
+    vec2(58, 7.35),
+    vec2(116, 8.6),
+    vec2(274.5, 10.20)
+};
+
+array<vec2> wood_valley = {
+    vec2(11.9, 4.74),
+    vec2(26.0, 10.21),
+    vec2(207.15, 81),
+    vec2(277.8, 108.3)
+};
+array<vec2> wood_p2 = {
+    vec2(11.3, 7.3),
+    vec2(87.8, 58.54),
+    vec2(136.86, 90.68),
+    vec2(177.5, 116.4),
+    vec2(276.6, 159.90)
+};
+
+
 float backwards_min = 15;
 float tarmac_min = 395 / 3.6;
 float other_min = 200 / 3.6;
+float wood_min = 10;
 

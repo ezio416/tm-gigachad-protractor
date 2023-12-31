@@ -6,6 +6,11 @@ bool isIceSurface(EPlugSurfaceMaterialId surface) {
       surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Snow;
 }
 
+bool isWoodSurface(EPlugSurfaceMaterialId surface) {
+  return 
+    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Wood || 
+    surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::SlidingWood;
+}
 
 bool isPlasticSurface(EPlugSurfaceMaterialId surface) {
   return 
@@ -45,7 +50,8 @@ bool isSupportedSurface(EPlugSurfaceMaterialId surface) {
   return isPlasticSurface(surface) ||
     isIceSurface(surface) ||
     isDirtSurface(surface) ||
-    isGrassSurface(surface);
+    isGrassSurface(surface) || 
+    isWoodSurface(surface);
 }
 
 vec4 ApplyOpacityToColor(vec4 inColor, float opacity) {
@@ -137,6 +143,9 @@ float getThetaMultForSurface(EPlugSurfaceMaterialId surface) {
   }
   if (isPlasticSurface(surface)) {
     return PLASTIC_TM; 
+  }
+  if (isWoodSurface(surface)) {
+    return WOOD_TM;
   }
   return -1000;
 }
