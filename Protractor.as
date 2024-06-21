@@ -23,6 +23,8 @@ class Protractor {
 
     float gearPointerFlip = 1;
 
+    bool activeWood = false;
+
     GearStateManager gearStateManager();
     ForwardProjection fowardProjection();
     HistoryTrail historyTrail();
@@ -498,6 +500,7 @@ class Protractor {
         }
 
         if (isWoodSurface(surface_normalized)) {
+            activeWood = true;
             renderSurface(visState, vel, vec_vel, wood_min, wood_p1, wood_valley, wood_p2);
             return;
         }
