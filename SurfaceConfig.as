@@ -200,6 +200,28 @@ array<vec2> wood_p2 = {
     vec2(276.6, 159.90)
 };
 
+array<vec2> wood_wet_ice_p1 = {
+    vec2(13.23, 0),
+    vec2(48.96, 0),
+    vec2(55.32, 0),
+    vec2(58, 0),
+    vec2(116, 0),
+    vec2(274.5, 10)
+};
+
+array<vec2> wood_wet_ice_valley = {
+    vec2(10, 4.34),
+    vec2(400, 173.986213644)
+};
+array<vec2> wood_wet_ice_p2 = {
+    vec2(4.7, 3.6),
+    vec2(78.74, 56.52),
+    vec2(189.4, 125.0),
+    vec2(253.8, 157.6),
+    vec2(271.1, 165.6)
+};
+
+
 
 float backwards_min = 15;
 float tarmac_min = 395 / 3.6;

@@ -499,9 +499,13 @@ class Protractor {
             return;
         }
 
-        if (isWoodSurface(surface_normalized)) {
+        if (isWoodSurface(surface_normalized) && visState.WetnessValue01 > 0) {
             activeWood = true;
-            renderSurface(visState, vel, vec_vel, wood_min, wood_p1, wood_valley, wood_p2);
+            if ((visState.FLIcing01 + visState.FRIcing01 + visState.RLIcing01 + visState.RRIcing01) > 0) {
+                renderSurface(visState, vel, vec_vel, wood_min, wood_wet_ice_p1, wood_wet_ice_valley, wood_wet_ice_p2, false);
+            } else {
+                renderSurface(visState, vel, vec_vel, wood_min, wood_p1, wood_valley, wood_p2);
+            }
             return;
         }
     }
@@ -530,7 +534,6 @@ class Protractor {
         if (BAD_SLIDE && SHOW_BAD_SLIDE && !isPreview()) {
             color = COLOR_50;
         }
-
         renderAngle( // player pointer
             visState,
             pointer_start,
@@ -992,13 +995,13 @@ class Protractor {
         return ret / SLIP_SMOOTHING;
     }
 
-    array < vec2 > getLinesToBeRendered(float ideal, float good, float base, float outer) {
+    array < vec2 > getLinesToBeRendered(float ideal, float good, float base, float outer, bool draw_good) {
         array < vec2 > out_arr;
         if (SIMPLIFIED_VIEW) {
             return out_arr;
         }
         out_arr.InsertLast(vec2(ideal, 0));
-        if (DRAW_GOOD)
+        if (DRAW_GOOD && draw_good)
             out_arr.InsertLast(vec2(good, 1));
         if (DRAW_BASE)
             out_arr.InsertLast(vec2(base, 2));
@@ -1024,6 +1027,9 @@ class Protractor {
     }
 
     void renderSurface(CSceneVehicleVisState @ visState, float speed, vec3 vec_vel, float min_vel, array < vec2 > ideal_config, array < vec2 > base_config,  array < vec2 > zero_config) {
+        renderSurface(visState, speed, vec_vel, min_vel, ideal_config, base_config, zero_config, true); 
+    }
+    void renderSurface(CSceneVehicleVisState @ visState, float speed, vec3 vec_vel, float min_vel, array < vec2 > ideal_config, array < vec2 > base_config,  array < vec2 > zero_config, bool show_good_ss) {
         float target_ss = approximateSideSpeed(ideal_config, speed);
         float outer_ss = approximateSideSpeed(zero_config, speed);
         float base_ss = approximateSideSpeed(base_config, speed);
@@ -1034,7 +1040,7 @@ class Protractor {
         float abs_sidespeed = Math::Abs(sideSpeed);
 
         vec2 startAndLength = getStartAndLength();
-        array < vec2 > targets = getLinesToBeRendered(target_ss, good_ss, base_ss, outer_ss);
+        array < vec2 > targets = getLinesToBeRendered(target_ss, good_ss, base_ss, outer_ss, show_good_ss);
 
         renderPlayerPointer(
             visState,
@@ -1056,7 +1062,7 @@ class Protractor {
                 OP_RES = -1;
             }
         } else {
-            if (getSlipTotal(visState) == 0) {
+            if (getSlipTotal(visState) == 0 && !(isWoodSurface(visState.FLGroundContactMaterial) && visState.FLIcing01 > 0 && visState.WetnessValue01 > 0)) {
                 if (SHOW_BAD_SLIDE) {
                     OP_RES = 1;
                     BAD_SLIDE = true;
