@@ -221,6 +221,23 @@ array<vec2> wood_wet_ice_p2 = {
     vec2(271.1, 165.6)
 };
 
+array<vec2> rally_ice_peak = {
+    vec2(1.0, 0),
+    vec2(400, 0.0)
+};
+
+array<vec2> rally_ice_zero = {
+    vec2(17.6, 0),
+    vec2(44.425, 18.1), 
+    vec2(57.34, 23.92),
+    vec2(80.4, 38.25)
+};
+
+array<vec2> rally_ice_slideout = {
+    vec2(1, 0.717),
+    vec2(50.5, 41.325),
+    vec2(400, 329.95)
+};
 
 
 float backwards_min = 15;

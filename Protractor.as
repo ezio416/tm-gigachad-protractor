@@ -453,7 +453,7 @@ class Protractor {
         gearStateManager.handleUpdate(slipAngle, vel,
             (isPreview() ? PREVIEW_GEAR : visState.CurGear), VehicleState::GetRPM(visState));
 
-        if (isIceSurface(surface_normalized) && visState.FLIcing01 > 0) {
+        if ((VehicleState::GetVehicleType(visState) ==  VehicleState::VehicleType::CarSport && !RALLY_CAR_OVERRIDE) && isIceSurface(surface_normalized) && visState.FLIcing01 > 0) {
             RENDER_MODE = RenderMode::ICE;
             renderIce(visState, vel, vec_vel);
             return;
@@ -497,6 +497,12 @@ class Protractor {
         if (isTarmacSurface(surface_normalized)) {
             renderSurface(visState, vel, vec_vel, tarmac_min, tarmac_ideal, tarmac_base, tarmac_zero);
             return;
+        }
+
+        if (isIceSurface(surface_normalized)) {
+            if (VehicleState::GetVehicleType(visState) ==  VehicleState::VehicleType::CarRally || RALLY_CAR_OVERRIDE) {
+                renderSurface(visState, vel, vec_vel, 10, rally_ice_peak, rally_ice_zero, rally_ice_slideout, false);
+            }
         }
 
         if (isWoodSurface(surface_normalized) && visState.WetnessValue01 > 0) {

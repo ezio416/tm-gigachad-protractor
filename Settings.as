@@ -415,3 +415,6 @@ float PERSPECTIVE_CONSTANT = 7;
 
 [Setting category="Advanced" name="History Perspective constant" drag min=0.5 max=40]
 float HISTORY_PERSPECTIVE_CONSTANT = 30;
+
+[Setting category="Overrides" name="Is Rally Car"]
+bool RALLY_CAR_OVERRIDE = true;
