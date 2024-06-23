@@ -17,6 +17,9 @@ string getMapUid() {
 }
 
 CSceneVehicleVisState@ getVisState() {
+  if (PLAYER_IDX == 0) {
+    return VehicleState::ViewingPlayerState();
+  }
   int pidx = Math::Clamp(PLAYER_IDX, 0, VehicleState::GetAllVis(GetApp().GameScene).Length);
   auto arr = VehicleState::GetAllVis(GetApp().GameScene);
   if (arr.Length == 0) {

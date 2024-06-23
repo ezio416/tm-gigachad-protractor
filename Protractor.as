@@ -410,6 +410,8 @@ class Protractor {
             surface_normalized = EPlugSurfaceMaterialId::Grass;
         } else if (PREVIEW_ICE) {
             surface_normalized = EPlugSurfaceMaterialId::Ice;
+        } else if (PREVIEW_WOOD) {
+            surface_normalized = EPlugSurfaceMaterialId::Wood;
         } else {
             if (visState.FLGroundContactMaterial != EPlugSurfaceMaterialId::XXX_Null) {
                 surface_normalized = visState.FLGroundContactMaterial;
@@ -445,7 +447,6 @@ class Protractor {
         }
 
         vec3 vec_vel = visState.WorldVel / vel;
-
         if (vel < 10) {
             return;
         }
@@ -504,10 +505,9 @@ class Protractor {
                 renderSurface(visState, vel, vec_vel, 10, rally_ice_peak, rally_ice_zero, rally_ice_slideout, false);
             }
         }
-
-        if (isWoodSurface(surface_normalized) && visState.WetnessValue01 > 0) {
+        if (isWoodSurface(surface_normalized) && (PREVIEW_WET || visState.WetnessValue01 > 0)) {
             activeWood = true;
-            if ((visState.FLIcing01 + visState.FRIcing01 + visState.RLIcing01 + visState.RRIcing01) > 0) {
+            if (PREVIEW_ICY || ((visState.FLIcing01 + visState.FRIcing01 + visState.RLIcing01 + visState.RRIcing01) > 0)) {
                 renderSurface(visState, vel, vec_vel, wood_min, wood_wet_ice_p1, wood_wet_ice_valley, wood_wet_ice_p2, false);
             } else {
                 renderSurface(visState, vel, vec_vel, wood_min, wood_p1, wood_valley, wood_p2);

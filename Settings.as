@@ -207,6 +207,9 @@ bool PREVIEW_PLASTIC = false;
 [Setting category="Preview" name="Preview ice"]
 bool PREVIEW_ICE = false; 
 
+[Setting category="Preview" name="Preview wood"]
+bool PREVIEW_WOOD = false; 
+
 [Setting category="Preview" name="Preview speed" drag min=0 max=1000]
 float PREVIEW_SPEED = 500;
 
@@ -215,6 +218,12 @@ float PREVIEW_SLIP = 0.1;
 
 [Setting category="Preview" name="Preview gear" drag min=1 max=5]
 int PREVIEW_GEAR = 5;
+
+[Setting category="Preview" name="Wet Preview"]
+bool PREVIEW_WET = false;
+
+[Setting category="Preview" name="Icy Preview"]
+bool PREVIEW_ICY = false;
 
 [Setting category="General" name="Show full gear lines on ice"]
 bool SHOW_VERBOSE_GEARS_ICE = false;
