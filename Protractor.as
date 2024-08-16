@@ -501,8 +501,11 @@ class Protractor {
         }
 
         if (isIceSurface(surface_normalized)) {
-            if (VehicleState::GetVehicleType(visState) ==  VehicleState::VehicleType::CarRally || RALLY_CAR_OVERRIDE) {
+            if (VehicleState::GetVehicleType(visState) ==  VehicleState::VehicleType::CarRally) {
                 renderSurface(visState, vel, vec_vel, 10, rally_ice_peak, rally_ice_zero, rally_ice_slideout, false);
+            }
+            if (VehicleState::GetVehicleType(visState) ==  VehicleState::VehicleType::CarDesert) {
+                renderSurface(visState, vel, vec_vel, 10, desert_ice_peak, desert_ice_zero, desert_ice_backpeak, false);
             }
         }
         if (isWoodSurface(surface_normalized) && (PREVIEW_WET || visState.WetnessValue01 > 0)) {

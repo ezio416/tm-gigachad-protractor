@@ -240,6 +240,30 @@ array<vec2> rally_ice_slideout = {
 };
 
 
+array<vec2> desert_ice_peak = {
+    vec2(2.125, 0.2),
+    vec2(15, .4),
+    vec2(28, .9),
+    vec2(31, .3),
+    vec2(104, .7),
+    vec2(187.7, 1),
+    vec2(272.6, 86.8)
+};
+
+array<vec2> desert_ice_zero = {
+    vec2(2.5, 1.8),
+    vec2(70.5, 64.8),
+    vec2(108, 107.75),
+    vec2(170, 165.95)
+};
+
+array<vec2> desert_ice_backpeak = {
+    vec2(2.5, 0.2),
+    vec2(84.2, 79.5),
+    vec2(116.75, 115.6)
+};
+
+
 float backwards_min = 15;
 float tarmac_min = 395 / 3.6;
 float other_min = 200 / 3.6;
