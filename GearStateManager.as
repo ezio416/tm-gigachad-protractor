@@ -68,11 +68,11 @@ class GearStateManager {
     }
 
     float getGearupMult() {
-        return Math::Min(Math::InvLerp(GEARUP_RPM_THRESH + 500, GEARUP_RPM_THRESH + 3000, expectedTrueRpm), 1);;
+        return Math::Min(Math::InvLerp(GEARUP_RPM_THRESH + 500, GEARUP_RPM_THRESH + 3000, int(expectedTrueRpm)), 1);;
     }
 
     float getGeardownMult() {
-        return Math::Min(Math::InvLerp(GEARDOWN_RPM_THRESH, GEARDOWN_RPM_THRESH - 3000, expectedTrueRpm), 1);
+        return Math::Min(Math::InvLerp(GEARDOWN_RPM_THRESH, GEARDOWN_RPM_THRESH - 3000, int(expectedTrueRpm)), 1);
     }
 
     float getScoreMax() {
@@ -102,7 +102,7 @@ class GearStateManager {
             for (int i = 0; i < FRAMES_AVERAGED; i++) {
                 sum += frame_times[i];
             }
-            FRAMES_AVERAGED = MILLISECONDS_AVERAGED / (sum / FRAMES_AVERAGED);
+            FRAMES_AVERAGED = int(MILLISECONDS_AVERAGED / (sum / FRAMES_AVERAGED));
         }
         return r;
     }

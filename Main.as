@@ -6,9 +6,9 @@ float g_dt = 0;
 
 string getMapUid() {
   auto app = cast < CTrackMania > (GetApp());
-  if (app != null) {
-    if (app.RootMap != null) {
-      if (app.RootMap.MapInfo != null) {
+  if (app !is null) {
+    if (app.RootMap !is null) {
+      if (app.RootMap.MapInfo !is null) {
         return app.RootMap.MapInfo.MapUid;
       }
     }

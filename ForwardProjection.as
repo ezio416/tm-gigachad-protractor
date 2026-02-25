@@ -63,14 +63,14 @@ class ForwardProjection {
             pos += vs[0];
             nexts.InsertLast(pos);
 
-            for (int i = 0; i < NUM_DERIVATIVES - 1; i++) {
-                vs[i] += vs[i + 1];
+            for (int j = 0; j < NUM_DERIVATIVES - 1; j++) {
+                vs[j] += vs[j + 1];
             }
         }
 
         nvg::BeginPath();
         nvg::MoveTo(Camera::ToScreenSpace(nexts[NOODLEBOB_START_OFFSET]));
-        for (int i = NOODLEBOB_START_OFFSET + 1; i < nexts.Length; i++) {
+        for (uint i = NOODLEBOB_START_OFFSET + 1; i < nexts.Length; i++) {
             nvg::LineTo(Camera::ToScreenSpace(nexts[i]));
         }
         nvg::StrokeColor(NOODLEBOB_COLOR);

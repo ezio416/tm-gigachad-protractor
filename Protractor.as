@@ -300,7 +300,7 @@ class Protractor {
         // the "region" inbetwixt the lines of interest, then filling it. 
 
         float angle_per_point = (flip * Math::PI * 2) / ICE_REGIONS_RESOLUTION;
-        int points = diff / angle_per_point;
+        int points = int(diff / angle_per_point);
 
         // print("__renderRegion");
         // print("start:\t" + tostring(start));
@@ -427,7 +427,7 @@ class Protractor {
 
     void render() {
         CSceneVehicleVisState @ visState = getVisState();
-        if (visState == null) {
+        if (visState is null) {
             return;
         }
         is_cam3 = isCam3(visState);
@@ -577,7 +577,7 @@ class Protractor {
 
             if (rpm < gearStateManager.GEARDOWN_RPM_THRESH) {
                 float color_pos = Math::InvLerp(abs_min, gearStateManager.GEARDOWN_RPM_THRESH, rpm);
-                vec4 color = DANGER_UPSHIFT * (1 - color_pos) + NORMAL_UPSHIFT * color_pos;
+                vec4 color1 = DANGER_UPSHIFT * (1 - color_pos) + NORMAL_UPSHIFT * color_pos;
                 renderAngle( // player pointer
                     visState,
                     pointer_start + rpm_pos,
@@ -585,7 +585,7 @@ class Protractor {
                     pointer_width,
                     theta,
                     i * offset_apply,
-                    ApplyOpacityToColor(color, playerFadeOpacity)
+                    ApplyOpacityToColor(color1, playerFadeOpacity)
                 );
             } else if (rpm < gearStateManager.GEARUP_RPM_THRESH) {
                 renderAngle( // player pointer
@@ -599,7 +599,7 @@ class Protractor {
                 );
             } else {
                 float color_pos = Math::InvLerp(gearStateManager.GEARUP_RPM_THRESH, abs_max, rpm);
-                vec4 color = DANGER_UPSHIFT * color_pos + NORMAL_UPSHIFT * (1 - color_pos);
+                vec4 color1 = DANGER_UPSHIFT * color_pos + NORMAL_UPSHIFT * (1 - color_pos);
                 renderAngle( // player pointer
                     visState,
                     pointer_start + geardown_pos,
@@ -607,7 +607,7 @@ class Protractor {
                     pointer_width,
                     theta,
                     i * offset_apply,
-                    ApplyOpacityToColor(color, playerFadeOpacity)
+                    ApplyOpacityToColor(color1, playerFadeOpacity)
                 );
             }
         }
@@ -631,7 +631,7 @@ class Protractor {
         for (int i = (SIMPLIFIED_VIEW ? -1 : 1); i <= 1; i += 2) {
             off.z = (i * SIMPLIFIED_VIEW_Z);
             opacity = HISTORY_START_OPACITY;
-            for (int i = 1; i < HISTORY_POINTS - 2; i++) {
+            for (int j = 1; j < HISTORY_POINTS - 2; j++) {
                 next_opacity = opacity * (1.0 - (1.0 / HISTORY_POINTS)) ** HISTORY_DECAY_FACTOR; //- (1 / (HISTORY_POINTS * 10));
 
                 rel_fade = Math::InvLerp(0, HISTORY_START_OPACITY, opacity);
@@ -641,8 +641,8 @@ class Protractor {
                 next_rel_fade = Math::InvLerp(0, HISTORY_START_OPACITY, next_opacity);
                 next_height_offset = Math::Lerp(HISTORY_START_HEIGHT, HISTORY_END_HEIGHT, next_rel_fade ** HISTORY_DISTANCE_FACTOR);
 
-                start_theta = processTheta(historyTrail.getAtIdx(i).slip);
-                end_theta = processTheta(historyTrail.getAtIdx(i + 1).slip);
+                start_theta = processTheta(historyTrail.getAtIdx(j).slip);
+                end_theta = processTheta(historyTrail.getAtIdx(j + 1).slip);
 
                 start_p = projectAngle(visState, height_offset + HISTORY_START_OFFSET + start + length, start_theta);
                 end_p = projectAngle(visState, next_height_offset + HISTORY_START_OFFSET + start + length, end_theta);
@@ -664,7 +664,7 @@ class Protractor {
                 nvg::BeginPath();
                 nvg::MoveTo(Camera::ToScreenSpace(start_p));
                 nvg::LineTo(Camera::ToScreenSpace(end_p));
-                nvg::StrokeColor(ApplyOpacityToColor(historyTrail.getAtIdx(i).color, playerFadeOpacity * opacity));
+                nvg::StrokeColor(ApplyOpacityToColor(historyTrail.getAtIdx(j).color, playerFadeOpacity * opacity));
                 nvg::StrokeWidth(rendered_width);
                 nvg::LineCap(nvg::LineCapType::Round);
                 nvg::Stroke();
@@ -757,7 +757,7 @@ class Protractor {
         if (ICE_GEAR_LINES_SHOW) {
             if (gearStateManager.expectedTrueRpm > gearStateManager.GEARUP_RPM_THRESH) {
                 color = gearStateManager.getGearupColor();
-                for (int i = 0; i < lines.Length; i++) {
+                for (uint i = 0; i < lines.Length; i++) {
                     if (i == 1 || i == 2) {
                         continue;
                     }
@@ -782,16 +782,16 @@ class Protractor {
             }
 
             if (gearStateManager.expectedTrueRpm < gearStateManager.GEARDOWN_RPM_THRESH) {
-                array < float > lines;
-                lines.InsertLast(lerpToMidpoint(ice_gearup_1, v));
-                lines.InsertLast(lerpToMidpoint(ice_gearup_4, v));
+                array < float > lines1;
+                lines1.InsertLast(lerpToMidpoint(ice_gearup_1, v));
+                lines1.InsertLast(lerpToMidpoint(ice_gearup_4, v));
                 color = gearStateManager.getGeardownColor();
-                for (int i = 0; i < lines.Length; i++) {
+                for (uint i = 0; i < lines1.Length; i++) {
                     slip = Math::Angle(visState.Dir, vel);
                     if (FIX_GUIDES_TO_CAR) {
-                        t = -lines[i];
+                        t = -lines1[i];
                     } else {
-                        t = slip - lines[i] - HALF_PI;
+                        t = slip - lines1[i] - HALF_PI;
                     }
                     if (Math::Angle(vel, visState.Left) > HALF_PI || isPreview()) {
                         t *= -1;
@@ -811,7 +811,7 @@ class Protractor {
 
         // handling shaded 'region' rendering:
 
-        float relativePos = Math::InvLerp(gearStateManager.GEARDOWN_RPM_THRESH, gearStateManager.GEARUP_RPM_THRESH, gearStateManager.expectedTrueRpm);
+        float relativePos = Math::InvLerp(gearStateManager.GEARDOWN_RPM_THRESH, gearStateManager.GEARUP_RPM_THRESH, int(gearStateManager.expectedTrueRpm));
 
         // we show regions all the time, but fade in and out of them depending on where we are
         // at 0.5, show no regions. 
@@ -1101,7 +1101,7 @@ class Protractor {
         int polarity = slip < 0 ? -1 : 1;
         for (int i = -1; i <= 1; i += 2) {
             lower = 0;
-            for (int j = 0; j < targets.Length; j++) {
+            for (uint j = 0; j < targets.Length; j++) {
                 upper = targets[j].x;
                 targetOpacity = Math::Max(Math::InvLerp(lower, upper, abs_sidespeed), MIN_BRIGHTNESS);
                 lower = upper;
@@ -1112,7 +1112,7 @@ class Protractor {
                     FS_PP_W,
                     (getSideSpeedAngle(speed, targets[j].x * i)),
                     vec3(0, 0, 0),
-                    ApplyOpacityToColor(getColor(targets[j].y), i == polarity ? targetOpacity : MIN_BRIGHTNESS)
+                    ApplyOpacityToColor(getColor(int(targets[j].y)), i == polarity ? targetOpacity : MIN_BRIGHTNESS)
                 );
             }
         }

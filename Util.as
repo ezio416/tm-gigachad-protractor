@@ -200,7 +200,7 @@ float lerpToMidpoint(array<vec2> points, float c) {
 
     upper = points[1];
 
-    for (int i = 1; i < points.Length - 1; i++) {
+    for (uint i = 1; i < points.Length - 1; i++) {
         if (points[i].x < c) {
             lower = points[i];
             upper = points[i + 1];

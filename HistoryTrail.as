@@ -12,7 +12,7 @@ class HistoryTrail {
 
     void update(float slip, vec4 color) {
         uint64 now = Time::Now;
-        if ((now - lastUpdateTime) > (HISTORY_SECONDS / float(HISTORY_POINTS)) * 1000) {
+        if (int(now - lastUpdateTime) > (HISTORY_SECONDS / float(HISTORY_POINTS)) * 1000) {
             historyTrailArr[cur_idx].update(slip, color);
             cur_idx = calcNext(1);
             lastUpdateTime = now;
@@ -26,7 +26,7 @@ class HistoryTrail {
     float calculateOpacity() {
         // decide the overall fade of the whole trail based on whether or not the slide is all on the same side 
         // e.g., if it's 100/0, 100% - 75/25, 50% - 50/50, 0%. 
-        float sum;
+        float sum = 0.0f;
         HistoryTrailObject@ o;
         for (int i = 0; i < HISTORY_POINTS; i++) {
             o = historyTrailArr[calcNext(i)];
