@@ -17,16 +17,16 @@ class ForwardProjection {
     int NUM_POINTS = 10;
     int idx = 0;
 
+    void addValue(int d_idx, vec3 dx) {
+        derivativeArrays[d_idx][idx] = dx;
+    }
+
     vec3 getDerivative(int d_idx) {
         vec3 r = 0;
         for (int i = 0; i < SMOOTHING; i++) {
             r += derivativeArrays[d_idx][i];
         }
         return (r / SMOOTHING);
-    }
-
-    void addValue(int d_idx, vec3 dx) {
-        derivativeArrays[d_idx][idx] = dx;
     }
 
     bool shouldRender(CSceneVehicleVisState@ visState) {

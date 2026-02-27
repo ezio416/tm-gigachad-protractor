@@ -10,15 +10,6 @@ class HistoryTrail {
         return historyTrailArr[calcNext(-idx)];
     }
 
-    void update(float slip, vec4 color) {
-        uint64 now = Time::Now;
-        if (int(now - lastUpdateTime) > (HISTORY_SECONDS / float(HISTORY_POINTS)) * 1000) {
-            historyTrailArr[cur_idx].update(slip, color);
-            cur_idx = calcNext(1);
-            lastUpdateTime = now;
-        }
-    }
-
     int calcNext(int offset) {
         return (cur_idx + HISTORY_POINTS + offset) % HISTORY_POINTS;
     }
@@ -33,6 +24,15 @@ class HistoryTrail {
             sum += o.slip;
         }
         return Math::Abs(sum) / HISTORY_POINTS;
+    }
+
+    void update(float slip, vec4 color) {
+        uint64 now = Time::Now;
+        if (int(now - lastUpdateTime) > (HISTORY_SECONDS / float(HISTORY_POINTS)) * 1000) {
+            historyTrailArr[cur_idx].update(slip, color);
+            cur_idx = calcNext(1);
+            lastUpdateTime = now;
+        }
     }
 }
 

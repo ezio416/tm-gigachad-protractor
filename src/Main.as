@@ -4,28 +4,13 @@ DatabaseFunctions@ databasefunctions;
 float HALF_PI = 1.57079632679;
 float g_dt = 0;
 
-string getMapUid() {
-    auto App = cast<CTrackMania>(GetApp());
-    if (App.RootMap !is null) {
-        App.RootMap.EdChallengeId;
-    }
-    return "";
+void Main() {
+    @protractor = Protractor();
+    @databasefunctions = DatabaseFunctions();
 }
 
-CSceneVehicleVisState@ getVisState() {
-    if (PLAYER_IDX == 0) {
-        return VehicleState::ViewingPlayerState();
-    }
-    int pidx = Math::Clamp(PLAYER_IDX, 0, VehicleState::GetAllVis(GetApp().GameScene).Length);
-    auto arr = VehicleState::GetAllVis(GetApp().GameScene);
-    if (arr.Length == 0) {
-        return null;
-    }
-    auto vs = arr[pidx];
-    if (vs !is null) {
-        return vs.AsyncState;
-    }
-    return null;
+void OnSettingsChanged() {
+    protractor.OnSettingsChanged();
 }
 
 void Render() {
@@ -50,10 +35,6 @@ void Render() {
     }
 }
 
-void Update(float dt) {
-    g_dt = dt;
-}
-
 void RenderMenu() {
     if (UI::BeginMenu(((g_visible || databasefunctions.isMapSkipped(getMapUid())) ? "\\$393" : "\\$999") + Icons::Bars + "\\$z GigaChad Protractor", true)) {
         if (UI::MenuItem(g_visible ? "\\$999" + Icons::Check + "\\$z Disable GCP" : "\\$393" + Icons::Check + "\\$z Enable GCP")) {
@@ -69,11 +50,6 @@ void RenderMenu() {
     }
 }
 
-void Main() {
-    @protractor = Protractor();
-    @databasefunctions = DatabaseFunctions();
-}
-
-void OnSettingsChanged() {
-    protractor.OnSettingsChanged();
+void Update(float dt) {
+    g_dt = dt;
 }
