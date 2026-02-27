@@ -6,10 +6,6 @@ class HistoryTrail {
     int cur_idx = 0;
     uint64 lastUpdateTime;
 
-    HistoryTrailObject@ GetAtIdx(int idx) {
-        return historyTrailArr[CalcNext(-idx)];
-    }
-
     int CalcNext(int offset) {
         return (cur_idx + HISTORY_POINTS + offset) % HISTORY_POINTS;
     }
@@ -24,6 +20,10 @@ class HistoryTrail {
             sum += o.slip;
         }
         return Math::Abs(sum) / HISTORY_POINTS;
+    }
+
+    HistoryTrailObject@ GetAtIdx(int idx) {
+        return historyTrailArr[CalcNext(-idx)];
     }
 
     void Update(float slip, vec4 color) {
