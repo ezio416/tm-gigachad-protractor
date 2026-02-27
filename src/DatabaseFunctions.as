@@ -44,5 +44,4 @@ class DatabaseFunctions {
         statement.Execute();
         prev_init = false;
     }
-
 }

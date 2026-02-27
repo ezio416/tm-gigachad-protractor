@@ -1,8 +1,7 @@
 class ForwardProjection {
-
     array<array<vec3>> derivativeArrays;
     array<vec3> prevs;
-    
+
     int NUM_DERIVATIVES_MAX = 10;
     int NUM_SMOOTHING_MAX = 100;
 
@@ -19,7 +18,7 @@ class ForwardProjection {
     int idx = 0;
 
     vec3 getDerivative(int d_idx) {
-        vec3 r = 0; 
+        vec3 r = 0;
         for (int i = 0; i < SMOOTHING; i++) {
             r += derivativeArrays[d_idx][i];
         }
@@ -31,7 +30,7 @@ class ForwardProjection {
     }
 
     bool shouldRender(CSceneVehicleVisState@ visState) {
-        return 
+        return
             NOODLEBOB_TARMAC && isTarmacSurface(visState.FLGroundContactMaterial)
             || NOODLEBOB_GRASS && isGrassSurface(visState.FLGroundContactMaterial)
             || NOODLEBOB_DIRT && isDirtSurface(visState.FLGroundContactMaterial)
@@ -44,7 +43,6 @@ class ForwardProjection {
             return;
         }
         vec3 v = visState.WorldVel * NOODLEBOB_SCALE;
-
 
         for (int i = 0; i < NUM_DERIVATIVES; i++) {
             addValue(i, v);
@@ -79,7 +77,4 @@ class ForwardProjection {
         nvg::Stroke();
         nvg::ClosePath();
     }
-
-    
-
 }

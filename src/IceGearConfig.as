@@ -1,5 +1,3 @@
-
-
 array<vec2> ice_gearup_1 = {
     vec2(37.5, 2.15),
     vec2(45.64, 2.0834),

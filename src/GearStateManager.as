@@ -19,7 +19,7 @@ class GearStateManager {
     float lastColorFetchScore = 0;
 
     GearStateManager() {
-        current_idx = 0; 
+        current_idx = 0;
         @gearup_scores = array<float>(500, 0);
         @frame_times = array<float>(500, 0);
     }
@@ -44,8 +44,6 @@ class GearStateManager {
         nvg::StrokeColor(BorderColor);
         nvg::StrokeWidth(BorderWidth);
         nvg::Stroke();
-
-
     }
 
     vec4 getGearupColor() {
@@ -55,7 +53,8 @@ class GearStateManager {
             vec4 c = DANGER_UPSHIFT * pos + NORMAL_UPSHIFT * (1 - pos);
             c.w *= mult;
             return c;
-        } return vec4(0, 0, 0, 0);
+        }
+        return vec4(0, 0, 0, 0);
     }
 
     vec4 getGeardownColor() {
@@ -64,7 +63,8 @@ class GearStateManager {
             vec4 c = NORMAL_UPSHIFT;
             c.w *= mult;
             return c;
-        } return vec4(0, 0, 0, 0);
+        }
+        return vec4(0, 0, 0, 0);
     }
 
     float getGearupMult() {
@@ -98,7 +98,7 @@ class GearStateManager {
         current_idx = (current_idx + 1) % FRAMES_AVERAGED;
 
         if (current_idx == 0) {
-            float sum = 0; 
+            float sum = 0;
             for (int i = 0; i < FRAMES_AVERAGED; i++) {
                 sum += frame_times[i];
             }
@@ -111,11 +111,10 @@ class GearStateManager {
         int idx = getAndIncrementIdx();
         expectedRpm = getExpectedRpm(inSpeed, inGear, inSlip, true);
         expectedTrueRpm = getExpectedRpm(inSpeed, inGear, inSlip, false);
-        
+
         gearup_scores[idx] = Math::Min(expectedRpm, SCORE_MAX);
         renderHud();
     }
-
 
     bool inSafeZone(float inSlip, float inSpeed) {
         inSlip = Math::Abs(inSlip);
@@ -148,7 +147,7 @@ class GearStateManager {
             case 1:
                 return 425;
             case 2:
-                return 275; // 270 is from grass - different across surfaces?
+                return 275;  // 270 is from grass - different across surfaces?
             case 3:
                 return 180;
             case 4:
@@ -174,10 +173,7 @@ class GearStateManager {
         vec2(150, 1.4)
     };
 
-
     float getIdealAngle(float speed) {
         return lerpToMidpoint(idealAngles, speed);
     }
-
-
 }

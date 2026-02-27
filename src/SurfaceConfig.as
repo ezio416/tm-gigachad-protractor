@@ -1,16 +1,13 @@
-
 /*
+Surface configuration:
 
-Surface configuration: 
+Provide two `vec2` arrays: ideal and zero.
 
-Provide two `vec2` arrays: ideal and zero. 
-
-The "ideal" array should provide the most precise "best" sidespeed possible for that speed. 
-The "zero" array should provide the sidespeed at which the car doesn't accelerate. 
-All intermediate values can be linearly interpreted from these. 
+The "ideal" array should provide the most precise "best" sidespeed possible for that speed.
+The "zero" array should provide the sidespeed at which the car doesn't accelerate.
+All intermediate values can be linearly interpreted from these.
 
 Format of vec2: (speed, target_sidespeed)
-
 */
 
 array<vec2> tarmac_ideal = {
@@ -24,7 +21,7 @@ array<vec2> tarmac_ideal = {
 array<vec2> tarmac_base = {
     vec2(111, 6.6),
     vec2(150.95, 8.920),
-    vec2(244, 13.8), 
+    vec2(244, 13.8),
     vec2(265, 15.04),
     vec2(277.5, 15.75)
 };
@@ -40,8 +37,6 @@ array<vec2> tarmac_zero = {
     vec2(264.425, 25.9050),
     vec2(277.5, 27.184)
 };
-
-
 
 array<vec2> dirt_ideal = {
     vec2(55, 1.0),
@@ -98,7 +93,6 @@ array<vec2> plastic_zero = {
     vec2(250, 33.33),
     vec2(277.5, 41.45)
 };
-
 
 array<vec2> grass_ideal = {
     vec2(55, 1.0),
@@ -192,6 +186,7 @@ array<vec2> wood_valley = {
     vec2(207.15, 81),
     vec2(277.8, 108.3)
 };
+
 array<vec2> wood_p2 = {
     vec2(11.3, 7.3),
     vec2(87.8, 58.54),
@@ -213,6 +208,7 @@ array<vec2> wood_wet_ice_valley = {
     vec2(10, 4.34),
     vec2(400, 173.986213644)
 };
+
 array<vec2> wood_wet_ice_p2 = {
     vec2(4.7, 3.6),
     vec2(78.74, 56.52),
@@ -228,7 +224,7 @@ array<vec2> rally_ice_peak = {
 
 array<vec2> rally_ice_zero = {
     vec2(17.6, 0),
-    vec2(44.425, 18.1), 
+    vec2(44.425, 18.1),
     vec2(57.34, 23.92),
     vec2(80.4, 38.25)
 };
@@ -238,7 +234,6 @@ array<vec2> rally_ice_slideout = {
     vec2(50.5, 41.325),
     vec2(400, 329.95)
 };
-
 
 array<vec2> desert_ice_peak = {
     vec2(2.125, 0.2),
@@ -263,9 +258,7 @@ array<vec2> desert_ice_backpeak = {
     vec2(116.75, 115.6)
 };
 
-
 float backwards_min = 15;
 float tarmac_min = 395 / 3.6;
 float other_min = 200 / 3.6;
 float wood_min = 10;
-

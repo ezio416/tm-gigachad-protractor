@@ -21,7 +21,7 @@ float ICE_PP_L = 1.5;
 [Setting category="Display" name="Player pointer line width" drag min=1 max=10]
 float FS_PP_W = 4.7;
 
-[Setting category="Ice" name="Ice assist line length fraction" drag min=1 max=10] 
+[Setting category="Ice" name="Ice assist line length fraction" drag min=1 max=10]
 float ICE_PLAYER_FRACTION = 2;
 
 [Setting category="Ice" name="Ice player pointer color" color]
@@ -117,7 +117,7 @@ float ICE_POINTER_Z_OFFSET = 0;
 [Setting category="Ice" name="Ice: Pointer angle offset" drag min=-1.41 max=1.41]
 float ICE_POINTER_ANGLE_OFFSET = 0;
 
-[Setting category="Ice" name="Set pointer to front corner"] 
+[Setting category="Ice" name="Set pointer to front corner"]
 bool ICE_RESET_TO_FRONT_CORNER = false;
 
 [Setting category="General" name="Reset pointer for front"]
@@ -172,12 +172,12 @@ float GOOD_THRESH = 0.9;
 bool DRAW_BASE = true;
 
 [Setting category="General" name="'Base' speedslide threshold" drag min=0.1 max=0.9]
-float BASE_THRESH = 0.5; 
+float BASE_THRESH = 0.5;
 
 [Setting category="General" name="Draw zero-acceleration line"]
 bool DRAW_OUTER = true;
 
-[Setting category="General" name="Show gears in pointer line"] 
+[Setting category="General" name="Show gears in pointer line"]
 bool SHOW_GEARS_IN_POINTER = false;
 
 [Setting category="General" name="Hide gears when in gear 5"]
@@ -193,22 +193,22 @@ float THETA_FLIP_THRESH = 0.1;
 bool GEAR_ON_BOTH_SIDES = true;
 
 [Setting category="Preview" name="Preview tarmac"]
-bool PREVIEW_TARMAC = false; 
+bool PREVIEW_TARMAC = false;
 
 [Setting category="Preview" name="Preview grass"]
-bool PREVIEW_GRASS = false; 
+bool PREVIEW_GRASS = false;
 
 [Setting category="Preview" name="Preview dirt"]
-bool PREVIEW_DIRT = false; 
+bool PREVIEW_DIRT = false;
 
 [Setting category="Preview" name="Preview plastic"]
-bool PREVIEW_PLASTIC = false; 
+bool PREVIEW_PLASTIC = false;
 
 [Setting category="Preview" name="Preview ice"]
-bool PREVIEW_ICE = false; 
+bool PREVIEW_ICE = false;
 
 [Setting category="Preview" name="Preview wood"]
-bool PREVIEW_WOOD = false; 
+bool PREVIEW_WOOD = false;
 
 [Setting category="Preview" name="Preview speed" drag min=0 max=1000]
 float PREVIEW_SPEED = 500;
@@ -253,19 +253,19 @@ vec4 NOODLEBOB_COLOR = vec4(0, 0, 0, 0.25);
 float NOODLEBOB_WIDTH = 5;
 
 [Setting category="Noodlebob" name="Enable tarmac"]
-bool NOODLEBOB_TARMAC = false; 
+bool NOODLEBOB_TARMAC = false;
 
 [Setting category="Noodlebob" name="Enable grass"]
-bool NOODLEBOB_GRASS = false; 
+bool NOODLEBOB_GRASS = false;
 
 [Setting category="Noodlebob" name="Enable dirt"]
-bool NOODLEBOB_DIRT = false; 
+bool NOODLEBOB_DIRT = false;
 
 [Setting category="Noodlebob" name="Enable plastic"]
-bool NOODLEBOB_PLASTIC = false; 
+bool NOODLEBOB_PLASTIC = false;
 
 [Setting category="Noodlebob" name="Enable ice"]
-bool NOODLEBOB_ICE = true; 
+bool NOODLEBOB_ICE = true;
 
 [Setting category="Ice" name="Fix guides to car instead of pointer"]
 bool FIX_GUIDES_TO_CAR = true;
@@ -314,10 +314,10 @@ bool ICE_REGIONS_RENDER = true;
 
 [Setting category="Ice" name="Draw outline over safe region"]
 bool ICE_REGION_OUTLINE_BOOL = false;
- 
+
 [Setting category="Ice" name="Ice region outline color" color]
 vec4 ICE_REGIONS_OUTLINE = vec4(0, 0, 0, 0.5);
- 
+
 [Setting category="Ice" name="Ice region outline thickness" drag min=0 max=5]
 float ICE_REGIONS_THICKNESS = 2;
 
@@ -350,7 +350,6 @@ float ICE_REGIONS_DARK_COLOR_FRAC = 1;
 
 [Setting category="Ice" name="Ice danger wedge color" color]
 vec4 ICE_REGIONS_DANGER_WEDGE_COLOR = vec4(1, 0, 0, 1);
-
 
 
 // [Setting category="Gear Display" name="Graph Width" drag min=50 max=2000]
@@ -390,7 +389,7 @@ bool HISTORY_ENABLED = true;
 int HISTORY_POINTS = 60;
 
 [Setting category="History" name="Amount of time to show in history (in seconds)" drag min=0.5 max=5]
-float HISTORY_SECONDS = 1; 
+float HISTORY_SECONDS = 1;
 
 [Setting category="History" name="History min width" drag min=1 max=4]
 float HISTORY_WIDTH_MIN = 1.32;

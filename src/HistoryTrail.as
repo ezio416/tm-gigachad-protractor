@@ -1,5 +1,5 @@
 class HistoryTrail {
-    HistoryTrail() {}
+    HistoryTrail() { }
 
     array<HistoryTrailObject> historyTrailArr(1000);
 
@@ -7,7 +7,7 @@ class HistoryTrail {
     uint64 lastUpdateTime;
 
     HistoryTrailObject@ getAtIdx(int idx) {
-        return historyTrailArr[calcNext(-idx)]; 
+        return historyTrailArr[calcNext(-idx)];
     }
 
     void update(float slip, vec4 color) {
@@ -20,12 +20,12 @@ class HistoryTrail {
     }
 
     int calcNext(int offset) {
-        return (cur_idx + HISTORY_POINTS + offset) % HISTORY_POINTS; 
+        return (cur_idx + HISTORY_POINTS + offset) % HISTORY_POINTS;
     }
 
     float calculateOpacity() {
-        // decide the overall fade of the whole trail based on whether or not the slide is all on the same side 
-        // e.g., if it's 100/0, 100% - 75/25, 50% - 50/50, 0%. 
+        // decide the overall fade of the whole trail based on whether or not the slide is all on the same side
+        // e.g., if it's 100/0, 100% - 75/25, 50% - 50/50, 0%.
         float sum = 0.0f;
         HistoryTrailObject@ o;
         for (int i = 0; i < HISTORY_POINTS; i++) {
@@ -34,14 +34,13 @@ class HistoryTrail {
         }
         return Math::Abs(sum) / HISTORY_POINTS;
     }
-
 }
 
 class HistoryTrailObject {
     float slip;
     vec4 color;
 
-    HistoryTrailObject() {}
+    HistoryTrailObject() { }
     HistoryTrailObject(float slip, vec4 color) {
         this.slip = slip;
         this.color = color;
@@ -51,5 +50,4 @@ class HistoryTrailObject {
         this.slip = slip;
         this.color = color;
     }
-
 }
