@@ -1,6 +1,9 @@
 [Setting category="General" name="Enable utility"]
 bool g_visible = true;
 
+[Setting category="General" name="Player index" drag min=0 max=10]
+int PLAYER_IDX = 0;
+
 [Setting category="Display" name="Normal gearup color indicator" color]
 // vec4 NORMAL_UPSHIFT(0, 108.0/255.0, 103.0/255.0, 0.5);
 vec4 NORMAL_UPSHIFT(1, 1, 1, 1);

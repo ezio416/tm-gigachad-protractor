@@ -77,6 +77,3 @@ void Main() {
 void OnSettingsChanged() {
     protractor.OnSettingsChanged();
 }
-
-[Setting category="General" name="Player index" drag min=0 max=10]
-int PLAYER_IDX = 0;
