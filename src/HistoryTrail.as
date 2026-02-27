@@ -1,7 +1,7 @@
 class HistoryTrail {
     HistoryTrail() { }
 
-    HistoryTrailObject@[] historyTrailArr(1000);
+    HistoryTrailObject[] historyTrailArr(1000);
 
     int cur_idx = 0;
     uint64 lastUpdateTime;
