@@ -1,13 +1,13 @@
 class ForwardProjection {
-    array<array<vec3>> derivativeArrays;
-    array<vec3> prevs;
+    vec3[][] derivativeArrays;
+    vec3[] prevs;
 
     int NUM_DERIVATIVES_MAX = 10;
     int NUM_SMOOTHING_MAX = 100;
 
     ForwardProjection() {
         for (int i = 0; i < NUM_DERIVATIVES_MAX; i++) {
-            array<vec3> arr(NUM_SMOOTHING_MAX);
+            vec3[] arr(NUM_SMOOTHING_MAX);
             derivativeArrays.InsertLast(arr);
         }
     }
@@ -50,8 +50,8 @@ class ForwardProjection {
         }
 
         idx = (idx + 1) % SMOOTHING;
-        array<vec3> nexts;
-        array<vec3> vs(NUM_DERIVATIVES);
+        vec3[] nexts;
+        vec3[] vs(NUM_DERIVATIVES);
 
         for (int i = 0; i < NUM_DERIVATIVES; i++) {
             vs[i] = getDerivative(i);

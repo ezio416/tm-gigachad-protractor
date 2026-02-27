@@ -723,7 +723,7 @@ class Protractor {
     }
 
     void renderIceGearLines(CSceneVehicleVisState@ visState, float v, vec3 vel, float slip) {
-        array < float > lines;
+        float[] lines;
         lines.InsertLast(lerpToMidpoint(ice_gearup_1, v));
         lines.InsertLast(lerpToMidpoint(ice_gearup_2, v));
         lines.InsertLast(lerpToMidpoint(ice_gearup_3, v));
@@ -760,7 +760,7 @@ class Protractor {
             }
 
             if (gearStateManager.expectedTrueRpm < gearStateManager.GEARDOWN_RPM_THRESH) {
-                array < float > lines1;
+                float[] lines1;
                 lines1.InsertLast(lerpToMidpoint(ice_gearup_1, v));
                 lines1.InsertLast(lerpToMidpoint(ice_gearup_4, v));
                 color = gearStateManager.getGeardownColor();
@@ -982,8 +982,8 @@ class Protractor {
         return ret / SLIP_SMOOTHING;
     }
 
-    array<vec2> getLinesToBeRendered(float ideal, float good, float base, float outer, bool draw_good) {
-        array<vec2> out_arr;
+    vec2[] getLinesToBeRendered(float ideal, float good, float base, float outer, bool draw_good) {
+        vec2[] out_arr;
         if (SIMPLIFIED_VIEW) {
             return out_arr;
         }
@@ -1013,11 +1013,11 @@ class Protractor {
         return vec2(start, length);
     }
 
-    void renderSurface(CSceneVehicleVisState@ visState, float speed, vec3 vec_vel, float min_vel, array<vec2> ideal_config, array<vec2> base_config,  array<vec2> zero_config) {
+    void renderSurface(CSceneVehicleVisState@ visState, float speed, vec3 vec_vel, float min_vel, vec2[] ideal_config, vec2[] base_config,  vec2[] zero_config) {
         renderSurface(visState, speed, vec_vel, min_vel, ideal_config, base_config, zero_config, true);
     }
 
-    void renderSurface(CSceneVehicleVisState@ visState, float speed, vec3 vec_vel, float min_vel, array<vec2> ideal_config, array<vec2> base_config,  array<vec2> zero_config, bool show_good_ss) {
+    void renderSurface(CSceneVehicleVisState@ visState, float speed, vec3 vec_vel, float min_vel, vec2[] ideal_config, vec2[] base_config,  vec2[] zero_config, bool show_good_ss) {
         float target_ss = approximateSideSpeed(ideal_config, speed);
         float outer_ss = approximateSideSpeed(zero_config, speed);
         float base_ss = approximateSideSpeed(base_config, speed);
@@ -1028,7 +1028,7 @@ class Protractor {
         float abs_sidespeed = Math::Abs(sideSpeed);
 
         vec2 startAndLength = getStartAndLength();
-        array<vec2> targets = getLinesToBeRendered(target_ss, good_ss, base_ss, outer_ss, show_good_ss);
+        vec2[] targets = getLinesToBeRendered(target_ss, good_ss, base_ss, outer_ss, show_good_ss);
 
         renderPlayerPointer(
             visState,

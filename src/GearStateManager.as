@@ -1,7 +1,7 @@
 class GearStateManager {
     int current_idx;
-    array<float>@ gearup_scores;
-    array<float>@ frame_times;
+    float[]@ gearup_scores;
+    float[]@ frame_times;
 
     float expectedRpm;
     float expectedTrueRpm;
@@ -158,7 +158,7 @@ class GearStateManager {
         return 0;
     }
 
-    array<vec2> idealAngles = {
+    vec2[] idealAngles = {
         vec2(0, 1.47),
         vec2(40, 1.47),
         vec2(50, 1.4),

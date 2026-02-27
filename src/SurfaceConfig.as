@@ -10,7 +10,7 @@ All intermediate values can be linearly interpreted from these.
 Format of vec2: (speed, target_sidespeed)
 */
 
-array<vec2> tarmac_ideal = {
+vec2[] tarmac_ideal = {
     vec2(111, 5.9),
     vec2(140, 5.6),
     vec2(210, 5.75),
@@ -18,7 +18,7 @@ array<vec2> tarmac_ideal = {
     vec2(280, 5.85)
 };
 
-array<vec2> tarmac_base = {
+vec2[] tarmac_base = {
     vec2(111, 6.6),
     vec2(150.95, 8.920),
     vec2(244, 13.8),
@@ -26,7 +26,7 @@ array<vec2> tarmac_base = {
     vec2(277.5, 15.75)
 };
 
-array<vec2> tarmac_zero = {
+vec2[] tarmac_zero = {
     vec2(111, 11.32),
     vec2(112.64, 11.938),
     vec2(129.25, 13.975),
@@ -38,21 +38,21 @@ array<vec2> tarmac_zero = {
     vec2(277.5, 27.184)
 };
 
-array<vec2> dirt_ideal = {
+vec2[] dirt_ideal = {
     vec2(55, 1.0),
     vec2(100, 1.5),
     vec2(202, 2.15),
     vec2(250, 2.15)
 };
 
-array<vec2> dirt_base = {
+vec2[] dirt_base = {
     vec2(55, 4),
     vec2(86.6, 7.25),
     vec2(216, 20.13),
     vec2(250, 21.39)
 };
 
-array<vec2> dirt_zero = {
+vec2[] dirt_zero = {
     vec2(55, 11.96),
     vec2(56.55, 12.18),
     vec2(80.25, 15.664),
@@ -63,7 +63,7 @@ array<vec2> dirt_zero = {
     vec2(250, 33.33)
 };
 
-array<vec2> plastic_ideal = {
+vec2[] plastic_ideal = {
     vec2(55, 1.0),
     vec2(99.5, 1.0),
     vec2(100, 1.3),
@@ -74,7 +74,7 @@ array<vec2> plastic_ideal = {
     vec2(250, 2)
 };
 
-array<vec2> plastic_base = {
+vec2[] plastic_base = {
     vec2(55, 12),
     vec2(91.6, 17.65),
     vec2(106, 18.3),
@@ -83,7 +83,7 @@ array<vec2> plastic_base = {
     vec2(275, 36)
 };
 
-array<vec2> plastic_zero = {
+vec2[] plastic_zero = {
     vec2(55, 12.5),
     vec2(70, 16.6),
     vec2(94.5, 20.4),
@@ -94,7 +94,7 @@ array<vec2> plastic_zero = {
     vec2(277.5, 41.45)
 };
 
-array<vec2> grass_ideal = {
+vec2[] grass_ideal = {
     vec2(55, 1.0),
     vec2(80, 1.365),
     vec2(110, 1.4),
@@ -104,14 +104,14 @@ array<vec2> grass_ideal = {
     vec2(250, 2.8)
 };
 
-array<vec2> grass_base = {
+vec2[] grass_base = {
     vec2(55, 4),
     vec2(86.6, 7.25),
     vec2(216, 20.13),
     vec2(250, 21.39)
 };
 
-array<vec2> grass_zero = {
+vec2[] grass_zero = {
     vec2(55, 13.5),
     vec2(87, 17.6),
     vec2(112.6, 21.25),
@@ -120,7 +120,7 @@ array<vec2> grass_zero = {
     vec2(250, 35.4)
 };
 
-array<vec2> bw_dirt_ideal = {
+vec2[] bw_dirt_ideal = {
     vec2(0, 2),
     vec2(25, 2),
     vec2(30, 2.3),
@@ -129,7 +129,7 @@ array<vec2> bw_dirt_ideal = {
     vec2(130, 2.9)
 };
 
-array<vec2> bw_dirt_zero = {
+vec2[] bw_dirt_zero = {
     vec2(0, 8),
     vec2(56, 17),
     vec2(30, 2.3),
@@ -139,14 +139,14 @@ array<vec2> bw_dirt_zero = {
     vec2(130, 26.5)
 };
 
-array<vec2> bw_tarmac_ideal = {
+vec2[] bw_tarmac_ideal = {
     vec2(0, 3.5),
     vec2(31, 5.4),
     vec2(40, 8.0),
     vec2(130, 8.2)
 };
 
-array<vec2> bw_tarmac_zero = {
+vec2[] bw_tarmac_zero = {
     vec2(0, 8),
     vec2(55, 16),
     vec2(85, 20),
@@ -154,7 +154,7 @@ array<vec2> bw_tarmac_zero = {
     vec2(130, 26)
 };
 
-array<vec2> bw_grass_ideal = {
+vec2[] bw_grass_ideal = {
     vec2(0, 1.4),
     vec2(28, 1.7),
     vec2(75, 2.18),
@@ -162,7 +162,7 @@ array<vec2> bw_grass_ideal = {
     vec2(130, 2.25)
 };
 
-array<vec2> bw_grass_zero = {
+vec2[] bw_grass_zero = {
     vec2(0, 2),
     vec2(10, 6),
     vec2(30, 12),
@@ -171,7 +171,7 @@ array<vec2> bw_grass_zero = {
     vec2(130, 27.4)
 };
 
-array<vec2> wood_p1 = {
+vec2[] wood_p1 = {
     vec2(13.23, 0.0792),
     vec2(48.96, 3.25),
     vec2(55.32, 4.23),
@@ -180,14 +180,14 @@ array<vec2> wood_p1 = {
     vec2(274.5, 10.20)
 };
 
-array<vec2> wood_valley = {
+vec2[] wood_valley = {
     vec2(11.9, 4.74),
     vec2(26.0, 10.21),
     vec2(207.15, 81),
     vec2(277.8, 108.3)
 };
 
-array<vec2> wood_p2 = {
+vec2[] wood_p2 = {
     vec2(11.3, 7.3),
     vec2(87.8, 58.54),
     vec2(136.86, 90.68),
@@ -195,7 +195,7 @@ array<vec2> wood_p2 = {
     vec2(276.6, 159.90)
 };
 
-array<vec2> wood_wet_ice_p1 = {
+vec2[] wood_wet_ice_p1 = {
     vec2(13.23, 0),
     vec2(48.96, 0),
     vec2(55.32, 0),
@@ -204,12 +204,12 @@ array<vec2> wood_wet_ice_p1 = {
     vec2(274.5, 10)
 };
 
-array<vec2> wood_wet_ice_valley = {
+vec2[] wood_wet_ice_valley = {
     vec2(10, 4.34),
     vec2(400, 173.986213644)
 };
 
-array<vec2> wood_wet_ice_p2 = {
+vec2[] wood_wet_ice_p2 = {
     vec2(4.7, 3.6),
     vec2(78.74, 56.52),
     vec2(189.4, 125.0),
@@ -217,25 +217,25 @@ array<vec2> wood_wet_ice_p2 = {
     vec2(271.1, 165.6)
 };
 
-array<vec2> rally_ice_peak = {
+vec2[] rally_ice_peak = {
     vec2(1.0, 0),
     vec2(400, 0.0)
 };
 
-array<vec2> rally_ice_zero = {
+vec2[] rally_ice_zero = {
     vec2(17.6, 0),
     vec2(44.425, 18.1),
     vec2(57.34, 23.92),
     vec2(80.4, 38.25)
 };
 
-array<vec2> rally_ice_slideout = {
+vec2[] rally_ice_slideout = {
     vec2(1, 0.717),
     vec2(50.5, 41.325),
     vec2(400, 329.95)
 };
 
-array<vec2> desert_ice_peak = {
+vec2[] desert_ice_peak = {
     vec2(2.125, 0.2),
     vec2(15, .4),
     vec2(28, .9),
@@ -245,14 +245,14 @@ array<vec2> desert_ice_peak = {
     vec2(272.6, 86.8)
 };
 
-array<vec2> desert_ice_zero = {
+vec2[] desert_ice_zero = {
     vec2(2.5, 1.8),
     vec2(70.5, 64.8),
     vec2(108, 107.75),
     vec2(170, 165.95)
 };
 
-array<vec2> desert_ice_backpeak = {
+vec2[] desert_ice_backpeak = {
     vec2(2.5, 0.2),
     vec2(84.2, 79.5),
     vec2(116.75, 115.6)

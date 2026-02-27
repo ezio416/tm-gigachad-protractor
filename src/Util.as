@@ -182,7 +182,7 @@ CSmPlayer@ getPlayer() {
     return null;
 }
 
-float lerpToMidpoint(array<vec2> points, float c) {
+float lerpToMidpoint(vec2[] points, float c) {
     if (points.Length == 0) {
         return 0;
     }
@@ -210,7 +210,7 @@ float lerpToMidpoint(array<vec2> points, float c) {
     return Math::Lerp(lower.y, upper.y, pos);
 }
 
-float approximateSideSpeed(const array<vec2> data, float speed) {
+float approximateSideSpeed(const vec2[] data, float speed) {
     if (data.Length == 0) {
         return 0;
     }
