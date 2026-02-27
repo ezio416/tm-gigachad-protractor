@@ -5,13 +5,9 @@ float HALF_PI = 1.57079632679;
 float g_dt = 0;
 
 string getMapUid() {
-    auto app = cast<CTrackMania>(GetApp());
-    if (app !is null) {
-        if (app.RootMap !is null) {
-            if (app.RootMap.MapInfo !is null) {
-                return app.RootMap.MapInfo.MapUid;
-            }
-        }
+    auto App = cast<CTrackMania>(GetApp());
+    if (App.RootMap !is null) {
+        App.RootMap.EdChallengeId;
     }
     return "";
 }
@@ -41,14 +37,14 @@ void Render() {
     }
 
     if (protractor !is null) {
-        auto app = GetApp();
-        if (app.CurrentPlayground !is null && (app.CurrentPlayground.UIConfigs.Length > 0)) {
-            if (app.CurrentPlayground.UIConfigs[0].UISequence == CGamePlaygroundUIConfig::EUISequence::Intro) {
+        auto App = GetApp();
+        if (App.CurrentPlayground !is null && App.CurrentPlayground.UIConfigs.Length > 0) {
+            if (App.CurrentPlayground.UIConfigs[0].UISequence == CGamePlaygroundUIConfig::EUISequence::Intro) {
                 return;
             }
         }
 
-        if (app !is null && app.GameScene !is null) {
+        if (App.GameScene !is null) {
             protractor.render();
         }
     }

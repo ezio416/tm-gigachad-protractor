@@ -163,8 +163,9 @@ CSmArenaClient@ getPlayground() {
 }
 
 int getPlayerStartTime() {
-    if (getPlayer() !is null)
-        return getPlayer().StartTime;
+    CSmPlayer@ Player = getPlayer();
+    if (Player !is null)
+        return Player.StartTime;
     return 0;
 }
 
@@ -172,11 +173,7 @@ CSmPlayer@ getPlayer() {
     auto playground = getPlayground();
     if (playground !is null) {
         if (playground.GameTerminals.Length > 0) {
-            CGameTerminal@ terminal = cast<CGameTerminal>(playground.GameTerminals[0]);
-            CSmPlayer@ player = cast<CSmPlayer>(terminal.GUIPlayer);
-            if (player !is null) {
-                return player;
-            }
+            return cast<CSmPlayer>(playground.GameTerminals[0].GUIPlayer);
         }
     }
     return null;
