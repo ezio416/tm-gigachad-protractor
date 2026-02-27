@@ -9,8 +9,8 @@ class DatabaseFunctions {
         database.Execute("CREATE TABLE IF NOT EXISTS skip_maps (map_uuid VARCHAR PRIMARY KEY)");
     }
 
-    void disableMap(string _map_uuid) {
-        if (isMapSkipped(_map_uuid)) {
+    void DisableMap(string _map_uuid) {
+        if (IsMapSkipped(_map_uuid)) {
             return;
         }
         SQLite::Statement@ statement = database.Prepare("INSERT INTO skip_maps VALUES (?)");
@@ -19,8 +19,8 @@ class DatabaseFunctions {
         prev_init = false;
     }
 
-    void enableMap(string _map_uuid) {
-        if (!isMapSkipped(_map_uuid)) {
+    void EnableMap(string _map_uuid) {
+        if (!IsMapSkipped(_map_uuid)) {
             return;
         }
         SQLite::Statement@ statement = database.Prepare("DELETE FROM skip_maps WHERE map_uuid = ?");
@@ -29,7 +29,7 @@ class DatabaseFunctions {
         prev_init = false;
     }
 
-    bool isMapSkipped(string _map_uuid) {
+    bool IsMapSkipped(string _map_uuid) {
         if (prev_init && prev_map == _map_uuid) {
             return prev_res;
         }

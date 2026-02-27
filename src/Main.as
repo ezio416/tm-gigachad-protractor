@@ -17,7 +17,7 @@ void Render() {
     if (!g_visible) {
         return;
     }
-    if (databasefunctions.isMapSkipped(getMapUid())) {
+    if (databasefunctions.IsMapSkipped(GetMapUid())) {
         return;
     }
 
@@ -30,21 +30,21 @@ void Render() {
         }
 
         if (App.GameScene !is null) {
-            protractor.render();
+            protractor.Render();
         }
     }
 }
 
 void RenderMenu() {
-    if (UI::BeginMenu(((g_visible || databasefunctions.isMapSkipped(getMapUid())) ? "\\$393" : "\\$999") + Icons::Bars + "\\$z GigaChad Protractor", true)) {
+    if (UI::BeginMenu(((g_visible || databasefunctions.IsMapSkipped(GetMapUid())) ? "\\$393" : "\\$999") + Icons::Bars + "\\$z GigaChad Protractor", true)) {
         if (UI::MenuItem(g_visible ? "\\$999" + Icons::Check + "\\$z Disable GCP" : "\\$393" + Icons::Check + "\\$z Enable GCP")) {
             g_visible = !g_visible;
         }
         if (UI::MenuItem("Disable on this map")) {
-            databasefunctions.disableMap(getMapUid());
+            databasefunctions.DisableMap(GetMapUid());
         }
         if (UI::MenuItem("Enable on this map")) {
-            databasefunctions.enableMap(getMapUid());
+            databasefunctions.EnableMap(GetMapUid());
         }
         UI::EndMenu();
     }

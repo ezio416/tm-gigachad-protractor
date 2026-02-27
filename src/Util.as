@@ -15,7 +15,7 @@ vec4 ApplyOpacityToColor(vec4 inColor, float opacity) {
     return outColor;
 }
 
-float approximateSideSpeed(const vec2[] data, float speed) {
+float ApproximateSideSpeed(const vec2[] data, float speed) {
     if (data.Length == 0) {
         return 0;
     }
@@ -35,14 +35,14 @@ float approximateSideSpeed(const vec2[] data, float speed) {
     return interpolated;
 }
 
-float calcAngle(vec3 v1, vec3 v2) {
-    if (isPreview()) {
+float CalcAngle(vec3 v1, vec3 v2) {
+    if (IsPreview()) {
         return PREVIEW_SLIP;
     }
     return Math::Angle(v1, v2);
 }
 
-float calcVecAngle(vec3 vec1, vec3 vec2) {
+float CalcVecAngle(vec3 vec1, vec3 vec2) {
     if (vec1.Length() == 0 || vec2.Length() == 0) {
         return 0;
     }
@@ -50,7 +50,7 @@ float calcVecAngle(vec3 vec1, vec3 vec2) {
     return angle;
 }
 
-vec4 getColor(int idx) {
+vec4 GetColor(int idx) {
     switch (idx) {
         case 0:
             return COLOR_100;
@@ -64,7 +64,7 @@ vec4 getColor(int idx) {
     return COLOR_0;
 }
 
-string getMapUid() {
+string GetMapUid() {
     auto App = cast<CTrackMania>(GetApp());
     if (App.RootMap !is null) {
         App.RootMap.EdChallengeId;
@@ -72,8 +72,8 @@ string getMapUid() {
     return "";
 }
 
-CSmPlayer@ getPlayer() {
-    auto playground = getPlayground();
+CSmPlayer@ GetPlayer() {
+    auto playground = GetPlayground();
     if (playground !is null) {
         if (playground.GameTerminals.Length > 0) {
             return cast<CSmPlayer>(playground.GameTerminals[0].GUIPlayer);
@@ -82,26 +82,26 @@ CSmPlayer@ getPlayer() {
     return null;
 }
 
-int getPlayerStartTime() {
-    CSmPlayer@ Player = getPlayer();
+int GetPlayerStartTime() {
+    CSmPlayer@ Player = GetPlayer();
     if (Player !is null)
         return Player.StartTime;
     return 0;
 }
 
-CSmArenaClient@ getPlayground() {
+CSmArenaClient@ GetPlayground() {
     return cast<CSmArenaClient>(GetApp().CurrentPlayground);
 }
 
-float getSideSpeedAngle(float vel, float target_sidespeed) {
+float GetSideSpeedAngle(float vel, float target_sidespeed) {
     return Math::Asin(target_sidespeed / vel);
 }
 
-float getSlipTotal(CSceneVehicleVisState@ visState) {
+float GetSlipTotal(CSceneVehicleVisState@ visState) {
     return visState.FLSlipCoef + visState.FRSlipCoef + visState.RLSlipCoef + visState.RRSlipCoef;
 }
 
-float getTargetThetaMultFactor(CSceneVehicleVisState@ visState) {
+float GetTargetThetaMultFactor(CSceneVehicleVisState@ visState) {
     if (visState.FLIcing01 > 0) {
         return 1;
     }
@@ -115,37 +115,37 @@ float getTargetThetaMultFactor(CSceneVehicleVisState@ visState) {
     }
 
     float sum =
-        getThetaMultForSurface(visState.FLGroundContactMaterial)
-            + getThetaMultForSurface(visState.FRGroundContactMaterial)
-            + getThetaMultForSurface(visState.RLGroundContactMaterial)
-            + getThetaMultForSurface(visState.RRGroundContactMaterial);
+        GetThetaMultForSurface(visState.FLGroundContactMaterial)
+            + GetThetaMultForSurface(visState.FRGroundContactMaterial)
+            + GetThetaMultForSurface(visState.RLGroundContactMaterial)
+            + GetThetaMultForSurface(visState.RRGroundContactMaterial);
 
     return sum / 4;
 }
 
-float getThetaMultForSurface(EPlugSurfaceMaterialId surface) {
-    if (isIceSurface(surface)) {
+float GetThetaMultForSurface(EPlugSurfaceMaterialId surface) {
+    if (IsIceSurface(surface)) {
         return 1;
     }
-    if (isDirtSurface(surface)) {
+    if (IsDirtSurface(surface)) {
         return DIRT_TM;
     }
-    if (isTarmacSurface(surface)) {
+    if (IsTarmacSurface(surface)) {
         return TARMAC_TM;
     }
-    if (isGrassSurface(surface)) {
+    if (IsGrassSurface(surface)) {
         return GRASS_TM;
     }
-    if (isPlasticSurface(surface)) {
+    if (IsPlasticSurface(surface)) {
         return PLASTIC_TM;
     }
-    if (isWoodSurface(surface)) {
+    if (IsWoodSurface(surface)) {
         return WOOD_TM;
     }
     return -1000;
 }
 
-CSceneVehicleVisState@ getVisState() {
+CSceneVehicleVisState@ GetVisState() {
     if (PLAYER_IDX == 0) {
         return VehicleState::ViewingPlayerState();
     }
@@ -161,18 +161,18 @@ CSceneVehicleVisState@ getVisState() {
     return null;
 }
 
-bool isDirtSurface(EPlugSurfaceMaterialId surface) {
+bool IsDirtSurface(EPlugSurfaceMaterialId surface) {
     return
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Dirt ||
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::DirtRoad;
 }
 
-bool isGrassSurface(EPlugSurfaceMaterialId surface) {
+bool IsGrassSurface(EPlugSurfaceMaterialId surface) {
     return surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Grass ||
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Green;
 }
 
-bool isIceSurface(EPlugSurfaceMaterialId surface) {
+bool IsIceSurface(EPlugSurfaceMaterialId surface) {
     return
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Ice ||
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Concrete ||
@@ -180,32 +180,32 @@ bool isIceSurface(EPlugSurfaceMaterialId surface) {
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Snow;
 }
 
-bool isPlasticDirtOrGrass(EPlugSurfaceMaterialId surface) {
-    return isPlasticSurface(surface) ||
-        isDirtSurface(surface) ||
-        isGrassSurface(surface);
+bool IsPlasticDirtOrGrass(EPlugSurfaceMaterialId surface) {
+    return IsPlasticSurface(surface) ||
+        IsDirtSurface(surface) ||
+        IsGrassSurface(surface);
 }
 
-bool isPlasticSurface(EPlugSurfaceMaterialId surface) {
+bool IsPlasticSurface(EPlugSurfaceMaterialId surface) {
     return
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Plastic ||
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Rubber ||  // found on edges of some plastic items, e.g., the mesh roof decor thing
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Water;  // ??? is this a good fit?
 }
 
-bool isPreview() {
+bool IsPreview() {
     return PREVIEW_DIRT || PREVIEW_GRASS || PREVIEW_ICE || PREVIEW_PLASTIC || PREVIEW_TARMAC || PREVIEW_WOOD;
 }
 
-bool isSupportedSurface(EPlugSurfaceMaterialId surface) {
-    return isPlasticSurface(surface) ||
-        isIceSurface(surface) ||
-        isDirtSurface(surface) ||
-        isGrassSurface(surface) ||
-        isWoodSurface(surface);
+bool IsSupportedSurface(EPlugSurfaceMaterialId surface) {
+    return IsPlasticSurface(surface) ||
+        IsIceSurface(surface) ||
+        IsDirtSurface(surface) ||
+        IsGrassSurface(surface) ||
+        IsWoodSurface(surface);
 }
 
-bool isTarmacSurface(EPlugSurfaceMaterialId surface) {
+bool IsTarmacSurface(EPlugSurfaceMaterialId surface) {
     return
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Concrete ||
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Asphalt ||
@@ -215,13 +215,13 @@ bool isTarmacSurface(EPlugSurfaceMaterialId surface) {
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::ResonantMetal;
 }
 
-bool isWoodSurface(EPlugSurfaceMaterialId surface) {
+bool IsWoodSurface(EPlugSurfaceMaterialId surface) {
     return
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Wood ||
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::SlidingWood;
 }
 
-float lerpToMidpoint(vec2[] points, float c) {
+float LerpToMidpoint(vec2[] points, float c) {
     if (points.Length == 0) {
         return 0;
     }
@@ -249,7 +249,7 @@ float lerpToMidpoint(vec2[] points, float c) {
     return Math::Lerp(lower.y, upper.y, pos);
 }
 
-float normalizeSlipAngle(float slipAngle, float frontSpeed) {
+float NormalizeSlipAngle(float slipAngle, float frontSpeed) {
     int polarity;
     float ret;
 
@@ -269,8 +269,8 @@ float normalizeSlipAngle(float slipAngle, float frontSpeed) {
     return ret * polarity;
 }
 
-float previewSlip(float in_slip) {
-    if (isPreview()) {
+float PreviewSlip(float in_slip) {
+    if (IsPreview()) {
         return PREVIEW_SLIP;
     } else {
         return in_slip;

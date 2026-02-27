@@ -17,11 +17,11 @@ class ForwardProjection {
     int NUM_POINTS = 10;
     int idx = 0;
 
-    void addValue(int d_idx, vec3 dx) {
+    void AddValue(int d_idx, vec3 dx) {
         derivativeArrays[d_idx][idx] = dx;
     }
 
-    vec3 getDerivative(int d_idx) {
+    vec3 GetDerivative(int d_idx) {
         vec3 r = 0;
         for (int i = 0; i < SMOOTHING; i++) {
             r += derivativeArrays[d_idx][i];
@@ -29,24 +29,24 @@ class ForwardProjection {
         return (r / SMOOTHING);
     }
 
-    bool shouldRender(CSceneVehicleVisState@ visState) {
+    bool ShouldRender(CSceneVehicleVisState@ visState) {
         return
-            NOODLEBOB_TARMAC && isTarmacSurface(visState.FLGroundContactMaterial)
-            || NOODLEBOB_GRASS && isGrassSurface(visState.FLGroundContactMaterial)
-            || NOODLEBOB_DIRT && isDirtSurface(visState.FLGroundContactMaterial)
-            || NOODLEBOB_PLASTIC && isPlasticSurface(visState.FLGroundContactMaterial)
-            || NOODLEBOB_ICE && isIceSurface(visState.FLGroundContactMaterial);
+            NOODLEBOB_TARMAC && IsTarmacSurface(visState.FLGroundContactMaterial)
+            || NOODLEBOB_GRASS && IsGrassSurface(visState.FLGroundContactMaterial)
+            || NOODLEBOB_DIRT && IsDirtSurface(visState.FLGroundContactMaterial)
+            || NOODLEBOB_PLASTIC && IsPlasticSurface(visState.FLGroundContactMaterial)
+            || NOODLEBOB_ICE && IsIceSurface(visState.FLGroundContactMaterial);
     }
 
-    void updateAndRender(CSceneVehicleVisState@ visState) {
-        if (!ENABLE_NOODLEBOB || visState.WorldVel.LengthSquared() < (20 ** 2) || !shouldRender(visState)) {
+    void UpdateAndRender(CSceneVehicleVisState@ visState) {
+        if (!ENABLE_NOODLEBOB || visState.WorldVel.LengthSquared() < (20 ** 2) || !ShouldRender(visState)) {
             return;
         }
         vec3 v = visState.WorldVel * NOODLEBOB_SCALE;
 
         for (int i = 0; i < NUM_DERIVATIVES; i++) {
-            addValue(i, v);
-            v = v - getDerivative(i);
+            AddValue(i, v);
+            v = v - GetDerivative(i);
         }
 
         idx = (idx + 1) % SMOOTHING;
@@ -54,7 +54,7 @@ class ForwardProjection {
         vec3[] vs(NUM_DERIVATIVES);
 
         for (int i = 0; i < NUM_DERIVATIVES; i++) {
-            vs[i] = getDerivative(i);
+            vs[i] = GetDerivative(i);
         }
         vec3 pos = visState.Position;
         for (int i = 0; i < NUM_NOODLEBOB_POINTS; i++) {
