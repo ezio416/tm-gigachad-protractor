@@ -1,9 +1,9 @@
 [meta]
-name = "GigaChad Protractor"
+name = "Gigachad Protractor"
 author = "sgt_bigbird"
-category = "Gamer Tools"
+category = "School"
 version = "1.0.4"
+siteid = 654
 
 [script]
-dependencies = [ "VehicleState", "Camera" ]
-timeout = 0
+dependencies = [ "Camera", "VehicleState" ]
