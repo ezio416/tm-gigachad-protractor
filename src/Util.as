@@ -64,11 +64,8 @@ vec4 GetColor(const int idx) {
 }
 
 string GetMapUid() {
-    auto App = cast<CTrackMania>(GetApp());
-    if (App.RootMap !is null) {
-        App.RootMap.EdChallengeId;
-    }
-    return "";
+    CGameCtnApp@ App = GetApp();
+    return App.RootMap !is null ? App.RootMap.EdChallengeId : "";
 }
 
 CSmPlayer@ GetPlayer() {

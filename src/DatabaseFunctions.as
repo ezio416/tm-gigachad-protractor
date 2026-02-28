@@ -13,7 +13,7 @@ class DatabaseFunctions {
         if (IsMapSkipped(uid)) {
             return;
         }
-        SQLite::Statement@ statement = database.Prepare("INSERT INTO skip_maps VALUES (?)");
+        SQLite::Statement@ statement = database.Prepare("REPLACE INTO skip_maps VALUES (?)");
         statement.Bind(1, uid);
         statement.Execute();
         prev_init = false;

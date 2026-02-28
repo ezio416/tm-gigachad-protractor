@@ -1,3 +1,8 @@
+const string  pluginColor = "\\$393";
+const string  pluginIcon  = Icons::Bars;
+Meta::Plugin@ pluginMeta  = Meta::ExecutingPlugin();
+const string  pluginTitle = pluginColor + pluginIcon + "\\$G " + pluginMeta.Name;
+
 Protractor@ protractor;
 DatabaseFunctions@ databasefunctions;
 
@@ -36,16 +41,25 @@ void Render() {
 }
 
 void RenderMenu() {
-    if (UI::BeginMenu(((g_visible || databasefunctions.IsMapSkipped(GetMapUid())) ? "\\$393" : "\\$999") + Icons::Bars + "\\$z GigaChad Protractor", true)) {
-        if (UI::MenuItem(g_visible ? "\\$999" + Icons::Check + "\\$z Disable GCP" : "\\$393" + Icons::Check + "\\$z Enable GCP")) {
+    if (UI::BeginMenu(pluginTitle)) {
+        if (UI::MenuItem("Enabled", "", g_visible)) {
             g_visible = !g_visible;
         }
-        if (UI::MenuItem("Disable on this map")) {
-            databasefunctions.DisableMap(GetMapUid());
+
+        const string uid = GetMapUid();
+
+        UI::BeginDisabled(uid.Length == 0);
+        if (databasefunctions.IsMapSkipped(uid)) {
+            if (UI::MenuItem("Enable on this map")) {
+                databasefunctions.EnableMap(uid);
+            }
+        } else {
+            if (UI::MenuItem("Disable on this map")) {
+                databasefunctions.DisableMap(uid);
+            }
         }
-        if (UI::MenuItem("Enable on this map")) {
-            databasefunctions.EnableMap(GetMapUid());
-        }
+        UI::EndDisabled();
+
         UI::EndMenu();
     }
 }
