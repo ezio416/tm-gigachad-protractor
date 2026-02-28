@@ -364,7 +364,7 @@ class Protractor {
             RenderAngle(visState, start, length, width, theta, offset, color);
     }
 
-    void renderHistoryTrail(CSceneVehicleVisState@ visState, const float start, const float length) {
+    void RenderHistoryTrail(CSceneVehicleVisState@ visState, const float start, const float length) {
         HistoryTrailObject@ o = historyTrail.GetAtIdx(0);
         float slip = o.slip;
         slip = ProcessTheta(slip);
@@ -703,7 +703,7 @@ class Protractor {
             RENDER_MODE != RenderMode::ICE || !S_HistoryHideIce
         )) {
             historyTrail.Update(theta, color);
-            renderHistoryTrail(visState, pointer_start, pointer_length);
+            RenderHistoryTrail(visState, pointer_start, pointer_length);
         }
         HandleGearPointerFlip(theta);
 
