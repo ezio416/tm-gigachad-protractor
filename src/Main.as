@@ -1,8 +1,8 @@
 Protractor@ protractor;
 DatabaseFunctions@ databasefunctions;
 
-float HALF_PI = 1.57079632679;
-float g_dt = 0;
+float HALF_PI = 1.57079632679f;
+float g_dt = 0.0f;
 
 void Main() {
     @protractor = Protractor();

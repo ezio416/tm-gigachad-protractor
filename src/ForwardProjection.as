@@ -22,7 +22,7 @@ class ForwardProjection {
     }
 
     vec3 GetDerivative(int d_idx) {
-        vec3 r = 0;
+        vec3 r = 0.0f;
         for (int i = 0; i < SMOOTHING; i++) {
             r += derivativeArrays[d_idx][i];
         }
@@ -39,7 +39,7 @@ class ForwardProjection {
     }
 
     void UpdateAndRender(CSceneVehicleVisState@ visState) {
-        if (!ENABLE_NOODLEBOB || visState.WorldVel.LengthSquared() < (20 ** 2) || !ShouldRender(visState)) {
+        if (!ENABLE_NOODLEBOB || visState.WorldVel.LengthSquared() < 400.0f || !ShouldRender(visState)) {
             return;
         }
         vec3 v = visState.WorldVel * NOODLEBOB_SCALE;

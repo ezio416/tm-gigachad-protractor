@@ -1,23 +1,23 @@
 
 vec4 ApplyOpacityToColor(vec4 inColor, float opacity) {
     if (Math::IsInf(opacity) || Math::IsNaN(opacity)) {
-        return vec4(0);
+        return vec4();
     }
 
     if (Math::IsInf(inColor.x) || Math::IsNaN(inColor.x)) {
-        return vec4(0);
+        return vec4();
     }
 
     vec4 outColor = inColor;
     outColor.w = Math::Min(opacity, outColor.w);
-    outColor.w = Math::Max(outColor.w, 0);
+    outColor.w = Math::Max(outColor.w, 0.0f);
 
     return outColor;
 }
 
 float ApproximateSideSpeed(const vec2[] data, float speed) {
     if (data.Length == 0) {
-        return 0;
+        return 0.0f;
     }
     vec2 lower = data[0];
     vec2 upper = data[data.Length - 1];
@@ -44,7 +44,7 @@ float CalcAngle(vec3 v1, vec3 v2) {
 
 float CalcVecAngle(vec3 vec1, vec3 vec2) {
     if (vec1.Length() == 0 || vec2.Length() == 0) {
-        return 0;
+        return 0.0f;
     }
     float angle = Math::Acos(Math::Dot(vec1, vec2) / (vec1.Length() * vec2.Length())) - HALF_PI;
     return angle;
@@ -102,16 +102,16 @@ float GetSlipTotal(CSceneVehicleVisState@ visState) {
 }
 
 float GetTargetThetaMultFactor(CSceneVehicleVisState@ visState) {
-    if (visState.FLIcing01 > 0) {
-        return 1;
+    if (visState.FLIcing01 > 0.0f) {
+        return 1.0f;
     }
 
-    if (visState.FrontSpeed < 0) {
+    if (visState.FrontSpeed < 0.0f) {
         return BACKWARDS_TM;
     }
 
     if (SIMPLIFIED_VIEW) {
-        return 1;
+        return 1.0f;
     }
 
     float sum =
@@ -120,12 +120,12 @@ float GetTargetThetaMultFactor(CSceneVehicleVisState@ visState) {
             + GetThetaMultForSurface(visState.RLGroundContactMaterial)
             + GetThetaMultForSurface(visState.RRGroundContactMaterial);
 
-    return sum / 4;
+    return sum / 4.0f;
 }
 
 float GetThetaMultForSurface(EPlugSurfaceMaterialId surface) {
     if (IsIceSurface(surface)) {
-        return 1;
+        return 1.0f;
     }
     if (IsDirtSurface(surface)) {
         return DIRT_TM;
@@ -142,7 +142,7 @@ float GetThetaMultForSurface(EPlugSurfaceMaterialId surface) {
     if (IsWoodSurface(surface)) {
         return WOOD_TM;
     }
-    return -1000;
+    return -1000.0f;
 }
 
 CSceneVehicleVisState@ GetVisState() {
@@ -223,7 +223,7 @@ bool IsWoodSurface(EPlugSurfaceMaterialId surface) {
 
 float LerpToMidpoint(vec2[] points, float c) {
     if (points.Length == 0) {
-        return 0;
+        return 0.0f;
     }
     vec2 lower = points[0];
     vec2 upper = points[points.Length - 1];
@@ -262,7 +262,7 @@ float NormalizeSlipAngle(float slipAngle, float frontSpeed) {
     slipAngle = Math::Abs(slipAngle);
 
     if (frontSpeed < 0) {
-        ret = 2 * HALF_PI - slipAngle;
+        ret = Math::PI - slipAngle;
     } else {
         ret = slipAngle;
     }
