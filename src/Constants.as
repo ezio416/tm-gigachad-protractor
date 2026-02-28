@@ -1,5 +1,5 @@
 const float BW_MIN         = 15.0f;
-const float HALF_PI        = 1.57079632679f;
+const float HALF_PI        = 1.570796f;
 const float OTHER_SURF_MIN = 55.555555f;
 const float ROAD_MIN       = 109.722222f;
 const float WOOD_MIN       = 10.0f;
@@ -245,7 +245,7 @@ const vec2[] WOOD_WET_ICE_P1 = {
 
 const vec2[] WOOD_WET_ICE_VALLEY = {
     vec2(10.0f,  4.34f),
-    vec2(400.0f, 173.986213644f)
+    vec2(400.0f, 173.986214f)
 };
 
 const vec2[] WOOD_WET_ICE_P2 = {

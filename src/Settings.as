@@ -182,11 +182,11 @@ float S_IceRegionInset = 0.023f;
 [Setting category="Ice" name="Ice region start (relative to player pointer)" min=0.0f max=1.0f]
 float S_IceRegionStart = 0.561f;
 
-[Setting category="Ice" name="Ice region end (relative to player pointer)" min=0 max=1]
+[Setting category="Ice" name="Ice region end (relative to player pointer)" min=0.0f max=1.0f]
 float S_IceRegionEnd = 0.891f;
 
 [Setting category="Ice" name="Ice warning region color" color]
-vec4 S_IceRegionWarning = vec4(222.0f, 235.0f, 52.0f, 255.0f) / 255.0f;
+vec4 S_IceRegionWarning = vec4(0.871f, 0.922f, 0.204f, 1.0f);
 
 [Setting category="Ice" name="Ice region inset frac" min=0.0f max=0.1f]
 float S_IceRegionInsetFraction = 0.0f;
