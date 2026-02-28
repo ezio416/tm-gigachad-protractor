@@ -12,8 +12,8 @@ class ForwardProjection {
         }
     }
 
-    int S_NoodlebobDerivateCount = 4;
-    int S_NoodlebobSmoothing = 20;
+    int NoodlebobDerivateCount = 4;
+    int NoodlebobSmoothing = 20;
     int NUM_POINTS = 10;
     int idx = 0;
 
@@ -23,10 +23,10 @@ class ForwardProjection {
 
     vec3 GetDerivative(const int d_idx) {
         vec3 r = 0.0f;
-        for (int i = 0; i < S_NoodlebobSmoothing; i++) {
+        for (int i = 0; i < NoodlebobSmoothing; i++) {
             r += derivativeArrays[d_idx][i];
         }
-        return (r / S_NoodlebobSmoothing);
+        return (r / NoodlebobSmoothing);
     }
 
     bool ShouldRender(CSceneVehicleVisState@ visState) {
@@ -44,16 +44,16 @@ class ForwardProjection {
         }
         vec3 v = visState.WorldVel * S_NoodlebobScale;
 
-        for (int i = 0; i < S_NoodlebobDerivateCount; i++) {
+        for (int i = 0; i < NoodlebobDerivateCount; i++) {
             AddValue(i, v);
             v = v - GetDerivative(i);
         }
 
-        idx = (idx + 1) % S_NoodlebobSmoothing;
+        idx = (idx + 1) % NoodlebobSmoothing;
         vec3[] nexts;
-        vec3[] vs(S_NoodlebobDerivateCount);
+        vec3[] vs(NoodlebobDerivateCount);
 
-        for (int i = 0; i < S_NoodlebobDerivateCount; i++) {
+        for (int i = 0; i < NoodlebobDerivateCount; i++) {
             vs[i] = GetDerivative(i);
         }
         vec3 pos = visState.Position;
@@ -61,7 +61,7 @@ class ForwardProjection {
             pos += vs[0];
             nexts.InsertLast(pos);
 
-            for (int j = 0; j < S_NoodlebobDerivateCount - 1; j++) {
+            for (int j = 0; j < NoodlebobDerivateCount - 1; j++) {
                 vs[j] += vs[j + 1];
             }
         }
