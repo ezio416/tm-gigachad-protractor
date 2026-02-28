@@ -7,18 +7,6 @@ class HistoryTrail {
         return (currentIndex + S_HistoryPoints + offset) % S_HistoryPoints;
     }
 
-    float CalculateOpacity() {
-        // decide the overall fade of the whole trail based on whether or not the slide is all on the same side
-        // e.g., if it's 100/0, 100% - 75/25, 50% - 50/50, 0%.
-        float sum = 0.0f;
-        HistoryTrailObject@ o;
-        for (int i = 0; i < S_HistoryPoints; i++) {
-            o = historyTrailArr[CalcNext(i)];
-            sum += o.slip;
-        }
-        return Math::Abs(sum) / S_HistoryPoints;
-    }
-
     HistoryTrailObject@ GetAtIdx(const int idx) {
         return historyTrailArr[CalcNext(-idx)];
     }

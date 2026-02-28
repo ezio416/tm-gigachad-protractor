@@ -183,12 +183,6 @@ bool IsIceSurface(const EPlugSurfaceMaterialId surface) {
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Snow;
 }
 
-bool IsPlasticDirtOrGrass(const EPlugSurfaceMaterialId surface) {
-    return IsPlasticSurface(surface) ||
-        IsDirtSurface(surface) ||
-        IsGrassSurface(surface);
-}
-
 bool IsPlasticSurface(const EPlugSurfaceMaterialId surface) {
     return
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Plastic ||
@@ -198,14 +192,6 @@ bool IsPlasticSurface(const EPlugSurfaceMaterialId surface) {
 
 bool IsPreview() {
     return S_PreviewDirt || S_PreviewGrass || S_PreviewIce || S_PreviewPlastic || S_PreviewRoad || S_PreviewWood;
-}
-
-bool IsSupportedSurface(const EPlugSurfaceMaterialId surface) {
-    return IsPlasticSurface(surface) ||
-        IsIceSurface(surface) ||
-        IsDirtSurface(surface) ||
-        IsGrassSurface(surface) ||
-        IsWoodSurface(surface);
 }
 
 bool IsRoadSurface(const EPlugSurfaceMaterialId surface) {

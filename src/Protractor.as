@@ -16,14 +16,6 @@ class Protractor {
     float                  thetaMult;
     vec3                   vel;
 
-    float get_theta_base(const vec3&in vec) {
-        float t = vec.z == 0.0f ? 0.0f : Math::Atan(vec.x / vec.z);
-        if (vec.z < 0.0f) {
-            t += Math::PI;
-        }
-        return t;
-    }
-
     float GetIceLineBrightness(const float slip, const float theta) {
         const float diff = Math::Abs(slip - theta);
         const float ret = Math::InvLerp(S_IceLineFadeRate, 0.0f, diff);
@@ -345,21 +337,6 @@ class Protractor {
             RenderSimplifiedView(visState, start, length, width, theta, offset, color);
         } else {
             _RenderAngle(visState, start, length, width, theta, offset, color);
-        }
-    }
-
-    void RenderAngleConditional(
-        CSceneVehicleVisState@ visState,
-        const float start,
-        const float length,
-        const float width,
-        const float theta,
-        const vec3&in offset,
-        const vec4&in color,
-        const bool conditional
-    ) {
-        if (conditional) {
-            RenderAngle(visState, start, length, width, theta, offset, color);
         }
     }
 
