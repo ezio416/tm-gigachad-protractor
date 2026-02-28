@@ -142,10 +142,9 @@ class Protractor {
     void HandleRunStart() {
         if (GetPlayerStartTime() == currentRunStartTime) {
             return;
-        } else {
-            currentRunStartTime = GetPlayerStartTime();
-            playerFadeOpacity = 0.0f;
         }
+        currentRunStartTime = GetPlayerStartTime();
+        playerFadeOpacity = 0.0f;
     }
 
     vec4 IO(const vec4&in color, const float slip, const float theta) {
@@ -170,11 +169,11 @@ class Protractor {
 
         if (v1 > 1.9f && v1 < 2.0f && v2 > 0.85f && v2 < 0.9f) {
             return 1;
-        } else if (v1 > 2.3f && v1 < 2.4f && v2 > 2.7f && v2 < 2.8f) {
-            return 2;
-        } else {
-            return 0;
         }
+        if (v1 > 2.3f && v1 < 2.4f && v2 > 2.7f && v2 < 2.8f) {
+            return 2;
+        }
+        return 0;
     }
 
     void IsPreviewOpacityCheck() {
@@ -206,8 +205,9 @@ class Protractor {
 
     float ProcessTheta(float theta) {
         if (renderMode == RenderMode::ICE) {
-            if (S_FlipDisplayIce)
+            if (S_FlipDisplayIce) {
                 theta = 2.0f * Math::PI - theta;
+            }
             return theta;
         }
         if (S_Simplified && renderMode == RenderMode::NORMAL && cam3 == 0) {
@@ -219,8 +219,9 @@ class Protractor {
         }
 
         theta *= thetaMult;
-        if (S_FlipDisplay ^^ (renderMode == RenderMode::BACKWARDS))
+        if (S_FlipDisplay ^^ (renderMode == RenderMode::BACKWARDS)) {
             theta = Math::PI + theta;
+        }
 
         return theta;
     }
@@ -342,7 +343,6 @@ class Protractor {
     ) {
         if (S_Simplified && renderMode == RenderMode::NORMAL && cam3 == 0) {
             RenderSimplifiedView(visState, start, length, width, theta, offset, color);
-            return;
         } else {
             _RenderAngle(visState, start, length, width, theta, offset, color);
         }
@@ -358,8 +358,9 @@ class Protractor {
         const vec4&in color,
         const bool conditional
     ) {
-        if (conditional)
+        if (conditional) {
             RenderAngle(visState, start, length, width, theta, offset, color);
+        }
     }
 
     void RenderHistoryTrail(CSceneVehicleVisState@ visState, const float start, const float length) {
@@ -444,8 +445,6 @@ class Protractor {
         }
         if (Math::Angle(vec_vel, visState.Left) > HALF_PI || IsPreview()) {
             t *= -1.0f;
-        } else {
-            t *= 1.0f;
         }
 
         vec4 color;
@@ -616,9 +615,7 @@ class Protractor {
                     lines[1],
                     vec3(),
                     ApplyOpacityToColor(S_IceRegionGoodColor, appliedOpacity),
-                    ApplyOpacityToColor(S_IceRegionOutlineColor, appliedOpacity),
                     slip,
-                    S_IceRegionThickness,
                     true,
                     appliedOpacity
                 );
@@ -630,9 +627,7 @@ class Protractor {
                     lines[3],
                     vec3(),
                     ApplyOpacityToColor(S_IceRegionGoodColor, appliedOpacity),
-                    ApplyOpacityToColor(S_IceRegionOutlineColor, appliedOpacity),
                     slip,
-                    S_IceRegionThickness,
                     true,
                     appliedOpacity
                 );
@@ -644,14 +639,12 @@ class Protractor {
                     lines[2],
                     vec3(),
                     ApplyOpacityToColor(S_IceDangerWedgeColor, appliedOpacity),
-                    ApplyOpacityToColor(S_IceRegionOutlineColor, appliedOpacity),
                     slip,
-                    S_IceRegionThickness,
                     false,
                     appliedOpacity
                 );
 
-            } else if (relativePos < 0.5f) {
+            } else {
                 appliedOpacity = Math::Min((0.5f - relativePos), 1);
                 RenderRegion(
                     visState,
@@ -661,9 +654,7 @@ class Protractor {
                     lines[1],
                     vec3(),
                     ApplyOpacityToColor(S_IceRegionGoodColor, appliedOpacity),
-                    ApplyOpacityToColor(S_IceRegionOutlineColor, appliedOpacity),
                     slip,
-                    S_IceRegionThickness,
                     true,
                     appliedOpacity
                 );
@@ -696,10 +687,7 @@ class Protractor {
         const vec3&in offset,
         vec4 color
     ) {
-        if (S_History &&
-        (
-            renderMode != RenderMode::ICE || !S_HistoryHideIce
-        )) {
+        if (S_History && (renderMode != RenderMode::ICE || !S_HistoryHideIce)) {
             historyTrail.Update(theta, color);
             RenderHistoryTrail(visState, pointer_start, pointer_length);
         }
@@ -783,16 +771,14 @@ class Protractor {
      * This lets us split it out to render subregions - i.e., the "safe" zone and warning zones
      */
     void RenderRegion(
-        CSceneVehicleVisState @ visState,
+        CSceneVehicleVisState@ visState,
         const float start,
         const float length,
         float thetaStart,
         float thetaEnd,
         const vec3&in offset,
         vec4 fillColor,
-        const vec4&in outlineColor,
         const float slip,
-        const float outlineThickness,
         const bool renderWarnZone,
         const float appliedOpacity
     ) {
@@ -810,7 +796,7 @@ class Protractor {
         thetaStart *= flip;
         thetaEnd *= flip;
         inner_thetaStart *= flip;
-        inner_thetaEnd   *= flip;
+        inner_thetaEnd *= flip;
 
         const vec2 radialRoot = Camera::ToScreenSpace(ProjectAngle(visState, (start + length) * S_IceRegionRadialInsetFraction, -1.0f * flip * ProcessTheta(slip)));
         const vec2 outermostPos = Camera::ToScreenSpace(ProjectAngle(visState, (start + length), ((thetaStart + thetaEnd) / 2.0f)));
@@ -849,11 +835,28 @@ class Protractor {
         }
     }
 
-    void RenderSurface(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel, const float min_vel, const vec2[]&in ideal_config, const vec2[]&in base_config, const vec2[]&in zero_config) {
+    void RenderSurface(
+        CSceneVehicleVisState@ visState,
+        const float speed,
+        const vec3&in vec_vel,
+        const float min_vel,
+        const vec2[]&in ideal_config,
+        const vec2[]&in base_config,
+        const vec2[]&in zero_config
+    ) {
         RenderSurface(visState, speed, vec_vel, min_vel, ideal_config, base_config, zero_config, true);
     }
 
-    void RenderSurface(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel, const float min_vel, const vec2[]&in ideal_config, const vec2[]&in base_config, const vec2[]&in zero_config, const bool show_good_ss) {
+    void RenderSurface(
+        CSceneVehicleVisState@ visState,
+        const float speed,
+        const vec3&in vec_vel,
+        const float min_vel,
+        const vec2[]&in ideal_config,
+        const vec2[]&in base_config,
+        const vec2[]&in zero_config,
+        const bool show_good_ss
+    ) {
         const float target_ss = ApproximateSideSpeed(ideal_config, speed);
         const float outer_ss = ApproximateSideSpeed(zero_config, speed);
         const float base_ss = ApproximateSideSpeed(base_config, speed);
@@ -960,7 +963,7 @@ class Protractor {
         vec3 offset,
         const vec4&in color
     ) {
-        if (cam3 > 0 && (!S_SimplifiedCam3) && S_Simplified) {
+        if (cam3 > 0 && !S_SimplifiedCam3 && S_Simplified) {
             return;
         }
 

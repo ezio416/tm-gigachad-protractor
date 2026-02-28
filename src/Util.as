@@ -86,8 +86,9 @@ CSmPlayer@ GetPlayer() {
 
 int GetPlayerStartTime() {
     CSmPlayer@ Player = GetPlayer();
-    if (Player !is null)
+    if (Player !is null) {
         return Player.StartTime;
+    }
     return 0;
 }
 
@@ -151,12 +152,12 @@ CSceneVehicleVisState@ GetVisState() {
     if (S_PlayerIndex == 0) {
         return VehicleState::ViewingPlayerState();
     }
-    int pidx = Math::Clamp(S_PlayerIndex, 0, VehicleState::GetAllVis(GetApp().GameScene).Length);
-    auto arr = VehicleState::GetAllVis(GetApp().GameScene);
-    if (arr.Length == 0) {
+    CSceneVehicleVis@[] AllVis = VehicleState::GetAllVis(GetApp().GameScene);
+    int pidx = Math::Clamp(S_PlayerIndex, 0, AllVis.Length);
+    if (AllVis.Length == 0) {
         return null;
     }
-    auto vs = arr[pidx];
+    auto vs = AllVis[pidx];
     if (vs !is null) {
         return vs.AsyncState;
     }
