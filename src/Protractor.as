@@ -1,22 +1,20 @@
 class Protractor {
-    vec3 vel;
-    float slipAngle = 0.0f;
-    int current_run_starttime = 0;
-    EPlugSurfaceMaterialId surface_normalized;
-    float[] slip_arr(100);
-    int slip_pos = 0;
-    float theta_mult;
-    int is_cam3 = 0;
-    bool BAD_SLIDE = false;
-    // opacity settings
-    float playerFadeOpacity;
-    RenderMode RENDER_MODE = RenderMode::NORMAL;
-    float gearPointerFlip = 1.0f;
-    bool activeWood = false;
-
-    GearStateManager gearStateManager();
-    ForwardProjection fowardProjection();
-    HistoryTrail historyTrail();
+    bool                   activeWood          = false;
+    bool                   badSlide            = false;
+    int                    cam3                = 0;
+    int                    currentRunStartTime = 0;
+    ForwardProjection      forwardProjection;
+    float                  gearPointerFlip     = 1.0f;
+    GearStateManager       gearStateManager;
+    HistoryTrail           historyTrail;
+    float                  playerFadeOpacity;
+    RenderMode             renderMode           = RenderMode::NORMAL;
+    float[]                slipArr(100);
+    int                    slipPos              = 0;
+    float                  slipAngle            = 0.0f;
+    EPlugSurfaceMaterialId surfaceNormalized;
+    float                  thetaMult;
+    vec3                   vel;
 
     float get_theta_base(const vec3&in vec) {
         float t = vec.z == 0 ? 0.0f : Math::Atan(vec.x / vec.z);
@@ -85,12 +83,12 @@ class Protractor {
         }
 
         const float slip = CalcVecAngle(left, vel);
-        slip_arr[slip_pos % S_SlipSmoothing] = slip;
-        slip_pos += 1;
+        slipArr[slipPos % S_SlipSmoothing] = slip;
+        slipPos += 1;
 
         float ret = 0.0f;
         for (int i = 0; i < S_SlipSmoothing; i++) {
-            ret += slip_arr[i];
+            ret += slipArr[i];
         }
         return ret / S_SlipSmoothing;
     }
@@ -99,8 +97,8 @@ class Protractor {
         float start = S_SDPointerStart;
         float length = S_SDPointerLength;
 
-        if (is_cam3 > 0) {
-            if (is_cam3 == 1) {
+        if (cam3 > 0) {
+            if (cam3 == 1) {
                 start = S_Cam3InternalStart;
                 length = S_Cam3InternalLength;
             } else {
@@ -123,29 +121,29 @@ class Protractor {
 
     void HandleNormalizeSurface(CSceneVehicleVisState@ visState) {
         if (S_PreviewRoad) {
-            surface_normalized = EPlugSurfaceMaterialId::Asphalt;
+            surfaceNormalized = EPlugSurfaceMaterialId::Asphalt;
         } else if (S_PreviewDirt) {
-            surface_normalized = EPlugSurfaceMaterialId::Dirt;
+            surfaceNormalized = EPlugSurfaceMaterialId::Dirt;
         } else if (S_PreviewPlastic) {
-            surface_normalized = EPlugSurfaceMaterialId::Plastic;
+            surfaceNormalized = EPlugSurfaceMaterialId::Plastic;
         } else if (S_PreviewGrass) {
-            surface_normalized = EPlugSurfaceMaterialId::Grass;
+            surfaceNormalized = EPlugSurfaceMaterialId::Grass;
         } else if (S_PreviewIce) {
-            surface_normalized = EPlugSurfaceMaterialId::Ice;
+            surfaceNormalized = EPlugSurfaceMaterialId::Ice;
         } else if (S_PreviewWood) {
-            surface_normalized = EPlugSurfaceMaterialId::Wood;
+            surfaceNormalized = EPlugSurfaceMaterialId::Wood;
         } else {
             if (visState.FLGroundContactMaterial != EPlugSurfaceMaterialId::XXX_Null) {
-                surface_normalized = visState.FLGroundContactMaterial;
+                surfaceNormalized = visState.FLGroundContactMaterial;
             }
         }
     }
 
     void HandleRunStart() {
-        if (GetPlayerStartTime() == current_run_starttime) {
+        if (GetPlayerStartTime() == currentRunStartTime) {
             return;
         } else {
-            current_run_starttime = GetPlayerStartTime();
+            currentRunStartTime = GetPlayerStartTime();
             playerFadeOpacity = 0.0f;
         }
     }
@@ -207,21 +205,21 @@ class Protractor {
     }
 
     float ProcessTheta(float theta) {
-        if (RENDER_MODE == RenderMode::ICE) {
+        if (renderMode == RenderMode::ICE) {
             if (S_FlipDisplayIce)
                 theta = 2.0f * Math::PI - theta;
             return theta;
         }
-        if (S_Simplified && RENDER_MODE == RenderMode::NORMAL && is_cam3 == 0) {
+        if (S_Simplified && renderMode == RenderMode::NORMAL && cam3 == 0) {
             return Math::PI - theta;
         }
 
-        if (RENDER_MODE == RenderMode::BACKWARDS) {
+        if (renderMode == RenderMode::BACKWARDS) {
             theta *= -1.0f;
         }
 
-        theta *= theta_mult;
-        if (S_FlipDisplay ^^ (RENDER_MODE == RenderMode::BACKWARDS))
+        theta *= thetaMult;
+        if (S_FlipDisplay ^^ (renderMode == RenderMode::BACKWARDS))
             theta = Math::PI + theta;
 
         return theta;
@@ -246,12 +244,12 @@ class Protractor {
         if (visState is null) {
             return;
         }
-        is_cam3 = IsCam3(visState);
+        cam3 = IsCam3(visState);
         HandleRunStart();
         IsPreviewOpacityCheck();
         SetThetaMult(visState);
         HandleNormalizeSurface(visState);
-        fowardProjection.UpdateAndRender(visState);
+        forwardProjection.UpdateAndRender(visState);
 
         float vel;
 
@@ -269,52 +267,52 @@ class Protractor {
 
         gearStateManager.HandleUpdate(slipAngle, vel, (IsPreview() ? S_PreviewGear : visState.CurGear));
 
-        if ((VehicleState::GetVehicleType(visState) == VehicleState::VehicleType::CarSport && !S_RallyOverride) && IsIceSurface(surface_normalized) && visState.FLIcing01 > 0.0f) {
-            RENDER_MODE = RenderMode::ICE;
+        if ((VehicleState::GetVehicleType(visState) == VehicleState::VehicleType::CarSport && !S_RallyOverride) && IsIceSurface(surfaceNormalized) && visState.FLIcing01 > 0.0f) {
+            renderMode = RenderMode::ICE;
             RenderIce(visState, vel, vec_vel);
             return;
         }
 
         if (visState.FrontSpeed < 0.0f || (IsPreview() && S_PreviewSpeed < 0.0f)) {
-            RENDER_MODE = RenderMode::BACKWARDS;
-            if (IsGrassSurface(surface_normalized)) {
+            renderMode = RenderMode::BACKWARDS;
+            if (IsGrassSurface(surfaceNormalized)) {
                 RenderSurface(visState, vel, vec_vel, BW_MIN, BW_GRASS_IDEAL, {}, BW_GRASS_ZERO);
                 return;
             }
-            if (IsDirtSurface(surface_normalized)) {
+            if (IsDirtSurface(surfaceNormalized)) {
                 RenderSurface(visState, vel, vec_vel, BW_MIN, BW_DIRT_IDEAL, {}, BW_DIRT_ZERO);
                 return;
             }
-            if (IsPlasticSurface(surface_normalized)) {
+            if (IsPlasticSurface(surfaceNormalized)) {
                 // just using grass ideals for plastic BW for now
                 RenderSurface(visState, vel, vec_vel, BW_MIN, BW_GRASS_IDEAL, {}, BW_GRASS_ZERO);
                 return;
             }
-            if (IsRoadSurface(surface_normalized)) {
+            if (IsRoadSurface(surfaceNormalized)) {
                 RenderSurface(visState, vel, vec_vel, BW_MIN, BW_ROAD_IDEAL, {}, BW_ROAD_ZERO);
                 return;
             }
         }
 
-        RENDER_MODE = RenderMode::NORMAL;
-        if (IsGrassSurface(surface_normalized)) {
+        renderMode = RenderMode::NORMAL;
+        if (IsGrassSurface(surfaceNormalized)) {
             RenderSurface(visState, vel, vec_vel, OTHER_SURF_MIN, GRASS_IDEAL, GRASS_BASE, GRASS_ZERO);
             return;
         }
-        if (IsDirtSurface(surface_normalized)) {
+        if (IsDirtSurface(surfaceNormalized)) {
             RenderSurface(visState, vel, vec_vel, OTHER_SURF_MIN, DIRT_IDEAL, DIRT_BASE, DIRT_ZERO);
             return;
         }
-        if (IsPlasticSurface(surface_normalized)) {
+        if (IsPlasticSurface(surfaceNormalized)) {
             RenderSurface(visState, vel, vec_vel, OTHER_SURF_MIN, PLASTIC_IDEAL, PLASTIC_BASE, PLASTIC_ZERO);
             return;
         }
-        if (IsRoadSurface(surface_normalized)) {
+        if (IsRoadSurface(surfaceNormalized)) {
             RenderSurface(visState, vel, vec_vel, ROAD_MIN, ROAD_IDEAL, ROAD_BASE, ROAD_ZERO);
             return;
         }
 
-        if (IsIceSurface(surface_normalized)) {
+        if (IsIceSurface(surfaceNormalized)) {
             if (VehicleState::GetVehicleType(visState) ==  VehicleState::VehicleType::CarRally) {
                 RenderSurface(visState, vel, vec_vel, 10, RALLY_ICE_PEAK, RALLY_ICE_ZERO, RALLY_ICE_SLIDEOUT, false);
             }
@@ -322,7 +320,7 @@ class Protractor {
                 RenderSurface(visState, vel, vec_vel, 10, DESERT_ICE_PEAK, DESERT_ICE_ZERO, DESERT_ICE_BACK_PEAK, false);
             }
         }
-        if (IsWoodSurface(surface_normalized) && (S_PreviewWet || visState.WetnessValue01 > 0.0f)) {
+        if (IsWoodSurface(surfaceNormalized) && (S_PreviewWet || visState.WetnessValue01 > 0.0f)) {
             activeWood = true;
             if (S_PreviewIcy || ((visState.FLIcing01 + visState.FRIcing01 + visState.RLIcing01 + visState.RRIcing01) > 0.0f)) {
                 RenderSurface(visState, vel, vec_vel, WOOD_MIN, WOOD_WET_ICE_P1, WOOD_WET_ICE_VALLEY, WOOD_WET_ICE_P2, false);
@@ -342,7 +340,7 @@ class Protractor {
         const vec3&in offset,
         const vec4&in color
     ) {
-        if (S_Simplified && RENDER_MODE == RenderMode::NORMAL && is_cam3 == 0) {
+        if (S_Simplified && renderMode == RenderMode::NORMAL && cam3 == 0) {
             RenderSimplifiedView(visState, start, length, width, theta, offset, color);
             return;
         } else {
@@ -374,7 +372,7 @@ class Protractor {
         vec3 start_p, end_p;
         vec3 off;
 
-        if (S_Simplified && is_cam3 > 0) {
+        if (S_Simplified && cam3 > 0) {
             return;
         }
 
@@ -700,14 +698,14 @@ class Protractor {
     ) {
         if (S_History &&
         (
-            RENDER_MODE != RenderMode::ICE || !S_HistoryHideIce
+            renderMode != RenderMode::ICE || !S_HistoryHideIce
         )) {
             historyTrail.Update(theta, color);
             RenderHistoryTrail(visState, pointer_start, pointer_length);
         }
         HandleGearPointerFlip(theta);
 
-        if (BAD_SLIDE && S_ShowBadSlide && !IsPreview()) {
+        if (badSlide && S_ShowBadSlide && !IsPreview()) {
             color = S_Color50;
         }
         RenderAngle( // player pointer
@@ -723,7 +721,7 @@ class Protractor {
             !S_PointerGears ||
             (S_HideGear5 && visState.CurGear == 5) ||
             (IsPreview() && S_PreviewGear == 5) ||
-            (RENDER_MODE == RenderMode::ICE && !S_VerboseIceGears)) {
+            (renderMode == RenderMode::ICE && !S_VerboseIceGears)) {
             return;
         }
 
@@ -878,12 +876,12 @@ class Protractor {
             ApplyOpacityToColor(GetPlayerPointerColor(abs_sidespeed, target_ss, good_ss, base_ss, outer_ss), 1.0f)
         );
 
-        BAD_SLIDE = false;
+        badSlide = false;
         int OP_RES = 0;
         if (speed < min_vel) {
             if (S_ShowBadSlide && GetSlipTotal(visState) > 0.0f) {
                 OP_RES = 1;
-                BAD_SLIDE = true;
+                badSlide = true;
             } else {
                 OP_RES = -1;
             }
@@ -891,7 +889,7 @@ class Protractor {
             if (GetSlipTotal(visState) == 0.0f && !(IsWoodSurface(visState.FLGroundContactMaterial) && visState.FLIcing01 > 0.0f && visState.WetnessValue01 > 0.0f)) {
                 if (S_ShowBadSlide) {
                     OP_RES = 1;
-                    BAD_SLIDE = true;
+                    badSlide = true;
                 } else {
                     OP_RES = -1;
                 }
@@ -937,13 +935,13 @@ class Protractor {
 
     void SetThetaMult(CSceneVehicleVisState@ visState) {
         float target = GetTargetThetaMultFactor(visState);
-        if (target < 0.0f || target == theta_mult) {
+        if (target < 0.0f || target == thetaMult) {
             return;
         }
-        if (target > theta_mult) {
-            theta_mult = Math::Min(target, theta_mult + S_ThetaMultDerivative);
+        if (target > thetaMult) {
+            thetaMult = Math::Min(target, thetaMult + S_ThetaMultDerivative);
         } else {
-            theta_mult = Math::Max(target, theta_mult - S_ThetaMultDerivative);
+            thetaMult = Math::Max(target, thetaMult - S_ThetaMultDerivative);
         }
     }
 
@@ -962,11 +960,11 @@ class Protractor {
         vec3 offset,
         const vec4&in color
     ) {
-        if (is_cam3 > 0 && (!S_SimplifiedCam3) && S_Simplified) {
+        if (cam3 > 0 && (!S_SimplifiedCam3) && S_Simplified) {
             return;
         }
 
-        if (RENDER_MODE == RenderMode::ICE) {
+        if (renderMode == RenderMode::ICE) {
             offset.x += S_IcePointerOffsetX;
             offset.z += (theta < 0.0f ? -1.0f : 1.0f) * S_IcePointerOffsetZ;
             theta += (theta < 0.0f ? -1.0f : 1.0f) * S_IcePointerOffsetAngle;
@@ -991,7 +989,7 @@ class Protractor {
         const float fillDarknessCoef,
         const vec2&in radialRoot
     ) {
-        if (RENDER_MODE == RenderMode::ICE) {
+        if (renderMode == RenderMode::ICE) {
             offset.x += S_IcePointerOffsetX;
             offset.z += (thetaStart < 0.0f ? -1.0f : 1.0f) * S_IcePointerOffsetZ;
             thetaStart += (thetaStart < 0.0f ? -1.0f : 1.0f) * S_IcePointerOffsetAngle;
@@ -1066,12 +1064,12 @@ class Protractor {
     ) {
         theta = ProcessTheta(theta);
 
-        if (S_Simplified && RENDER_MODE == RenderMode::NORMAL && is_cam3 == 0) {
+        if (S_Simplified && renderMode == RenderMode::NORMAL && cam3 == 0) {
             color = ApplyOpacityToColor(color, S_SimplifiedOpacity);
             width = S_SimplifiedLineThickness;
         }
 
-        for (int i = 0; i < (is_cam3 > 0 ? 1 : S_LayerCount); i++) {
+        for (int i = 0; i < (cam3 > 0 ? 1 : S_LayerCount); i++) {
             vec3 o = offset;
             const float y_offset = S_LayerHeight * i;
             o.y += y_offset;

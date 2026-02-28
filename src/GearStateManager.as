@@ -1,32 +1,40 @@
 class GearStateManager {
-    int current_idx;
-    float[]@ gearup_scores;
-    float[]@ frame_times;
-    float expectedRpm;
-    float expectedTrueRpm;
-    int current_gear;
-    int GEARUP_RPM_THRESH = 10000;
-    int GEARDOWN_RPM_THRESH = 7500;
-    int FRAMES_AVERAGED = 100;
-    float SCORE_MAX = GEARUP_RPM_THRESH * 1.5f;
-    uint64 lastColorFetchTime = 0;
-    float lastColorFetchScore = 0.0f;
+    int     currentIndex        = 0;
+    float   expectedRpm;
+    float   expectedTrueRpm     = 0.0f;
+    int     FRAMES_AVERAGED     = 100;
+    float[] frameTimes          = { 500.0f, 0.0f };
+    int     GEARDOWN_RPM_THRESH = 7500;
+    int     GEARUP_RPM_THRESH   = 10000;
+    float[] gearupScores        = { 500.0f, 0.0f };
+    uint64  lastColorFetchTime  = 0;
+    float   lastColorFetchScore = 0.0f;
+    float   SCORE_MAX           = GEARUP_RPM_THRESH * 1.5f;
 
-    GearStateManager() {
-        current_idx = 0;
-        @gearup_scores = array<float>(500.0f, 0.0f);
-        @frame_times = array<float>(500.0f, 0.0f);
-    }
+    vec2[] idealAngles = {
+        vec2(0.0f,   1.47f),
+        vec2(40.0f,  1.47f),
+        vec2(50.0f,  1.4f),
+        vec2(57.0f,  1.35f),
+        vec2(64.0f,  1.3f),
+        vec2(70.0f,  1.24f),
+        vec2(76.0f,  1.2f),
+        vec2(84.0f,  1.24f),
+        vec2(90.0f,  1.25f),
+        vec2(100.0f, 1.27f),
+        vec2(130.0f, 1.35f),
+        vec2(150.0f, 1.4f)
+    };
 
     int GetAndIncrementIdx() {
-        const int r = current_idx;
-        frame_times[r] = g_dt;
-        current_idx = (current_idx + 1) % FRAMES_AVERAGED;
+        const int r = currentIndex;
+        frameTimes[r] = g_dt;
+        currentIndex = (currentIndex + 1) % FRAMES_AVERAGED;
 
-        if (current_idx == 0) {
+        if (currentIndex == 0) {
             float sum = 0.0f;
             for (int i = 0; i < FRAMES_AVERAGED; i++) {
-                sum += frame_times[i];
+                sum += frameTimes[i];
             }
             FRAMES_AVERAGED = int(S_MsAveraged / (sum / FRAMES_AVERAGED));
         }
@@ -93,7 +101,7 @@ class GearStateManager {
         }
         float s = 0.0f;
         for (int i = 0; i < FRAMES_AVERAGED; i++) {
-            s += gearup_scores[i];
+            s += gearupScores[i];
         }
         lastColorFetchScore = Math::Min(s, GetScoreMax());
         lastColorFetchTime = Time::Now;
@@ -113,7 +121,7 @@ class GearStateManager {
         expectedRpm = GetExpectedRpm(inSpeed, inGear, inSlip, true);
         expectedTrueRpm = GetExpectedRpm(inSpeed, inGear, inSlip, false);
 
-        gearup_scores[idx] = Math::Min(expectedRpm, SCORE_MAX);
+        gearupScores[idx] = Math::Min(expectedRpm, SCORE_MAX);
         RenderHud();
     }
 
@@ -155,19 +163,4 @@ class GearStateManager {
         nvg::StrokeWidth(S_BorderWidth);
         nvg::Stroke();
     }
-
-    vec2[] idealAngles = {
-        vec2(0.0f,   1.47f),
-        vec2(40.0f,  1.47f),
-        vec2(50.0f,  1.4f),
-        vec2(57.0f,  1.35f),
-        vec2(64.0f,  1.3f),
-        vec2(70.0f,  1.24f),
-        vec2(76.0f,  1.2f),
-        vec2(84.0f,  1.24f),
-        vec2(90.0f,  1.25f),
-        vec2(100.0f, 1.27f),
-        vec2(130.0f, 1.35f),
-        vec2(150.0f, 1.4f)
-    };
 }

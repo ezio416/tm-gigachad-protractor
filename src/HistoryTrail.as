@@ -1,11 +1,10 @@
 class HistoryTrail {
+    int                  currentIndex = 0;
     HistoryTrailObject[] historyTrailArr(1000);
-
-    int cur_idx = 0;
-    uint64 lastUpdateTime;
+    uint64               lastUpdateTime;
 
     int CalcNext(const int offset) {
-        return (cur_idx + S_HistoryPoints + offset) % S_HistoryPoints;
+        return (currentIndex + S_HistoryPoints + offset) % S_HistoryPoints;
     }
 
     float CalculateOpacity() {
@@ -27,8 +26,8 @@ class HistoryTrail {
     void Update(const float slip, const vec4&in color) {
         const uint64 now = Time::Now;
         if (int(now - lastUpdateTime) > (S_HistorySeconds / float(S_HistoryPoints)) * 1000) {
-            historyTrailArr[cur_idx].Update(slip, color);
-            cur_idx = CalcNext(1);
+            historyTrailArr[currentIndex].Update(slip, color);
+            currentIndex = CalcNext(1);
             lastUpdateTime = now;
         }
     }
@@ -36,7 +35,7 @@ class HistoryTrail {
 
 class HistoryTrailObject {
     float slip;
-    vec4 color;
+    vec4  color;
 
     void Update(const float slip, const vec4&in color) {
         this.slip = slip;

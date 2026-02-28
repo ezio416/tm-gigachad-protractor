@@ -1,21 +1,19 @@
 class ForwardProjection {
     vec3[][] derivativeArrays;
-    vec3[] prevs;
-
-    int NUM_DERIVATIVES_MAX = 10;
-    int NUM_SMOOTHING_MAX = 100;
+    int      derivativesMax         = 10;
+    int      idx                    = 0;
+    int      noodlebobDerivateCount = 4;
+    int      noodlebobSmoothing     = 20;
+    int      pointCount             = 10;
+    vec3[]   prevs;
+    int      smoothingMax           = 100;
 
     ForwardProjection() {
-        for (int i = 0; i < NUM_DERIVATIVES_MAX; i++) {
-            vec3[] arr(NUM_SMOOTHING_MAX);
+        for (int i = 0; i < derivativesMax; i++) {
+            vec3[] arr(smoothingMax);
             derivativeArrays.InsertLast(arr);
         }
     }
-
-    int NoodlebobDerivateCount = 4;
-    int NoodlebobSmoothing = 20;
-    int NUM_POINTS = 10;
-    int idx = 0;
 
     void AddValue(const int d_idx, const vec3&in dx) {
         derivativeArrays[d_idx][idx] = dx;
@@ -23,10 +21,10 @@ class ForwardProjection {
 
     vec3 GetDerivative(const int d_idx) {
         vec3 r = 0.0f;
-        for (int i = 0; i < NoodlebobSmoothing; i++) {
+        for (int i = 0; i < noodlebobSmoothing; i++) {
             r += derivativeArrays[d_idx][i];
         }
-        return (r / NoodlebobSmoothing);
+        return (r / noodlebobSmoothing);
     }
 
     bool ShouldRender(CSceneVehicleVisState@ visState) {
@@ -44,16 +42,16 @@ class ForwardProjection {
         }
         vec3 v = visState.WorldVel * S_NoodlebobScale;
 
-        for (int i = 0; i < NoodlebobDerivateCount; i++) {
+        for (int i = 0; i < noodlebobDerivateCount; i++) {
             AddValue(i, v);
             v = v - GetDerivative(i);
         }
 
-        idx = (idx + 1) % NoodlebobSmoothing;
+        idx = (idx + 1) % noodlebobSmoothing;
         vec3[] nexts;
-        vec3[] vs(NoodlebobDerivateCount);
+        vec3[] vs(noodlebobDerivateCount);
 
-        for (int i = 0; i < NoodlebobDerivateCount; i++) {
+        for (int i = 0; i < noodlebobDerivateCount; i++) {
             vs[i] = GetDerivative(i);
         }
         vec3 pos = visState.Position;
@@ -61,7 +59,7 @@ class ForwardProjection {
             pos += vs[0];
             nexts.InsertLast(pos);
 
-            for (int j = 0; j < NoodlebobDerivateCount - 1; j++) {
+            for (int j = 0; j < noodlebobDerivateCount - 1; j++) {
                 vs[j] += vs[j + 1];
             }
         }
