@@ -38,12 +38,6 @@ class HistoryTrailObject {
     float slip;
     vec4 color;
 
-    HistoryTrailObject() { }
-    HistoryTrailObject(const float slip, const vec4&in color) {
-        this.slip = slip;
-        this.color = color;
-    }
-
     void Update(const float slip, const vec4&in color) {
         this.slip = slip;
         this.color = color;
