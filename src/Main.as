@@ -3,40 +3,30 @@ const string  pluginIcon  = Icons::Bars;
 Meta::Plugin@ pluginMeta  = Meta::ExecutingPlugin();
 const string  pluginTitle = pluginColor + pluginIcon + "\\$G " + pluginMeta.Name;
 
-Protractor@ protractor;
-DatabaseFunctions@ databasefunctions;
+Protractor protractor;
+DatabaseFunctions databasefunctions;
 
 const float HALF_PI = 1.57079632679f;
 float g_dt = 0.0f;
-
-void Main() {
-    @protractor = Protractor();
-    @databasefunctions = DatabaseFunctions();
-}
 
 void OnSettingsChanged() {
     protractor.OnSettingsChanged();
 }
 
 void Render() {
-    if (!g_visible) {
-        return;
-    }
-    if (databasefunctions.IsMapSkipped(GetMapUid())) {
+    if (!g_visible or databasefunctions.IsMapSkipped(GetMapUid())) {
         return;
     }
 
-    if (protractor !is null) {
-        auto App = GetApp();
-        if (App.CurrentPlayground !is null && App.CurrentPlayground.UIConfigs.Length > 0) {
-            if (App.CurrentPlayground.UIConfigs[0].UISequence == CGamePlaygroundUIConfig::EUISequence::Intro) {
-                return;
-            }
+    CGameCtnApp@ App = GetApp();
+    if (App.CurrentPlayground !is null and App.CurrentPlayground.UIConfigs.Length > 0) {
+        if (App.CurrentPlayground.UIConfigs[0].UISequence == CGamePlaygroundUIConfig::EUISequence::Intro) {
+            return;
         }
+    }
 
-        if (App.GameScene !is null) {
-            protractor.Render();
-        }
+    if (App.GameScene !is null) {
+        protractor.Render();
     }
 }
 
