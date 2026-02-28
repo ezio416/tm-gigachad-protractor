@@ -2,19 +2,13 @@ class GearStateManager {
     int current_idx;
     float[]@ gearup_scores;
     float[]@ frame_times;
-
     float expectedRpm;
     float expectedTrueRpm;
-
     int current_gear;
-
     int GEARUP_RPM_THRESH = 10000;
     int GEARDOWN_RPM_THRESH = 7500;
-
     int FRAMES_AVERAGED = 100;
-
     float SCORE_MAX = GEARUP_RPM_THRESH * 1.5f;
-
     uint64 lastColorFetchTime = 0;
     float lastColorFetchScore = 0.0f;
 
