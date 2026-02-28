@@ -278,56 +278,56 @@ class Protractor {
         if (visState.FrontSpeed < 0.0f || (IsPreview() && PREVIEW_SPEED < 0.0f)) {
             RENDER_MODE = RenderMode::BACKWARDS;
             if (IsGrassSurface(surface_normalized)) {
-                RenderSurface(visState, vel, vec_vel, backwards_min, bw_grass_ideal, {}, bw_grass_zero);
+                RenderSurface(visState, vel, vec_vel, BW_MIN, BW_GRASS_IDEAL, {}, BW_GRASS_ZERO);
                 return;
             }
             if (IsDirtSurface(surface_normalized)) {
-                RenderSurface(visState, vel, vec_vel, backwards_min, bw_dirt_ideal, {}, bw_dirt_zero);
+                RenderSurface(visState, vel, vec_vel, BW_MIN, BW_DIRT_IDEAL, {}, BW_DIRT_ZERO);
                 return;
             }
             if (IsPlasticSurface(surface_normalized)) {
                 // just using grass ideals for plastic BW for now
-                RenderSurface(visState, vel, vec_vel, backwards_min, bw_grass_ideal, {}, bw_grass_zero);
+                RenderSurface(visState, vel, vec_vel, BW_MIN, BW_GRASS_IDEAL, {}, BW_GRASS_ZERO);
                 return;
             }
             if (IsTarmacSurface(surface_normalized)) {
-                RenderSurface(visState, vel, vec_vel, backwards_min, bw_tarmac_ideal, {}, bw_tarmac_zero);
+                RenderSurface(visState, vel, vec_vel, BW_MIN, BW_TARMAC_IDEAL, {}, BW_TARMAC_ZERO);
                 return;
             }
         }
 
         RENDER_MODE = RenderMode::NORMAL;
         if (IsGrassSurface(surface_normalized)) {
-            RenderSurface(visState, vel, vec_vel, other_min, grass_ideal, grass_base, grass_zero);
+            RenderSurface(visState, vel, vec_vel, OTHER_SURF_MIN, GRASS_IDEAL, GRASS_BASE, GRASS_ZERO);
             return;
         }
         if (IsDirtSurface(surface_normalized)) {
-            RenderSurface(visState, vel, vec_vel, other_min, dirt_ideal, dirt_base, dirt_zero);
+            RenderSurface(visState, vel, vec_vel, OTHER_SURF_MIN, DIRT_IDEAL, DIRT_BASE, DIRT_ZERO);
             return;
         }
         if (IsPlasticSurface(surface_normalized)) {
-            RenderSurface(visState, vel, vec_vel, other_min, plastic_ideal, plastic_base, plastic_zero);
+            RenderSurface(visState, vel, vec_vel, OTHER_SURF_MIN, PLASTIC_IDEAL, PLASTIC_BASE, PLASTIC_ZERO);
             return;
         }
         if (IsTarmacSurface(surface_normalized)) {
-            RenderSurface(visState, vel, vec_vel, tarmac_min, tarmac_ideal, tarmac_base, tarmac_zero);
+            RenderSurface(visState, vel, vec_vel, TARMAC_MIN, TARMAC_IDEAL, TARMAC_BASE, TARMAC_ZERO);
             return;
         }
 
         if (IsIceSurface(surface_normalized)) {
             if (VehicleState::GetVehicleType(visState) ==  VehicleState::VehicleType::CarRally) {
-                RenderSurface(visState, vel, vec_vel, 10, rally_ice_peak, rally_ice_zero, rally_ice_slideout, false);
+                RenderSurface(visState, vel, vec_vel, 10, RALLY_ICE_PEAK, RALLY_ICE_ZERO, RALLY_ICE_SLIDEOUT, false);
             }
             if (VehicleState::GetVehicleType(visState) ==  VehicleState::VehicleType::CarDesert) {
-                RenderSurface(visState, vel, vec_vel, 10, desert_ice_peak, desert_ice_zero, desert_ice_backpeak, false);
+                RenderSurface(visState, vel, vec_vel, 10, DESERT_ICE_PEAK, DESERT_ICE_ZERO, DESERT_ICE_BACK_PEAK, false);
             }
         }
         if (IsWoodSurface(surface_normalized) && (PREVIEW_WET || visState.WetnessValue01 > 0.0f)) {
             activeWood = true;
             if (PREVIEW_ICY || ((visState.FLIcing01 + visState.FRIcing01 + visState.RLIcing01 + visState.RRIcing01) > 0.0f)) {
-                RenderSurface(visState, vel, vec_vel, wood_min, wood_wet_ice_p1, wood_wet_ice_valley, wood_wet_ice_p2, false);
+                RenderSurface(visState, vel, vec_vel, WOOD_MIN, WOOD_WET_ICE_P1, WOOD_WET_ICE_VALLEY, WOOD_WET_ICE_P2, false);
             } else {
-                RenderSurface(visState, vel, vec_vel, wood_min, wood_p1, wood_valley, wood_p2);
+                RenderSurface(visState, vel, vec_vel, WOOD_MIN, WOOD_P1, WOOD_VALLEY, WOOD_P2);
             }
             return;
         }
@@ -534,10 +534,10 @@ class Protractor {
 
     void RenderIceGearLines(CSceneVehicleVisState@ visState, const float v, const vec3&in vel, float slip) {
         float[] lines;
-        lines.InsertLast(LerpToMidpoint(ice_gearup_1, v));
-        lines.InsertLast(LerpToMidpoint(ice_gearup_2, v));
-        lines.InsertLast(LerpToMidpoint(ice_gearup_3, v));
-        lines.InsertLast(LerpToMidpoint(ice_gearup_4, v));
+        lines.InsertLast(LerpToMidpoint(ICE_GEARUP_1, v));
+        lines.InsertLast(LerpToMidpoint(ICE_GEARUP_2, v));
+        lines.InsertLast(LerpToMidpoint(ICE_GEARUP_3, v));
+        lines.InsertLast(LerpToMidpoint(ICE_GEARUP_4, v));
         float t;
 
         vec4 color;
@@ -571,8 +571,8 @@ class Protractor {
 
             if (gearStateManager.expectedTrueRpm < gearStateManager.GEARDOWN_RPM_THRESH) {
                 float[] lines1;
-                lines1.InsertLast(LerpToMidpoint(ice_gearup_1, v));
-                lines1.InsertLast(LerpToMidpoint(ice_gearup_4, v));
+                lines1.InsertLast(LerpToMidpoint(ICE_GEARUP_1, v));
+                lines1.InsertLast(LerpToMidpoint(ICE_GEARUP_4, v));
                 color = gearStateManager.GetGeardownColor();
                 for (uint i = 0; i < lines1.Length; i++) {
                     slip = Math::Angle(visState.Dir, vel);

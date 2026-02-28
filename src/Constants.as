@@ -1,3 +1,42 @@
+const float BW_MIN         = 15.0f;
+const float HALF_PI        = 1.57079632679f;
+const float OTHER_SURF_MIN = 55.555555f;
+const float TARMAC_MIN     = 109.722222f;
+const float WOOD_MIN       = 10.0f;
+
+const vec2[] ICE_GEARUP_1 = {
+    vec2(37.5f,   2.15f),
+    vec2(45.64f,  2.0834f),
+    vec2(52.15f,  2.01175f),
+    vec2(64.65f,  1.9276f),
+    vec2(67.465f, 1.9093f),
+    vec2(77.5f,   1.866f)
+};
+
+const vec2[] ICE_GEARUP_2 = {
+    vec2(29.65f, 1.69f),
+    vec2(43.5f,  1.642f),
+    vec2(52.86f, 1.632f),
+    vec2(68.5f,  1.622f),
+    vec2(75.0f,  1.618f)
+};
+
+const vec2[] ICE_GEARUP_3 = {
+    vec2(35.0f,  1.637f),
+    vec2(46.0f,  1.6195f),
+    vec2(52.3f,  1.60950f),
+    vec2(75.95f, 1.596f)
+};
+
+const vec2[] ICE_GEARUP_4 = {
+    vec2(46.60f,  1.44f),
+    vec2(56.2f,   1.502f),
+    vec2(62.4f,   1.53f),
+    vec2(78.52f,  1.526f),
+    vec2(79.825f, 1.5175f),
+    vec2(80.26f,  1.508f)
+};
+
 /*
 Surface configuration:
 
@@ -10,7 +49,7 @@ All intermediate values can be linearly interpreted from these.
 Format of vec2: (speed, target_sidespeed)
 */
 
-const vec2[] tarmac_ideal = {
+const vec2[] TARMAC_IDEAL = {
     vec2(111.0f, 5.9f),
     vec2(140.0f, 5.6f),
     vec2(210.0f, 5.75f),
@@ -18,7 +57,7 @@ const vec2[] tarmac_ideal = {
     vec2(280.0f, 5.85f)
 };
 
-const vec2[] tarmac_base = {
+const vec2[] TARMAC_BASE = {
     vec2(111.0f,  6.6f),
     vec2(150.95f, 8.92f),
     vec2(244.0f,  13.8f),
@@ -26,7 +65,7 @@ const vec2[] tarmac_base = {
     vec2(277.5f,  15.75f)
 };
 
-const vec2[] tarmac_zero = {
+const vec2[] TARMAC_ZERO = {
     vec2(111.0f,   11.32f),
     vec2(112.64f,  11.938f),
     vec2(129.25f,  13.975f),
@@ -38,21 +77,21 @@ const vec2[] tarmac_zero = {
     vec2(277.5f,   27.184f)
 };
 
-const vec2[] dirt_ideal = {
+const vec2[] DIRT_IDEAL = {
     vec2(55.0f,  1.0f),
     vec2(100.0f, 1.5f),
     vec2(202.0f, 2.15f),
     vec2(250.0f, 2.15f)
 };
 
-const vec2[] dirt_base = {
+const vec2[] DIRT_BASE = {
     vec2(55.0f,  4.0f),
     vec2(86.6f,  7.25f),
     vec2(216.0f, 20.13f),
     vec2(250.0f, 21.39f)
 };
 
-const vec2[] dirt_zero = {
+const vec2[] DIRT_ZERO = {
     vec2(55.0f,    11.96f),
     vec2(56.55f,   12.18f),
     vec2(80.25f,   15.664f),
@@ -63,7 +102,7 @@ const vec2[] dirt_zero = {
     vec2(250.0f,   33.33f)
 };
 
-const vec2[] plastic_ideal = {
+const vec2[] PLASTIC_IDEAL = {
     vec2(55.0f,  1.0f),
     vec2(99.5f,  1.0f),
     vec2(100.0f, 1.3f),
@@ -74,7 +113,7 @@ const vec2[] plastic_ideal = {
     vec2(250.0f, 2.0f)
 };
 
-const vec2[] plastic_base = {
+const vec2[] PLASTIC_BASE = {
     vec2(55.0f,  12.0f),
     vec2(91.6f,  17.65f),
     vec2(106.0f, 18.3f),
@@ -83,7 +122,7 @@ const vec2[] plastic_base = {
     vec2(275.0f, 36.0f)
 };
 
-const vec2[] plastic_zero = {
+const vec2[] PLASTIC_ZERO = {
     vec2(55.0f,  12.5f),
     vec2(70.0f,  16.6f),
     vec2(94.5f,  20.4f),
@@ -94,7 +133,7 @@ const vec2[] plastic_zero = {
     vec2(277.5f, 41.45f)
 };
 
-const vec2[] grass_ideal = {
+const vec2[] GRASS_IDEAL = {
     vec2(55.0f,  1.0f),
     vec2(80.0f,  1.365f),
     vec2(110.0f, 1.4f),
@@ -104,14 +143,14 @@ const vec2[] grass_ideal = {
     vec2(250.0f, 2.8f)
 };
 
-const vec2[] grass_base = {
+const vec2[] GRASS_BASE = {
     vec2(55.0f,  4.0f),
     vec2(86.6f,  7.25f),
     vec2(216.0f, 20.13f),
     vec2(250.0f, 21.39f)
 };
 
-const vec2[] grass_zero = {
+const vec2[] GRASS_ZERO = {
     vec2(55.0f,  13.5f),
     vec2(87.0f,  17.6f),
     vec2(112.6f, 21.25f),
@@ -120,7 +159,7 @@ const vec2[] grass_zero = {
     vec2(250.0f, 35.4f)
 };
 
-const vec2[] bw_dirt_ideal = {
+const vec2[] BW_DIRT_IDEAL = {
     vec2(0.0f,   2.0f),
     vec2(25.0f,  2.0f),
     vec2(30.0f,  2.3f),
@@ -129,7 +168,7 @@ const vec2[] bw_dirt_ideal = {
     vec2(130.0f, 2.9f)
 };
 
-const vec2[] bw_dirt_zero = {
+const vec2[] BW_DIRT_ZERO = {
     vec2(0.0f,   8.0f),
     vec2(56.0f,  17.0f),
     vec2(30.0f,  2.3f),
@@ -139,14 +178,14 @@ const vec2[] bw_dirt_zero = {
     vec2(130.0f, 26.5f)
 };
 
-const vec2[] bw_tarmac_ideal = {
+const vec2[] BW_TARMAC_IDEAL = {
     vec2(0.0f,   3.5f),
     vec2(31.0f,  5.4f),
     vec2(40.0f,  8.0f),
     vec2(130.0f, 8.2f)
 };
 
-const vec2[] bw_tarmac_zero = {
+const vec2[] BW_TARMAC_ZERO = {
     vec2(0.0f,   8.0f),
     vec2(55.0f,  16.0f),
     vec2(85.0f,  20.0f),
@@ -154,7 +193,7 @@ const vec2[] bw_tarmac_zero = {
     vec2(130.0f, 26.0f)
 };
 
-const vec2[] bw_grass_ideal = {
+const vec2[] BW_GRASS_IDEAL = {
     vec2(0.0f,   1.4f),
     vec2(28.0f,  1.7f),
     vec2(75.0f,  2.18f),
@@ -162,7 +201,7 @@ const vec2[] bw_grass_ideal = {
     vec2(130.0f, 2.25f)
 };
 
-const vec2[] bw_grass_zero = {
+const vec2[] BW_GRASS_ZERO = {
     vec2(0.0f,   2.0f),
     vec2(10.0f,  6.0f),
     vec2(30.0f,  12.0f),
@@ -171,7 +210,7 @@ const vec2[] bw_grass_zero = {
     vec2(130.0f, 27.4f)
 };
 
-const vec2[] wood_p1 = {
+const vec2[] WOOD_P1 = {
     vec2(13.23f, 0.0792f),
     vec2(48.96f, 3.25f),
     vec2(55.32f, 4.23f),
@@ -180,14 +219,14 @@ const vec2[] wood_p1 = {
     vec2(274.5f, 10.2f)
 };
 
-const vec2[] wood_valley = {
+const vec2[] WOOD_VALLEY = {
     vec2(11.9f,   4.74f),
     vec2(26.0f,   10.21f),
     vec2(207.15f, 81.0f),
     vec2(277.8f,  108.3f)
 };
 
-const vec2[] wood_p2 = {
+const vec2[] WOOD_P2 = {
     vec2(11.3f,   7.3f),
     vec2(87.8f,   58.54f),
     vec2(136.86f, 90.68f),
@@ -195,7 +234,7 @@ const vec2[] wood_p2 = {
     vec2(276.6f,  159.9f)
 };
 
-const vec2[] wood_wet_ice_p1 = {
+const vec2[] WOOD_WET_ICE_P1 = {
     vec2(13.23f, 0.0f),
     vec2(48.96f, 0.0f),
     vec2(55.32f, 0.0f),
@@ -204,12 +243,12 @@ const vec2[] wood_wet_ice_p1 = {
     vec2(274.5f, 10.0f)
 };
 
-const vec2[] wood_wet_ice_valley = {
+const vec2[] WOOD_WET_ICE_VALLEY = {
     vec2(10.0f,  4.34f),
     vec2(400.0f, 173.986213644f)
 };
 
-const vec2[] wood_wet_ice_p2 = {
+const vec2[] WOOD_WET_ICE_P2 = {
     vec2(4.7f,   3.6f),
     vec2(78.74f, 56.52f),
     vec2(189.4f, 125.0f),
@@ -217,25 +256,25 @@ const vec2[] wood_wet_ice_p2 = {
     vec2(271.1f, 165.6f)
 };
 
-const vec2[] rally_ice_peak = {
+const vec2[] RALLY_ICE_PEAK = {
     vec2(1.0f,   0.0f),
     vec2(400.0f, 0.0f)
 };
 
-const vec2[] rally_ice_zero = {
+const vec2[] RALLY_ICE_ZERO = {
     vec2(17.6f,   0.0f),
     vec2(44.425f, 18.1f),
     vec2(57.34f,  23.92f),
     vec2(80.4f,   38.25f)
 };
 
-const vec2[] rally_ice_slideout = {
+const vec2[] RALLY_ICE_SLIDEOUT = {
     vec2(1.0f,   0.717f),
     vec2(50.5f,  41.325f),
     vec2(400.0f, 329.95f)
 };
 
-const vec2[] desert_ice_peak = {
+const vec2[] DESERT_ICE_PEAK = {
     vec2(2.125f, 0.2f),
     vec2(15.0f,  0.4f),
     vec2(28.0f,  0.9f),
@@ -245,20 +284,15 @@ const vec2[] desert_ice_peak = {
     vec2(272.6f, 86.8f)
 };
 
-const vec2[] desert_ice_zero = {
+const vec2[] DESERT_ICE_ZERO = {
     vec2(2.5f,   1.8f),
     vec2(70.5f,  64.8f),
     vec2(108.0f, 107.75f),
     vec2(170.0f, 165.95f)
 };
 
-const vec2[] desert_ice_backpeak = {
+const vec2[] DESERT_ICE_BACK_PEAK = {
     vec2(2.5f,    0.2f),
     vec2(84.2f,   79.5f),
     vec2(116.75f, 115.6f)
 };
-
-const float backwards_min = 15.0f;
-const float tarmac_min = 395.0f / 3.6f;
-const float other_min = 200.0f / 3.6f;
-const float wood_min = 10.0f;

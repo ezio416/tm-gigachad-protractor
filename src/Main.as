@@ -3,11 +3,9 @@ const string  pluginIcon  = Icons::Bars;
 Meta::Plugin@ pluginMeta  = Meta::ExecutingPlugin();
 const string  pluginTitle = pluginColor + pluginIcon + "\\$G " + pluginMeta.Name;
 
-Protractor protractor;
 DatabaseFunctions databasefunctions;
-
-const float HALF_PI = 1.57079632679f;
-float g_dt = 0.0f;
+float             g_dt = 0.0f;
+Protractor        protractor;
 
 void OnSettingsChanged() {
     protractor.OnSettingsChanged();

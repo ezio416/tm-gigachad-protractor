@@ -119,16 +119,16 @@ class GearStateManager {
 
     bool InSafeZone(float inSlip, const float inSpeed) {
         inSlip = Math::Abs(inSlip);
-        if (inSlip >= LerpToMidpoint(ice_gearup_1, inSpeed)) {
+        if (inSlip >= LerpToMidpoint(ICE_GEARUP_1, inSpeed)) {
             return false;
         }
-        if (inSlip >= LerpToMidpoint(ice_gearup_2, inSpeed)) {
+        if (inSlip >= LerpToMidpoint(ICE_GEARUP_2, inSpeed)) {
             return true;
         }
-        if (inSlip >= LerpToMidpoint(ice_gearup_3, inSpeed)) {
+        if (inSlip >= LerpToMidpoint(ICE_GEARUP_3, inSpeed)) {
             return false;
         }
-        if (inSlip >= LerpToMidpoint(ice_gearup_4, inSpeed)) {
+        if (inSlip >= LerpToMidpoint(ICE_GEARUP_4, inSpeed)) {
             return true;
         }
         return false;
