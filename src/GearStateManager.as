@@ -108,7 +108,7 @@ class GearStateManager {
         return SCORE_MAX * FRAMES_AVERAGED;
     }
 
-    void HandleUpdate(const float inSlip, const float inSpeed, const int inGear, const float inEngineRpm) {
+    void HandleUpdate(const float inSlip, const float inSpeed, const int inGear) {
         const int idx = GetAndIncrementIdx();
         expectedRpm = GetExpectedRpm(inSpeed, inGear, inSlip, true);
         expectedTrueRpm = GetExpectedRpm(inSpeed, inGear, inSlip, false);

@@ -267,8 +267,7 @@ class Protractor {
             return;
         }
 
-        gearStateManager.HandleUpdate(slipAngle, vel,
-            (IsPreview() ? PREVIEW_GEAR : visState.CurGear), VehicleState::GetRPM(visState));
+        gearStateManager.HandleUpdate(slipAngle, vel, (IsPreview() ? PREVIEW_GEAR : visState.CurGear));
 
         if ((VehicleState::GetVehicleType(visState) == VehicleState::VehicleType::CarSport && !RALLY_CAR_OVERRIDE) && IsIceSurface(surface_normalized) && visState.FLIcing01 > 0.0f) {
             RENDER_MODE = RenderMode::ICE;
@@ -365,7 +364,7 @@ class Protractor {
             RenderAngle(visState, start, length, width, theta, offset, color);
     }
 
-    void renderHistoryTrail(CSceneVehicleVisState@ visState, const float start, const float length, const float width) {
+    void renderHistoryTrail(CSceneVehicleVisState@ visState, const float start, const float length) {
         HistoryTrailObject@ o = historyTrail.GetAtIdx(0);
         float slip = o.slip;
         slip = ProcessTheta(slip);
@@ -465,10 +464,10 @@ class Protractor {
 
         RenderIceGearLines(visState, vel, vec_vel, slip);
         RenderIceIdealAngle(visState, vel, vec_vel, slip);
-        RenderIceCustomAngle1(visState, vel, vec_vel);
-        RenderIceCustomAngle2(visState, vel, vec_vel);
+        RenderIceCustomAngle1(visState, vec_vel);
+        RenderIceCustomAngle2(visState, vec_vel);
 
-        RenderPlayerPointer(  // player pointer
+        RenderPlayerPointer(
             visState,
             ICE_PP_S,
             ICE_PP_L,
@@ -479,7 +478,7 @@ class Protractor {
         );
     }
 
-    void RenderIceAngle(CSceneVehicleVisState@ visState, const float vel, const vec3&in vec_vel, const vec4&in color, const float t) {
+    void RenderIceAngle(CSceneVehicleVisState@ visState, const vec4&in color, const float t) {
         RenderAngle(
             visState,
             ICE_PP_S,
@@ -491,7 +490,7 @@ class Protractor {
         );
     }
 
-    void RenderIceCustomAngle1(CSceneVehicleVisState@ visState, const float vel, const vec3&in vec_vel) {
+    void RenderIceCustomAngle1(CSceneVehicleVisState@ visState, const vec3&in vec_vel) {
         if (!SHOW_ICE_CUSTOM_ANGLE) {
             return;
         }
@@ -509,10 +508,10 @@ class Protractor {
         if (Math::Angle(vec_vel, visState.Left) > HALF_PI || IsPreview()) {
             t *= -1.0f;
         }
-        RenderIceAngle(visState, vel, vec_vel, ICE_CUSTOM_ANGLE1_COLOR, t);
+        RenderIceAngle(visState, ICE_CUSTOM_ANGLE1_COLOR, t);
     }
 
-    void RenderIceCustomAngle2(CSceneVehicleVisState@ visState, const float vel, const vec3&in vec_vel) {
+    void RenderIceCustomAngle2(CSceneVehicleVisState@ visState, const vec3&in vec_vel) {
         if (!SHOW_ICE_CUSTOM_ANGLE2) {
             return;
         }
@@ -530,7 +529,7 @@ class Protractor {
         if (Math::Angle(vec_vel, visState.Left) > HALF_PI || IsPreview()) {
             t *= -1.0f;
         }
-        RenderIceAngle(visState, vel, vec_vel, ICE_CUSTOM_ANGLE2_COLOR, t);
+        RenderIceAngle(visState, ICE_CUSTOM_ANGLE2_COLOR, t);
     }
 
     void RenderIceGearLines(CSceneVehicleVisState@ visState, const float v, const vec3&in vel, float slip) {
@@ -687,16 +686,24 @@ class Protractor {
         if (Math::Angle(vec_vel, visState.Left) > HALF_PI || IsPreview()) {
             t *= -1;
         }
-        RenderIceAngle(visState, vel, vec_vel, IO(ICE_IDEAL_ANGLE_COLOR, slip, t), t);
+        RenderIceAngle(visState, IO(ICE_IDEAL_ANGLE_COLOR, slip, t), t);
     }
 
-    void RenderPlayerPointer(CSceneVehicleVisState@ visState, const float pointer_start, const float pointer_length, const float pointer_width, const float theta, const vec3&in offset, vec4 color) {
+    void RenderPlayerPointer(
+        CSceneVehicleVisState@ visState,
+        const float pointer_start,
+        const float pointer_length,
+        const float pointer_width,
+        const float theta,
+        const vec3&in offset,
+        vec4 color
+    ) {
         if (HISTORY_ENABLED &&
         (
             RENDER_MODE != RenderMode::ICE || !HISTORY_HIDE_ON_ICE
         )) {
             historyTrail.Update(theta, color);
-            renderHistoryTrail(visState, pointer_start, pointer_length, pointer_width);
+            renderHistoryTrail(visState, pointer_start, pointer_length);
         }
         HandleGearPointerFlip(theta);
 
@@ -817,11 +824,11 @@ class Protractor {
         const vec4 warnColor = ApplyOpacityToColor(ICE_REGIONS_WARNING, appliedOpacity);
 
         if (renderWarnZone) {
-            _RenderRegion(visState, start, length, inner_thetaStart, inner_thetaEnd, offset, fillColor, ICE_REGIONS_DARK_COLOR_FRAC, radialRoot, radialParams, outlineColor, outlineThickness);
-            _RenderRegion(visState, start, length, thetaStart, inner_thetaStart, offset, warnColor, ICE_REGIONS_DARK_COLOR_FRAC, radialRoot, radialParams, vec4(), outlineThickness);
-            _RenderRegion(visState, start, length, inner_thetaEnd, thetaEnd, offset, warnColor, ICE_REGIONS_DARK_COLOR_FRAC, radialRoot, radialParams, vec4(), outlineThickness);
+            _RenderRegion(visState, start, length, inner_thetaStart, inner_thetaEnd, offset, fillColor, ICE_REGIONS_DARK_COLOR_FRAC, radialRoot);
+            _RenderRegion(visState, start, length, thetaStart, inner_thetaStart, offset, warnColor, ICE_REGIONS_DARK_COLOR_FRAC, radialRoot);
+            _RenderRegion(visState, start, length, inner_thetaEnd, thetaEnd, offset, warnColor, ICE_REGIONS_DARK_COLOR_FRAC, radialRoot);
         } else {
-            _RenderRegion(visState, start, length, thetaStart, thetaEnd, offset, fillColor, ICE_REGIONS_DARK_COLOR_FRAC, radialRoot, radialParams, outlineColor, outlineThickness);
+            _RenderRegion(visState, start, length, thetaStart, thetaEnd, offset, fillColor, ICE_REGIONS_DARK_COLOR_FRAC, radialRoot);
         }
     }
 
@@ -982,10 +989,7 @@ class Protractor {
         vec3 offset,
         vec4 fillColor,
         const float fillDarknessCoef,
-        const vec2&in radialRoot,
-        const vec2&in radialParams,
-        const vec4&in outlineColor,
-        const float outlineThickness
+        const vec2&in radialRoot
     ) {
         if (RENDER_MODE == RenderMode::ICE) {
             offset.x += ICE_POINTER_X_OFFSET;
