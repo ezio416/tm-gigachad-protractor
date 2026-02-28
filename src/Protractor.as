@@ -17,7 +17,7 @@ class Protractor {
     vec3                   vel;
 
     float get_theta_base(const vec3&in vec) {
-        float t = vec.z == 0 ? 0.0f : Math::Atan(vec.x / vec.z);
+        float t = vec.z == 0.0f ? 0.0f : Math::Atan(vec.x / vec.z);
         if (vec.z < 0.0f) {
             t += Math::PI;
         }
