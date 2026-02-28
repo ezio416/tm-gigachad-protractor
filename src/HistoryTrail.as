@@ -1,6 +1,4 @@
 class HistoryTrail {
-    HistoryTrail() { }
-
     HistoryTrailObject[] historyTrailArr(1000);
 
     int cur_idx = 0;

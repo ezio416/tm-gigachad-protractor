@@ -26,8 +26,6 @@ class Protractor {
         return t;
     }
 
-    Protractor() { }
-
     float GetIceLineBrightness(const float slip, const float theta) {
         const float diff = Math::Abs(slip - theta);
         const float ret = Math::InvLerp(ICE_LINE_FADE_RATE, 0.0f, diff);
