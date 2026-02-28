@@ -1,3 +1,9 @@
+enum RenderMode {
+    NORMAL,
+    ICE,
+    BACKWARDS
+}
+
 vec4 ApplyOpacityToColor(const vec4&in inColor, const float opacity) {
     if (Math::IsInf(opacity) || Math::IsNaN(opacity)) {
         return vec4();
