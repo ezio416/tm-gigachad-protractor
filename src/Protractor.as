@@ -18,7 +18,7 @@ class Protractor {
     ForwardProjection fowardProjection();
     HistoryTrail historyTrail();
 
-    float get_theta_base(vec3 vec) {
+    float get_theta_base(const vec3&in vec) {
         float t = vec.z == 0 ? 0.0f : Math::Atan(vec.x / vec.z);
         if (vec.z < 0.0f) {
             t += Math::PI;
@@ -28,13 +28,13 @@ class Protractor {
 
     Protractor() { }
 
-    float GetIceLineBrightness(float slip, float theta) {
-        float diff = Math::Abs(slip - theta);
-        float ret = Math::InvLerp(ICE_LINE_FADE_RATE, 0.0f, diff);
+    float GetIceLineBrightness(const float slip, const float theta) {
+        const float diff = Math::Abs(slip - theta);
+        const float ret = Math::InvLerp(ICE_LINE_FADE_RATE, 0.0f, diff);
         return Math::Max(ret, ICE_LINE_MIN_BRIGHTNESS);
     }
 
-    vec2[] GetLinesToBeRendered(float ideal, float good, float base, float outer, bool draw_good) {
+    vec2[] GetLinesToBeRendered(const float ideal, const float good, const float base, const float outer, const bool draw_good) {
         vec2[] out_arr;
         if (SIMPLIFIED_VIEW) {
             return out_arr;
@@ -49,7 +49,7 @@ class Protractor {
         return out_arr;
     }
 
-    vec4 GetPlayerPointerColor(float sideSpeed, float target, float good, float base, float outer) {
+    vec4 GetPlayerPointerColor(const float sideSpeed, const float target, const float good, const float base, const float outer) {
         float pos;
         int lcol, ucol;
         if (sideSpeed < target) {
@@ -77,16 +77,16 @@ class Protractor {
         if (lcol == ucol) {
             return COLOR_0;
         }
-        vec4 c = (GetColor(lcol) * (1.0f - pos)) + (GetColor(ucol) * pos);
+        const vec4 c = (GetColor(lcol) * (1.0f - pos)) + (GetColor(ucol) * pos);
         return c;
     }
 
-    float GetSlipSmoothed(vec3 left, vec3 vel) {
+    float GetSlipSmoothed(const vec3&in left, const vec3&in vel) {
         if (IsPreview()) {
             return PREVIEW_SLIP;
         }
 
-        float slip = CalcVecAngle(left, vel);
+        const float slip = CalcVecAngle(left, vel);
         slip_arr[slip_pos % SLIP_SMOOTHING] = slip;
         slip_pos += 1;
 
@@ -113,7 +113,7 @@ class Protractor {
         return vec2(start, length);
     }
 
-    void HandleGearPointerFlip(float theta) {
+    void HandleGearPointerFlip(const float theta) {
         if (GEAR_ON_BOTH_SIDES) {
             gearPointerFlip = 1.0f;
             return;
@@ -152,7 +152,7 @@ class Protractor {
         }
     }
 
-    vec4 IO(vec4 color, float slip, float theta) {
+    vec4 IO(const vec4&in color, const float slip, const float theta) {
         vec4 c = color;
         c.w *= GetIceLineBrightness(slip, theta);
         return c;
@@ -165,12 +165,12 @@ class Protractor {
      * 2: Cam three full.
      */
     int IsCam3(CSceneVehicleVisState@ visState) {
-        vec3 pos = visState.Position;
-        vec3 cameraPos = Camera::GetCurrentPosition();
-        vec3 pos_offset_forward = visState.Position + visState.Dir;
+        const vec3 pos = visState.Position;
+        const vec3 cameraPos = Camera::GetCurrentPosition();
+        const vec3 pos_offset_forward = visState.Position + visState.Dir;
 
-        float v1 = (cameraPos - pos_offset_forward).LengthSquared();
-        float v2 = (cameraPos - pos).LengthSquared();
+        const float v1 = (cameraPos - pos_offset_forward).LengthSquared();
+        const float v2 = (cameraPos - pos).LengthSquared();
 
         if (v1 > 1.9f && v1 < 2.0f && v2 > 0.85f && v2 < 0.9f) {
             return 1;
@@ -229,14 +229,14 @@ class Protractor {
         return theta;
     }
 
-    vec3 ProjectAngle(CSceneVehicleVisState @ visState, float r, float theta) {
+    vec3 ProjectAngle(CSceneVehicleVisState@ visState, const float r, const float theta) {
         vec3 p = visState.Position;
         p += visState.Dir * Math::Cos(theta) * r;
         p += visState.Left * Math::Sin(theta) * r;
         return p;
     }
 
-    vec3 ProjectOffset(CSceneVehicleVisState @ visState, vec3 in_pos, vec3 offset) {
+    vec3 ProjectOffset(CSceneVehicleVisState@ visState, const vec3&in in_pos, const vec3&in offset) {
         return in_pos +
             visState.Dir * offset.x +
             visState.Up * offset.y +
@@ -264,7 +264,7 @@ class Protractor {
             slipAngle = NormalizeSlipAngle(CalcVecAngle(visState.Left, visState.WorldVel), visState.FrontSpeed);
         }
 
-        vec3 vec_vel = visState.WorldVel / vel;
+        const vec3 vec_vel = visState.WorldVel / vel;
         if (vel < 10.0f) {
             return;
         }
@@ -338,12 +338,12 @@ class Protractor {
 
     void RenderAngle(
         CSceneVehicleVisState@ visState,
-        float start,
-        float length,
-        float width,
-        float theta,
-        vec3 offset,
-        vec4 color
+        const float start,
+        const float length,
+        const float width,
+        const float theta,
+        const vec3&in offset,
+        const vec4&in color
     ) {
         if (SIMPLIFIED_VIEW && RENDER_MODE == RenderMode::NORMAL && is_cam3 == 0) {
             RenderSimplifiedView(visState, start, length, width, theta, offset, color);
@@ -355,19 +355,19 @@ class Protractor {
 
     void RenderAngleConditional(
         CSceneVehicleVisState@ visState,
-        float start,
-        float length,
-        float width,
-        float theta,
-        vec3 offset,
-        vec4 color,
-        bool conditional
+        const float start,
+        const float length,
+        const float width,
+        const float theta,
+        const vec3&in offset,
+        const vec4&in color,
+        const bool conditional
     ) {
         if (conditional)
             RenderAngle(visState, start, length, width, theta, offset, color);
     }
 
-    void renderHistoryTrail(CSceneVehicleVisState@ visState, float start, float length, float width) {
+    void renderHistoryTrail(CSceneVehicleVisState@ visState, const float start, const float length, const float width) {
         HistoryTrailObject@ o = historyTrail.GetAtIdx(0);
         float slip = o.slip;
         slip = ProcessTheta(slip);
@@ -410,7 +410,7 @@ class Protractor {
                     continue;
                 }
 
-                vec3 cameraDist = start_p - Camera::GetCurrentPosition();
+                const vec3 cameraDist = start_p - Camera::GetCurrentPosition();
                 float rendered_width = stroke_width / cameraDist.Length();
                 rendered_width *= HISTORY_PERSPECTIVE_CONSTANT;  // normalizes width to pixels, approximately, based on vibes
 
@@ -427,18 +427,16 @@ class Protractor {
         }
     }
 
-    void RenderIce(CSceneVehicleVisState@ visState, float vel, vec3 vec_vel) {
-        float slip = PreviewSlip(CalcAngle(vec_vel, visState.Dir));
+    void RenderIce(CSceneVehicleVisState@ visState, const float vel, const vec3&in vec_vel) {
+        const float slip = PreviewSlip(CalcAngle(vec_vel, visState.Dir));
 
-        float absSlip = Math::Abs(slip);
+        const float absSlip = Math::Abs(slip);
 
         if (absSlip < HALF_PI / 3.0f) {
             playerFadeOpacity = 0.0f;
-        }
-        else if (absSlip < HALF_PI / 2.0f) {
+        } else if (absSlip < HALF_PI / 2.0f) {
             playerFadeOpacity = Math::InvLerp(HALF_PI / 3.0f, HALF_PI / 2.0f, absSlip);
-        }
-        else if (absSlip > HALF_PI / 2.0f) {
+        } else if (absSlip > HALF_PI / 2.0f) {
             playerFadeOpacity = 1.0f;
         }
 
@@ -483,7 +481,7 @@ class Protractor {
         );
     }
 
-    void RenderIceAngle(CSceneVehicleVisState@ visState, float vel, vec3 vec_vel, vec4 color, float t) {
+    void RenderIceAngle(CSceneVehicleVisState@ visState, const float vel, const vec3&in vec_vel, const vec4&in color, const float t) {
         RenderAngle(
             visState,
             ICE_PP_S,
@@ -495,13 +493,13 @@ class Protractor {
         );
     }
 
-    void RenderIceCustomAngle1(CSceneVehicleVisState@ visState, float vel, vec3 vec_vel) {
+    void RenderIceCustomAngle1(CSceneVehicleVisState@ visState, const float vel, const vec3&in vec_vel) {
         if (!SHOW_ICE_CUSTOM_ANGLE) {
             return;
         }
 
-        float angle = ICE_CUSTOM_ANGLE * 0.0174533f;
-        float slip = Math::Angle(visState.Dir, vec_vel);
+        const float angle = ICE_CUSTOM_ANGLE * 0.0174533f;
+        const float slip = Math::Angle(visState.Dir, vec_vel);
         float t;
 
         if (FIX_GUIDES_TO_CAR) {
@@ -516,13 +514,13 @@ class Protractor {
         RenderIceAngle(visState, vel, vec_vel, ICE_CUSTOM_ANGLE1_COLOR, t);
     }
 
-    void RenderIceCustomAngle2(CSceneVehicleVisState@ visState, float vel, vec3 vec_vel) {
+    void RenderIceCustomAngle2(CSceneVehicleVisState@ visState, const float vel, const vec3&in vec_vel) {
         if (!SHOW_ICE_CUSTOM_ANGLE2) {
             return;
         }
 
-        float angle = ICE_CUSTOM_ANGLE2 * 0.0174533f;
-        float slip = Math::Angle(visState.Dir, vec_vel);
+        const float angle = ICE_CUSTOM_ANGLE2 * 0.0174533f;
+        const float slip = Math::Angle(visState.Dir, vec_vel);
         float t;
 
         if (FIX_GUIDES_TO_CAR) {
@@ -537,7 +535,7 @@ class Protractor {
         RenderIceAngle(visState, vel, vec_vel, ICE_CUSTOM_ANGLE2_COLOR, t);
     }
 
-    void RenderIceGearLines(CSceneVehicleVisState@ visState, float v, vec3 vel, float slip) {
+    void RenderIceGearLines(CSceneVehicleVisState@ visState, const float v, const vec3&in vel, float slip) {
         float[] lines;
         lines.InsertLast(LerpToMidpoint(ice_gearup_1, v));
         lines.InsertLast(LerpToMidpoint(ice_gearup_2, v));
@@ -604,7 +602,7 @@ class Protractor {
 
         // handling shaded 'region' rendering:
 
-        float relativePos = Math::InvLerp(gearStateManager.GEARDOWN_RPM_THRESH, gearStateManager.GEARUP_RPM_THRESH, int(gearStateManager.expectedTrueRpm));
+        const float relativePos = Math::InvLerp(gearStateManager.GEARDOWN_RPM_THRESH, gearStateManager.GEARUP_RPM_THRESH, int(gearStateManager.expectedTrueRpm));
 
         // we show regions all the time, but fade in and out of them depending on where we are
         // at 0.5, show no regions.
@@ -658,8 +656,7 @@ class Protractor {
                     appliedOpacity
                 );
 
-            }
-            else if (relativePos < 0.5f) {
+            } else if (relativePos < 0.5f) {
                 appliedOpacity = Math::Min((0.5f - relativePos), 1);
                 RenderRegion(
                     visState,
@@ -679,8 +676,8 @@ class Protractor {
         }
     }
 
-    void RenderIceIdealAngle(CSceneVehicleVisState@ visState, float vel, vec3 vec_vel, float slip) {
-        float angle = gearStateManager.GetIdealAngle(vel);
+    void RenderIceIdealAngle(CSceneVehicleVisState@ visState, const float vel, const vec3&in vec_vel, const float slip) {
+        const float angle = gearStateManager.GetIdealAngle(vel);
         float t;
 
         if (FIX_GUIDES_TO_CAR) {
@@ -695,7 +692,7 @@ class Protractor {
         RenderIceAngle(visState, vel, vec_vel, IO(ICE_IDEAL_ANGLE_COLOR, slip, t), t);
     }
 
-    void RenderPlayerPointer(CSceneVehicleVisState@ visState, float pointer_start, float pointer_length, float pointer_width, float theta, vec3 offset, vec4 color) {
+    void RenderPlayerPointer(CSceneVehicleVisState@ visState, const float pointer_start, const float pointer_length, const float pointer_width, const float theta, const vec3&in offset, vec4 color) {
         if (HISTORY_ENABLED &&
         (
             RENDER_MODE != RenderMode::ICE || !HISTORY_HIDE_ON_ICE
@@ -733,16 +730,16 @@ class Protractor {
 
         for (int i = 1;
             (i >= (GEAR_ON_BOTH_SIDES ? -1 : 1)); i -= 2) {
-            float abs_max = 13000.0f;
-            float abs_min = 7000.0f;
-            float rpm = Math::Clamp(gearStateManager.expectedRpm, abs_min, abs_max);
+            const float abs_max = 13000.0f;
+            const float abs_min = 7000.0f;
+            const float rpm = Math::Clamp(gearStateManager.expectedRpm, abs_min, abs_max);
 
-            float rpm_pos = Math::InvLerp(abs_min, abs_max, rpm) * pointer_length;
-            float geardown_pos = Math::InvLerp(abs_min, abs_max, gearStateManager.GEARDOWN_RPM_THRESH) * pointer_length;
+            const float rpm_pos = Math::InvLerp(abs_min, abs_max, rpm) * pointer_length;
+            const float geardown_pos = Math::InvLerp(abs_min, abs_max, gearStateManager.GEARDOWN_RPM_THRESH) * pointer_length;
 
             if (rpm < gearStateManager.GEARDOWN_RPM_THRESH) {
-                float color_pos = Math::InvLerp(abs_min, gearStateManager.GEARDOWN_RPM_THRESH, rpm);
-                vec4 color1 = DANGER_UPSHIFT * (1.0f - color_pos) + NORMAL_UPSHIFT * color_pos;
+                const float color_pos = Math::InvLerp(abs_min, gearStateManager.GEARDOWN_RPM_THRESH, rpm);
+                const vec4 color1 = DANGER_UPSHIFT * (1.0f - color_pos) + NORMAL_UPSHIFT * color_pos;
                 RenderAngle( // player pointer
                     visState,
                     pointer_start + rpm_pos,
@@ -763,8 +760,8 @@ class Protractor {
                     ApplyOpacityToColor(NORMAL_UPSHIFT, playerFadeOpacity)
                 );
             } else {
-                float color_pos = Math::InvLerp(gearStateManager.GEARUP_RPM_THRESH, abs_max, rpm);
-                vec4 color1 = DANGER_UPSHIFT * color_pos + NORMAL_UPSHIFT * (1 - color_pos);
+                const float color_pos = Math::InvLerp(gearStateManager.GEARUP_RPM_THRESH, abs_max, rpm);
+                const vec4 color1 = DANGER_UPSHIFT * color_pos + NORMAL_UPSHIFT * (1 - color_pos);
                 RenderAngle( // player pointer
                     visState,
                     pointer_start + geardown_pos,
@@ -784,21 +781,21 @@ class Protractor {
      */
     void RenderRegion(
         CSceneVehicleVisState @ visState,
-        float start,
-        float length,
+        const float start,
+        const float length,
         float thetaStart,
         float thetaEnd,
-        vec3 offset,
+        const vec3&in offset,
         vec4 fillColor,
-        vec4 outlineColor,
-        float slip,
-        float outlineThickness,
-        bool renderWarnZone,
-        float appliedOpacity
+        const vec4&in outlineColor,
+        const float slip,
+        const float outlineThickness,
+        const bool renderWarnZone,
+        const float appliedOpacity
     ) {
         // this is to inset [not warning, just to make it look visually good]
         float diff = thetaEnd - thetaStart;
-        int flip = (Math::Angle(visState.WorldVel, visState.Left) > HALF_PI || IsPreview()) ? -1 : 1;
+        const int flip = (Math::Angle(visState.WorldVel, visState.Left) > HALF_PI || IsPreview()) ? -1 : 1;
         thetaStart += diff * ICE_REGIONS_EDGE_FRAC;
         thetaEnd -= diff * ICE_REGIONS_EDGE_FRAC;
 
@@ -812,14 +809,14 @@ class Protractor {
         inner_thetaStart *= flip;
         inner_thetaEnd   *= flip;
 
-        vec2 radialRoot = Camera::ToScreenSpace(ProjectAngle(visState, (start + length) * ICE_REGIONS_RADIAL_INSET_FRAC, -1.0f * flip * ProcessTheta(slip)));
-        vec2 outermostPos = Camera::ToScreenSpace(ProjectAngle(visState, (start + length), ((thetaStart + thetaEnd) / 2.0f)));
-        vec2 innerPos = Camera::ToScreenSpace(ProjectAngle(visState, (start), ((thetaStart + thetaEnd) / 2.0f)));
+        const vec2 radialRoot = Camera::ToScreenSpace(ProjectAngle(visState, (start + length) * ICE_REGIONS_RADIAL_INSET_FRAC, -1.0f * flip * ProcessTheta(slip)));
+        const vec2 outermostPos = Camera::ToScreenSpace(ProjectAngle(visState, (start + length), ((thetaStart + thetaEnd) / 2.0f)));
+        const vec2 innerPos = Camera::ToScreenSpace(ProjectAngle(visState, (start), ((thetaStart + thetaEnd) / 2.0f)));
         vec2 radialParams = vec2((radialRoot - innerPos).Length(), (radialRoot - outermostPos).Length());
         radialParams /= 5.0f;
 
         fillColor = ApplyOpacityToColor(fillColor, appliedOpacity);
-        vec4 warnColor = ApplyOpacityToColor(ICE_REGIONS_WARNING, appliedOpacity);
+        const vec4 warnColor = ApplyOpacityToColor(ICE_REGIONS_WARNING, appliedOpacity);
 
         if (renderWarnZone) {
             _RenderRegion(visState, start, length, inner_thetaStart, inner_thetaEnd, offset, fillColor, ICE_REGIONS_DARK_COLOR_FRAC, radialRoot, radialParams, outlineColor, outlineThickness);
@@ -834,10 +831,10 @@ class Protractor {
         CSceneVehicleVisState@ visState,
         float start,
         float length,
-        float width,
-        float theta,
-        vec3 offset,
-        vec4 color
+        const float width,
+        const float theta,
+        const vec3&in offset,
+        const vec4&in color
     ) {
         vec3 o = offset;
         start = SIMPLIFIED_START;
@@ -849,22 +846,22 @@ class Protractor {
         }
     }
 
-    void RenderSurface(CSceneVehicleVisState@ visState, float speed, vec3 vec_vel, float min_vel, vec2[] ideal_config, vec2[] base_config,  vec2[] zero_config) {
+    void RenderSurface(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel, const float min_vel, const vec2[]&in ideal_config, const vec2[]&in base_config, const vec2[]&in zero_config) {
         RenderSurface(visState, speed, vec_vel, min_vel, ideal_config, base_config, zero_config, true);
     }
 
-    void RenderSurface(CSceneVehicleVisState@ visState, float speed, vec3 vec_vel, float min_vel, vec2[] ideal_config, vec2[] base_config,  vec2[] zero_config, bool show_good_ss) {
-        float target_ss = ApproximateSideSpeed(ideal_config, speed);
-        float outer_ss = ApproximateSideSpeed(zero_config, speed);
-        float base_ss = ApproximateSideSpeed(base_config, speed);
-        float good_ss = Math::Lerp(outer_ss, target_ss, GOOD_THRESH);
+    void RenderSurface(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel, const float min_vel, const vec2[]&in ideal_config, const vec2[]&in base_config, const vec2[]&in zero_config, const bool show_good_ss) {
+        const float target_ss = ApproximateSideSpeed(ideal_config, speed);
+        const float outer_ss = ApproximateSideSpeed(zero_config, speed);
+        const float base_ss = ApproximateSideSpeed(base_config, speed);
+        const float good_ss = Math::Lerp(outer_ss, target_ss, GOOD_THRESH);
 
-        float slip = PreviewSlip(GetSlipSmoothed(visState.Left, vec_vel));
-        float sideSpeed = speed * Math::Sin(PreviewSlip(Math::Angle(visState.Dir, vec_vel)));
-        float abs_sidespeed = Math::Abs(sideSpeed);
+        const float slip = PreviewSlip(GetSlipSmoothed(visState.Left, vec_vel));
+        const float sideSpeed = speed * Math::Sin(PreviewSlip(Math::Angle(visState.Dir, vec_vel)));
+        const float abs_sidespeed = Math::Abs(sideSpeed);
 
-        vec2 startAndLength = GetStartAndLength();
-        vec2[] targets = GetLinesToBeRendered(target_ss, good_ss, base_ss, outer_ss, show_good_ss);
+        const vec2 startAndLength = GetStartAndLength();
+        const vec2[] targets = GetLinesToBeRendered(target_ss, good_ss, base_ss, outer_ss, show_good_ss);
 
         RenderPlayerPointer(
             visState,
@@ -913,7 +910,7 @@ class Protractor {
         }
 
         float lower, upper, targetOpacity;
-        int polarity = slip < 0.0f ? -1 : 1;
+        const int polarity = slip < 0.0f ? -1 : 1;
         for (int i = -1; i <= 1; i += 2) {
             lower = 0.0f;
             for (uint j = 0; j < targets.Length; j++) {
@@ -945,7 +942,7 @@ class Protractor {
         }
     }
 
-    void _LineTo(vec3 p) {
+    void _LineTo(const vec3&in p) {
         if (!Camera::IsBehind(p)) {
             nvg::LineTo(Camera::ToScreenSpace(p));
         }
@@ -953,12 +950,12 @@ class Protractor {
 
     void _RenderAngle(
         CSceneVehicleVisState@ visState,
-        float start,
-        float length,
-        float width,
+        const float start,
+        const float length,
+        const float width,
         float theta,
         vec3 offset,
-        vec4 color
+        const vec4&in color
     ) {
         if (is_cam3 > 0 && (!DRAW_CAM3_IN_SIMPLIFIED_VIEW) && SIMPLIFIED_VIEW) {
             return;
@@ -980,17 +977,17 @@ class Protractor {
 
     void _RenderRegion(
         CSceneVehicleVisState@ visState,
-        float start,
-        float length,
+        const float start,
+        const float length,
         float thetaStart,
         float thetaEnd,
         vec3 offset,
         vec4 fillColor,
-        float fillDarknessCoef,
-        vec2 radialRoot,
-        vec2 radialParams,
-        vec4 outlineColor,
-        float outlineThickness
+        const float fillDarknessCoef,
+        const vec2&in radialRoot,
+        const vec2&in radialParams,
+        const vec4&in outlineColor,
+        const float outlineThickness
     ) {
         if (RENDER_MODE == RenderMode::ICE) {
             offset.x += ICE_POINTER_X_OFFSET;
@@ -999,8 +996,8 @@ class Protractor {
             thetaEnd += (thetaEnd < 0.0f ? -1.0f : 1.0f) * ICE_POINTER_ANGLE_OFFSET;
         }
 
-        float diff = thetaEnd - thetaStart;
-        int flip = (Math::Angle(visState.WorldVel, visState.Left) > HALF_PI || IsPreview()) ? 1 : -1;
+        const float diff = thetaEnd - thetaStart;
+        const int flip = (Math::Angle(visState.WorldVel, visState.Left) > HALF_PI || IsPreview()) ? 1 : -1;
 
         fillColor = ApplyOpacityToColor(fillColor, playerFadeOpacity);
 
@@ -1011,8 +1008,8 @@ class Protractor {
         // We need to draw a shaded region by drawing a closed path outlining
         // the "region" inbetwixt the lines of interest, then filling it.
 
-        float angle_per_point = (flip * Math::PI * 2.0f) / ICE_REGIONS_RESOLUTION;
-        int points = int(diff / angle_per_point);
+        const float angle_per_point = (flip * Math::PI * 2.0f) / ICE_REGIONS_RESOLUTION;
+        const int points = int(diff / angle_per_point);
 
         // print("__renderRegion");
         // print("start:\t" + tostring(start));
@@ -1058,11 +1055,11 @@ class Protractor {
 
     void __RenderAngle(
         CSceneVehicleVisState@ visState,
-        float start,
-        float length,
+        const float start,
+        const float length,
         float width,
         float theta,
-        vec3 offset,
+        const vec3&in offset,
         vec4 color
     ) {
         theta = ProcessTheta(theta);
@@ -1074,16 +1071,16 @@ class Protractor {
 
         for (int i = 0; i < (is_cam3 > 0 ? 1 : NUM_LAYERS); i++) {
             vec3 o = offset;
-            float y_offset = LAYER_HEIGHT * i;
+            const float y_offset = LAYER_HEIGHT * i;
             o.y += y_offset;
 
-            vec3 v_start = ProjectOffset(visState, ProjectAngle(visState, start, theta), o);
-            vec3 v_end = ProjectOffset(visState, ProjectAngle(visState, start + length, theta), o);
+            const vec3 v_start = ProjectOffset(visState, ProjectAngle(visState, start, theta), o);
+            const vec3 v_end = ProjectOffset(visState, ProjectAngle(visState, start + length, theta), o);
 
             if (Camera::IsBehind(v_start) || Camera::IsBehind(v_end)) {
                 return;
             }
-            vec3 cameraDist = v_start - Camera::GetCurrentPosition();
+            const vec3 cameraDist = v_start - Camera::GetCurrentPosition();
             float rendered_width = width / cameraDist.Length();
             rendered_width *= PERSPECTIVE_CONSTANT; // normalizes width to pixels, approximately, based on vibes
             nvg::BeginPath();

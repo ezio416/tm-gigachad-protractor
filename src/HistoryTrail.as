@@ -6,7 +6,7 @@ class HistoryTrail {
     int cur_idx = 0;
     uint64 lastUpdateTime;
 
-    int CalcNext(int offset) {
+    int CalcNext(const int offset) {
         return (cur_idx + HISTORY_POINTS + offset) % HISTORY_POINTS;
     }
 
@@ -22,12 +22,12 @@ class HistoryTrail {
         return Math::Abs(sum) / HISTORY_POINTS;
     }
 
-    HistoryTrailObject@ GetAtIdx(int idx) {
+    HistoryTrailObject@ GetAtIdx(const int idx) {
         return historyTrailArr[CalcNext(-idx)];
     }
 
-    void Update(float slip, vec4 color) {
-        uint64 now = Time::Now;
+    void Update(const float slip, const vec4&in color) {
+        const uint64 now = Time::Now;
         if (int(now - lastUpdateTime) > (HISTORY_SECONDS / float(HISTORY_POINTS)) * 1000) {
             historyTrailArr[cur_idx].Update(slip, color);
             cur_idx = CalcNext(1);
@@ -41,12 +41,12 @@ class HistoryTrailObject {
     vec4 color;
 
     HistoryTrailObject() { }
-    HistoryTrailObject(float slip, vec4 color) {
+    HistoryTrailObject(const float slip, const vec4&in color) {
         this.slip = slip;
         this.color = color;
     }
 
-    void Update(float slip, vec4 color) {
+    void Update(const float slip, const vec4&in color) {
         this.slip = slip;
         this.color = color;
     }

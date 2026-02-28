@@ -1,7 +1,7 @@
 Protractor@ protractor;
 DatabaseFunctions@ databasefunctions;
 
-float HALF_PI = 1.57079632679f;
+const float HALF_PI = 1.57079632679f;
 float g_dt = 0.0f;
 
 void Main() {

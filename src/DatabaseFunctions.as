@@ -6,40 +6,40 @@ class DatabaseFunctions {
     bool prev_init;
 
     DatabaseFunctions() {
-        database.Execute("CREATE TABLE IF NOT EXISTS skip_maps (map_uuid VARCHAR PRIMARY KEY)");
+        database.Execute("CREATE TABLE IF NOT EXISTS skip_maps (uid VARCHAR PRIMARY KEY)");
     }
 
-    void DisableMap(string _map_uuid) {
-        if (IsMapSkipped(_map_uuid)) {
+    void DisableMap(const string&in uid) {
+        if (IsMapSkipped(uid)) {
             return;
         }
         SQLite::Statement@ statement = database.Prepare("INSERT INTO skip_maps VALUES (?)");
-        statement.Bind(1, _map_uuid);
+        statement.Bind(1, uid);
         statement.Execute();
         prev_init = false;
     }
 
-    void EnableMap(string _map_uuid) {
-        if (!IsMapSkipped(_map_uuid)) {
+    void EnableMap(const string&in uid) {
+        if (!IsMapSkipped(uid)) {
             return;
         }
-        SQLite::Statement@ statement = database.Prepare("DELETE FROM skip_maps WHERE map_uuid = ?");
-        statement.Bind(1, _map_uuid);
+        SQLite::Statement@ statement = database.Prepare("DELETE FROM skip_maps WHERE uid = ?");
+        statement.Bind(1, uid);
         statement.Execute();
         prev_init = false;
     }
 
-    bool IsMapSkipped(string _map_uuid) {
-        if (prev_init && prev_map == _map_uuid) {
+    bool IsMapSkipped(const string&in uid) {
+        if (prev_init && prev_map == uid) {
             return prev_res;
         }
 
-        SQLite::Statement@ statement = database.Prepare("SELECT map_uuid FROM skip_maps WHERE map_uuid = ?");
-        statement.Bind(1, _map_uuid);
+        SQLite::Statement@ statement = database.Prepare("SELECT uid FROM skip_maps WHERE uid = ?");
+        statement.Bind(1, uid);
         statement.Execute();
         statement.NextRow();
-        bool res = statement.NextRow();
-        prev_map = _map_uuid;
+        const bool res = statement.NextRow();
+        prev_map = uid;
         prev_res = res;
         prev_init = true;
         return res;

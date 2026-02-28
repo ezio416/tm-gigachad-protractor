@@ -1,5 +1,5 @@
 
-vec4 ApplyOpacityToColor(vec4 inColor, float opacity) {
+vec4 ApplyOpacityToColor(const vec4&in inColor, const float opacity) {
     if (Math::IsInf(opacity) || Math::IsNaN(opacity)) {
         return vec4();
     }
@@ -15,14 +15,14 @@ vec4 ApplyOpacityToColor(vec4 inColor, float opacity) {
     return outColor;
 }
 
-float ApproximateSideSpeed(const vec2[] data, float speed) {
+float ApproximateSideSpeed(const vec2[]&in data, const float speed) {
     if (data.Length == 0) {
         return 0.0f;
     }
     vec2 lower = data[0];
     vec2 upper = data[data.Length - 1];
     for (uint i = 0; i < data.Length; i++) {
-        vec2 entry = data[i];
+        const vec2 entry = data[i];
         if (entry.x < speed && entry.x > lower.x) {
             lower = entry;
         }
@@ -30,19 +30,19 @@ float ApproximateSideSpeed(const vec2[] data, float speed) {
             upper = entry;
         }
     }
-    float t = Math::InvLerp(lower.x, upper.x, speed);
-    float interpolated = Math::Lerp(lower.y, upper.y, t);
+    const float t = Math::InvLerp(lower.x, upper.x, speed);
+    const float interpolated = Math::Lerp(lower.y, upper.y, t);
     return interpolated;
 }
 
-float CalcAngle(vec3 v1, vec3 v2) {
+float CalcAngle(const vec3&in v1, const vec3&in v2) {
     if (IsPreview()) {
         return PREVIEW_SLIP;
     }
     return Math::Angle(v1, v2);
 }
 
-float CalcVecAngle(vec3 vec1, vec3 vec2) {
+float CalcVecAngle(const vec3&in vec1, const vec3&in vec2) {
     if (vec1.Length() == 0 || vec2.Length() == 0) {
         return 0.0f;
     }
@@ -50,7 +50,7 @@ float CalcVecAngle(vec3 vec1, vec3 vec2) {
     return angle;
 }
 
-vec4 GetColor(int idx) {
+vec4 GetColor(const int idx) {
     switch (idx) {
         case 0:
             return COLOR_100;
@@ -93,7 +93,7 @@ CSmArenaClient@ GetPlayground() {
     return cast<CSmArenaClient>(GetApp().CurrentPlayground);
 }
 
-float GetSideSpeedAngle(float vel, float target_sidespeed) {
+float GetSideSpeedAngle(const float vel, const float target_sidespeed) {
     return Math::Asin(target_sidespeed / vel);
 }
 
@@ -123,7 +123,7 @@ float GetTargetThetaMultFactor(CSceneVehicleVisState@ visState) {
     return sum / 4.0f;
 }
 
-float GetThetaMultForSurface(EPlugSurfaceMaterialId surface) {
+float GetThetaMultForSurface(const EPlugSurfaceMaterialId surface) {
     if (IsIceSurface(surface)) {
         return 1.0f;
     }
@@ -161,18 +161,18 @@ CSceneVehicleVisState@ GetVisState() {
     return null;
 }
 
-bool IsDirtSurface(EPlugSurfaceMaterialId surface) {
+bool IsDirtSurface(const EPlugSurfaceMaterialId surface) {
     return
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Dirt ||
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::DirtRoad;
 }
 
-bool IsGrassSurface(EPlugSurfaceMaterialId surface) {
+bool IsGrassSurface(const EPlugSurfaceMaterialId surface) {
     return surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Grass ||
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Green;
 }
 
-bool IsIceSurface(EPlugSurfaceMaterialId surface) {
+bool IsIceSurface(const EPlugSurfaceMaterialId surface) {
     return
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Ice ||
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Concrete ||
@@ -180,13 +180,13 @@ bool IsIceSurface(EPlugSurfaceMaterialId surface) {
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Snow;
 }
 
-bool IsPlasticDirtOrGrass(EPlugSurfaceMaterialId surface) {
+bool IsPlasticDirtOrGrass(const EPlugSurfaceMaterialId surface) {
     return IsPlasticSurface(surface) ||
         IsDirtSurface(surface) ||
         IsGrassSurface(surface);
 }
 
-bool IsPlasticSurface(EPlugSurfaceMaterialId surface) {
+bool IsPlasticSurface(const EPlugSurfaceMaterialId surface) {
     return
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Plastic ||
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Rubber ||  // found on edges of some plastic items, e.g., the mesh roof decor thing
@@ -197,7 +197,7 @@ bool IsPreview() {
     return PREVIEW_DIRT || PREVIEW_GRASS || PREVIEW_ICE || PREVIEW_PLASTIC || PREVIEW_TARMAC || PREVIEW_WOOD;
 }
 
-bool IsSupportedSurface(EPlugSurfaceMaterialId surface) {
+bool IsSupportedSurface(const EPlugSurfaceMaterialId surface) {
     return IsPlasticSurface(surface) ||
         IsIceSurface(surface) ||
         IsDirtSurface(surface) ||
@@ -205,7 +205,7 @@ bool IsSupportedSurface(EPlugSurfaceMaterialId surface) {
         IsWoodSurface(surface);
 }
 
-bool IsTarmacSurface(EPlugSurfaceMaterialId surface) {
+bool IsTarmacSurface(const EPlugSurfaceMaterialId surface) {
     return
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Concrete ||
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Asphalt ||
@@ -215,13 +215,13 @@ bool IsTarmacSurface(EPlugSurfaceMaterialId surface) {
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::ResonantMetal;
 }
 
-bool IsWoodSurface(EPlugSurfaceMaterialId surface) {
+bool IsWoodSurface(const EPlugSurfaceMaterialId surface) {
     return
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Wood ||
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::SlidingWood;
 }
 
-float LerpToMidpoint(vec2[] points, float c) {
+float LerpToMidpoint(const vec2[]&in points, const float c) {
     if (points.Length == 0) {
         return 0.0f;
     }
@@ -245,11 +245,11 @@ float LerpToMidpoint(vec2[] points, float c) {
             break;
         }
     }
-    float pos = Math::InvLerp(lower.x, upper.x, c);
+    const float pos = Math::InvLerp(lower.x, upper.x, c);
     return Math::Lerp(lower.y, upper.y, pos);
 }
 
-float NormalizeSlipAngle(float slipAngle, float frontSpeed) {
+float NormalizeSlipAngle(float slipAngle, const float frontSpeed) {
     int polarity;
     float ret;
 
@@ -269,7 +269,7 @@ float NormalizeSlipAngle(float slipAngle, float frontSpeed) {
     return ret * polarity;
 }
 
-float PreviewSlip(float in_slip) {
+float PreviewSlip(const float in_slip) {
     if (IsPreview()) {
         return PREVIEW_SLIP;
     } else {

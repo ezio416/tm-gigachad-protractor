@@ -17,11 +17,11 @@ class ForwardProjection {
     int NUM_POINTS = 10;
     int idx = 0;
 
-    void AddValue(int d_idx, vec3 dx) {
+    void AddValue(const int d_idx, const vec3&in dx) {
         derivativeArrays[d_idx][idx] = dx;
     }
 
-    vec3 GetDerivative(int d_idx) {
+    vec3 GetDerivative(const int d_idx) {
         vec3 r = 0.0f;
         for (int i = 0; i < SMOOTHING; i++) {
             r += derivativeArrays[d_idx][i];

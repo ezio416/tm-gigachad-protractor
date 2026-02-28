@@ -19,7 +19,7 @@ class GearStateManager {
     }
 
     int GetAndIncrementIdx() {
-        int r = current_idx;
+        const int r = current_idx;
         frame_times[r] = g_dt;
         current_idx = (current_idx + 1) % FRAMES_AVERAGED;
 
@@ -33,14 +33,14 @@ class GearStateManager {
         return r;
     }
 
-    float GetExpectedRpm(float inSpeed, int inGear, float inSlip, bool checkSlip) {
+    float GetExpectedRpm(const float inSpeed, const int inGear, const float inSlip, const bool checkSlip) {
         if (!checkSlip || !InSafeZone(inSlip, inSpeed)) {
             return inSpeed * GetExpectedRpmBySpeedMult(inGear);
         }
         return 0.0f;
     }
 
-    float GetExpectedRpmBySpeedMult(int inGear) {
+    float GetExpectedRpmBySpeedMult(const int inGear) {
         switch (inGear) {
             case 0:
                 return -375.0f;
@@ -60,7 +60,7 @@ class GearStateManager {
 
     vec4 GetGeardownColor() {
         if (expectedTrueRpm < GEARDOWN_RPM_THRESH) {
-            float mult = GetGeardownMult();
+            const float mult = GetGeardownMult();
             vec4 c = NORMAL_UPSHIFT;
             c.w *= mult;
             return c;
@@ -74,8 +74,8 @@ class GearStateManager {
 
     vec4 GetGearupColor() {
         if (expectedTrueRpm > GEARUP_RPM_THRESH) {
-            float mult = GetGearupMult();
-            float pos = GetGearupScore() / GetScoreMax();
+            const float mult = GetGearupMult();
+            const float pos = GetGearupScore() / GetScoreMax();
             vec4 c = DANGER_UPSHIFT * pos + NORMAL_UPSHIFT * (1 - pos);
             c.w *= mult;
             return c;
@@ -100,7 +100,7 @@ class GearStateManager {
         return lastColorFetchScore;
     }
 
-    float GetIdealAngle(float speed) {
+    float GetIdealAngle(const float speed) {
         return LerpToMidpoint(idealAngles, speed);
     }
 
@@ -108,8 +108,8 @@ class GearStateManager {
         return SCORE_MAX * FRAMES_AVERAGED;
     }
 
-    void HandleUpdate(float inSlip, float inSpeed, int inGear, float inEngineRpm) {
-        int idx = GetAndIncrementIdx();
+    void HandleUpdate(const float inSlip, const float inSpeed, const int inGear, const float inEngineRpm) {
+        const int idx = GetAndIncrementIdx();
         expectedRpm = GetExpectedRpm(inSpeed, inGear, inSlip, true);
         expectedTrueRpm = GetExpectedRpm(inSpeed, inGear, inSlip, false);
 
@@ -117,7 +117,7 @@ class GearStateManager {
         RenderHud();
     }
 
-    bool InSafeZone(float inSlip, float inSpeed) {
+    bool InSafeZone(float inSlip, const float inSpeed) {
         inSlip = Math::Abs(inSlip);
         if (inSlip >= LerpToMidpoint(ice_gearup_1, inSpeed)) {
             return false;
@@ -146,7 +146,7 @@ class GearStateManager {
         nvg::StrokeWidth(BorderWidth);
         nvg::Stroke();
 
-        float height = graph_height * GetGearupScore() / GetScoreMax();
+        const float height = graph_height * GetGearupScore() / GetScoreMax();
         nvg::BeginPath();
         nvg::RoundedRect(graph_x_offset, graph_y_offset + (graph_height - height), graph_width, height, BorderRadius);
         nvg::FillColor(vec4(1.0f));
