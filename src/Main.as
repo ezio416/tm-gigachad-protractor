@@ -3,16 +3,19 @@ const string  pluginIcon  = Icons::Bars;
 Meta::Plugin@ pluginMeta  = Meta::ExecutingPlugin();
 const string  pluginTitle = pluginColor + pluginIcon + "\\$G " + pluginMeta.Name;
 
-DatabaseFunctions databasefunctions;
-float             g_dt = 0.0f;
-Protractor        protractor;
+float      g_dt = 0.0f;
+Protractor protractor;
+
+void Main() {
+    Skipped::Load();
+}
 
 void OnSettingsChanged() {
     protractor.OnSettingsChanged();
 }
 
 void Render() {
-    if (!S_Enabled or databasefunctions.IsMapSkipped(GetMapUid())) {
+    if (!S_Enabled or Skipped::Skipped(GetMapUid())) {
         return;
     }
 
@@ -37,13 +40,13 @@ void RenderMenu() {
         const string uid = GetMapUid();
 
         UI::BeginDisabled(uid.Length == 0);
-        if (databasefunctions.IsMapSkipped(uid)) {
+        if (Skipped::Skipped(uid)) {
             if (UI::MenuItem("Enable on this map")) {
-                databasefunctions.EnableMap(uid);
+                Skipped::Unskip(uid);
             }
         } else {
             if (UI::MenuItem("Disable on this map")) {
-                databasefunctions.DisableMap(uid);
+                Skipped::Skip(uid);
             }
         }
         UI::EndDisabled();
