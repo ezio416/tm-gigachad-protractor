@@ -28,7 +28,7 @@ class GearStateManager {
             for (int i = 0; i < FRAMES_AVERAGED; i++) {
                 sum += frame_times[i];
             }
-            FRAMES_AVERAGED = int(MILLISECONDS_AVERAGED / (sum / FRAMES_AVERAGED));
+            FRAMES_AVERAGED = int(S_MsAveraged / (sum / FRAMES_AVERAGED));
         }
         return r;
     }
@@ -61,7 +61,7 @@ class GearStateManager {
     vec4 GetGeardownColor() {
         if (expectedTrueRpm < GEARDOWN_RPM_THRESH) {
             const float mult = GetGeardownMult();
-            vec4 c = NORMAL_UPSHIFT;
+            vec4 c = S_ColorUpshiftNormal;
             c.w *= mult;
             return c;
         }
@@ -76,7 +76,7 @@ class GearStateManager {
         if (expectedTrueRpm > GEARUP_RPM_THRESH) {
             const float mult = GetGearupMult();
             const float pos = GetGearupScore() / GetScoreMax();
-            vec4 c = DANGER_UPSHIFT * pos + NORMAL_UPSHIFT * (1 - pos);
+            vec4 c = S_ColorUpshiftDanger * pos + S_ColorUpshiftNormal * (1 - pos);
             c.w *= mult;
             return c;
         }
@@ -135,24 +135,24 @@ class GearStateManager {
     }
 
     void RenderHud() {
-        if (!RENDER_GEAR_HUD) {
+        if (!S_GearHUD) {
             return;
         }
         nvg::BeginPath();
-        nvg::RoundedRect(graph_x_offset, graph_y_offset, graph_width, graph_height, BorderRadius);
-        nvg::FillColor(BackdropColor);
+        nvg::RoundedRect(S_GraphOffsetX, S_GraphOffsetY, S_GraphWidth, S_GraphHeight, S_BorderRadius);
+        nvg::FillColor(S_ColorBackdrop);
         nvg::Fill();
-        nvg::StrokeColor(BorderColor);
-        nvg::StrokeWidth(BorderWidth);
+        nvg::StrokeColor(S_ColorBorder);
+        nvg::StrokeWidth(S_BorderWidth);
         nvg::Stroke();
 
-        const float height = graph_height * GetGearupScore() / GetScoreMax();
+        const float height = S_GraphHeight * GetGearupScore() / GetScoreMax();
         nvg::BeginPath();
-        nvg::RoundedRect(graph_x_offset, graph_y_offset + (graph_height - height), graph_width, height, BorderRadius);
+        nvg::RoundedRect(S_GraphOffsetX, S_GraphOffsetY + (S_GraphHeight - height), S_GraphWidth, height, S_BorderRadius);
         nvg::FillColor(vec4(1.0f));
         nvg::Fill();
-        nvg::StrokeColor(BorderColor);
-        nvg::StrokeWidth(BorderWidth);
+        nvg::StrokeColor(S_ColorBorder);
+        nvg::StrokeWidth(S_BorderWidth);
         nvg::Stroke();
     }
 

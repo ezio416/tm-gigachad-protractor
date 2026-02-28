@@ -12,7 +12,7 @@ void OnSettingsChanged() {
 }
 
 void Render() {
-    if (!g_visible or databasefunctions.IsMapSkipped(GetMapUid())) {
+    if (!S_Enabled or databasefunctions.IsMapSkipped(GetMapUid())) {
         return;
     }
 
@@ -30,8 +30,8 @@ void Render() {
 
 void RenderMenu() {
     if (UI::BeginMenu(pluginTitle)) {
-        if (UI::MenuItem("Enabled", "", g_visible)) {
-            g_visible = !g_visible;
+        if (UI::MenuItem("Enabled", "", S_Enabled)) {
+            S_Enabled = !S_Enabled;
         }
 
         const string uid = GetMapUid();

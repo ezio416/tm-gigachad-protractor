@@ -5,7 +5,7 @@ class HistoryTrail {
     uint64 lastUpdateTime;
 
     int CalcNext(const int offset) {
-        return (cur_idx + HISTORY_POINTS + offset) % HISTORY_POINTS;
+        return (cur_idx + S_HistoryPoints + offset) % S_HistoryPoints;
     }
 
     float CalculateOpacity() {
@@ -13,11 +13,11 @@ class HistoryTrail {
         // e.g., if it's 100/0, 100% - 75/25, 50% - 50/50, 0%.
         float sum = 0.0f;
         HistoryTrailObject@ o;
-        for (int i = 0; i < HISTORY_POINTS; i++) {
+        for (int i = 0; i < S_HistoryPoints; i++) {
             o = historyTrailArr[CalcNext(i)];
             sum += o.slip;
         }
-        return Math::Abs(sum) / HISTORY_POINTS;
+        return Math::Abs(sum) / S_HistoryPoints;
     }
 
     HistoryTrailObject@ GetAtIdx(const int idx) {
@@ -26,7 +26,7 @@ class HistoryTrail {
 
     void Update(const float slip, const vec4&in color) {
         const uint64 now = Time::Now;
-        if (int(now - lastUpdateTime) > (HISTORY_SECONDS / float(HISTORY_POINTS)) * 1000) {
+        if (int(now - lastUpdateTime) > (S_HistorySeconds / float(S_HistoryPoints)) * 1000) {
             historyTrailArr[cur_idx].Update(slip, color);
             cur_idx = CalcNext(1);
             lastUpdateTime = now;

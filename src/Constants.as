@@ -1,7 +1,7 @@
 const float BW_MIN         = 15.0f;
 const float HALF_PI        = 1.57079632679f;
 const float OTHER_SURF_MIN = 55.555555f;
-const float TARMAC_MIN     = 109.722222f;
+const float ROAD_MIN       = 109.722222f;
 const float WOOD_MIN       = 10.0f;
 
 const vec2[] ICE_GEARUP_1 = {
@@ -49,7 +49,7 @@ All intermediate values can be linearly interpreted from these.
 Format of vec2: (speed, target_sidespeed)
 */
 
-const vec2[] TARMAC_IDEAL = {
+const vec2[] ROAD_IDEAL = {
     vec2(111.0f, 5.9f),
     vec2(140.0f, 5.6f),
     vec2(210.0f, 5.75f),
@@ -57,7 +57,7 @@ const vec2[] TARMAC_IDEAL = {
     vec2(280.0f, 5.85f)
 };
 
-const vec2[] TARMAC_BASE = {
+const vec2[] ROAD_BASE = {
     vec2(111.0f,  6.6f),
     vec2(150.95f, 8.92f),
     vec2(244.0f,  13.8f),
@@ -65,7 +65,7 @@ const vec2[] TARMAC_BASE = {
     vec2(277.5f,  15.75f)
 };
 
-const vec2[] TARMAC_ZERO = {
+const vec2[] ROAD_ZERO = {
     vec2(111.0f,   11.32f),
     vec2(112.64f,  11.938f),
     vec2(129.25f,  13.975f),
@@ -178,14 +178,14 @@ const vec2[] BW_DIRT_ZERO = {
     vec2(130.0f, 26.5f)
 };
 
-const vec2[] BW_TARMAC_IDEAL = {
+const vec2[] BW_ROAD_IDEAL = {
     vec2(0.0f,   3.5f),
     vec2(31.0f,  5.4f),
     vec2(40.0f,  8.0f),
     vec2(130.0f, 8.2f)
 };
 
-const vec2[] BW_TARMAC_ZERO = {
+const vec2[] BW_ROAD_ZERO = {
     vec2(0.0f,   8.0f),
     vec2(55.0f,  16.0f),
     vec2(85.0f,  20.0f),

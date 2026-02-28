@@ -36,7 +36,7 @@ float ApproximateSideSpeed(const vec2[]&in data, const float speed) {
 
 float CalcAngle(const vec3&in v1, const vec3&in v2) {
     if (IsPreview()) {
-        return PREVIEW_SLIP;
+        return S_PreviewSlip;
     }
     return Math::Angle(v1, v2);
 }
@@ -52,15 +52,15 @@ float CalcVecAngle(const vec3&in vec1, const vec3&in vec2) {
 vec4 GetColor(const int idx) {
     switch (idx) {
         case 0:
-            return COLOR_100;
+            return S_ColorOptimal;
         case 1:
-            return COLOR_90;
+            return S_Color90;
         case 2:
-            return COLOR_50;
+            return S_Color50;
         case 3:
-            return COLOR_0;
+            return S_Color0;
     }
-    return COLOR_0;
+    return S_Color0;
 }
 
 string GetMapUid() {
@@ -103,10 +103,10 @@ float GetTargetThetaMultFactor(CSceneVehicleVisState@ visState) {
     }
 
     if (visState.FrontSpeed < 0.0f) {
-        return BACKWARDS_TM;
+        return S_ThetaMultBW;
     }
 
-    if (SIMPLIFIED_VIEW) {
+    if (S_Simplified) {
         return 1.0f;
     }
 
@@ -124,28 +124,28 @@ float GetThetaMultForSurface(const EPlugSurfaceMaterialId surface) {
         return 1.0f;
     }
     if (IsDirtSurface(surface)) {
-        return DIRT_TM;
+        return S_ThetaMultDirt;
     }
-    if (IsTarmacSurface(surface)) {
-        return TARMAC_TM;
+    if (IsRoadSurface(surface)) {
+        return S_ThetaMultRoad;
     }
     if (IsGrassSurface(surface)) {
-        return GRASS_TM;
+        return S_ThetaMultGrass;
     }
     if (IsPlasticSurface(surface)) {
-        return PLASTIC_TM;
+        return S_ThetaMultPlastic;
     }
     if (IsWoodSurface(surface)) {
-        return WOOD_TM;
+        return S_ThetaMultWood;
     }
     return -1000.0f;
 }
 
 CSceneVehicleVisState@ GetVisState() {
-    if (PLAYER_IDX == 0) {
+    if (S_PlayerIndex == 0) {
         return VehicleState::ViewingPlayerState();
     }
-    int pidx = Math::Clamp(PLAYER_IDX, 0, VehicleState::GetAllVis(GetApp().GameScene).Length);
+    int pidx = Math::Clamp(S_PlayerIndex, 0, VehicleState::GetAllVis(GetApp().GameScene).Length);
     auto arr = VehicleState::GetAllVis(GetApp().GameScene);
     if (arr.Length == 0) {
         return null;
@@ -190,7 +190,7 @@ bool IsPlasticSurface(const EPlugSurfaceMaterialId surface) {
 }
 
 bool IsPreview() {
-    return PREVIEW_DIRT || PREVIEW_GRASS || PREVIEW_ICE || PREVIEW_PLASTIC || PREVIEW_TARMAC || PREVIEW_WOOD;
+    return S_PreviewDirt || S_PreviewGrass || S_PreviewIce || S_PreviewPlastic || S_PreviewRoad || S_PreviewWood;
 }
 
 bool IsSupportedSurface(const EPlugSurfaceMaterialId surface) {
@@ -201,7 +201,7 @@ bool IsSupportedSurface(const EPlugSurfaceMaterialId surface) {
         IsWoodSurface(surface);
 }
 
-bool IsTarmacSurface(const EPlugSurfaceMaterialId surface) {
+bool IsRoadSurface(const EPlugSurfaceMaterialId surface) {
     return
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Concrete ||
         surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Asphalt ||
@@ -267,7 +267,7 @@ float NormalizeSlipAngle(float slipAngle, const float frontSpeed) {
 
 float PreviewSlip(const float in_slip) {
     if (IsPreview()) {
-        return PREVIEW_SLIP;
+        return S_PreviewSlip;
     } else {
         return in_slip;
     }
