@@ -408,7 +408,7 @@ float S_HistoryPerspectiveConstant = 30.0f;
 
 
 [Setting category="Overrides" name="Is Rally Car"]
-bool S_RallyOverride = true;
+bool S_RallyOverride = false;
 
 
 // [Setting category="Gear Display" name="Graph Width" min=50 max=2000]
