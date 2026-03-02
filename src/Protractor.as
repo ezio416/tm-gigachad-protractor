@@ -260,7 +260,7 @@ class Protractor {
 
         gearStateManager.HandleUpdate(slipAngle, vel, (IsPreview() ? S_PreviewGear : visState.CurGear));
 
-        if ((VehicleState::GetVehicleType(visState) == VehicleState::VehicleType::CarSport && !S_RallyOverride) && IsIceSurface(surfaceNormalized) && visState.FLIcing01 > 0.0f) {
+        if ((VehicleState::GetVehicleType(visState) == VehicleState::VehicleType::CarSport && !S_RallyOverride) && Surface::Ice::Is(surfaceNormalized) && visState.FLIcing01 > 0.0f) {
             renderMode = RenderMode::ICE;
             RenderIce(visState, vel, vec_vel);
             return;
@@ -268,57 +268,66 @@ class Protractor {
 
         if (visState.FrontSpeed < 0.0f || (IsPreview() && S_PreviewSpeed < 0.0f)) {
             renderMode = RenderMode::BACKWARDS;
-            if (IsGrassSurface(surfaceNormalized)) {
-                RenderSurface(visState, vel, vec_vel, BW_MIN, BW_GRASS_IDEAL, {}, BW_GRASS_ZERO);
+
+            if (Surface::Grass::Is(surfaceNormalized)) {
+                RenderSurface(visState, vel, vec_vel, Surface::Other::BW_MIN, Surface::Grass::BW_IDEAL, {}, Surface::Grass::BW_ZERO);
                 return;
             }
-            if (IsDirtSurface(surfaceNormalized)) {
-                RenderSurface(visState, vel, vec_vel, BW_MIN, BW_DIRT_IDEAL, {}, BW_DIRT_ZERO);
+
+            if (Surface::Dirt::Is(surfaceNormalized)) {
+                RenderSurface(visState, vel, vec_vel, Surface::Other::BW_MIN, Surface::Dirt::BW_IDEAL, {}, Surface::Dirt::BW_ZERO);
                 return;
             }
-            if (IsPlasticSurface(surfaceNormalized)) {
+
+            if (Surface::Plastic::Is(surfaceNormalized)) {
                 // just using grass ideals for plastic BW for now
-                RenderSurface(visState, vel, vec_vel, BW_MIN, BW_GRASS_IDEAL, {}, BW_GRASS_ZERO);
+                RenderSurface(visState, vel, vec_vel, Surface::Other::BW_MIN, Surface::Grass::BW_IDEAL, {}, Surface::Grass::BW_ZERO);
                 return;
             }
-            if (IsRoadSurface(surfaceNormalized)) {
-                RenderSurface(visState, vel, vec_vel, BW_MIN, BW_ROAD_IDEAL, {}, BW_ROAD_ZERO);
+
+            if (Surface::Road::Is(surfaceNormalized)) {
+                RenderSurface(visState, vel, vec_vel, Surface::Other::BW_MIN, Surface::Road::BW_IDEAL, {}, Surface::Road::BW_ZERO);
                 return;
             }
         }
 
         renderMode = RenderMode::NORMAL;
-        if (IsGrassSurface(surfaceNormalized)) {
-            RenderSurface(visState, vel, vec_vel, OTHER_SURF_MIN, GRASS_IDEAL, GRASS_BASE, GRASS_ZERO);
-            return;
-        }
-        if (IsDirtSurface(surfaceNormalized)) {
-            RenderSurface(visState, vel, vec_vel, OTHER_SURF_MIN, DIRT_IDEAL, DIRT_BASE, DIRT_ZERO);
-            return;
-        }
-        if (IsPlasticSurface(surfaceNormalized)) {
-            RenderSurface(visState, vel, vec_vel, OTHER_SURF_MIN, PLASTIC_IDEAL, PLASTIC_BASE, PLASTIC_ZERO);
-            return;
-        }
-        if (IsRoadSurface(surfaceNormalized)) {
-            RenderSurface(visState, vel, vec_vel, ROAD_MIN, ROAD_IDEAL, ROAD_BASE, ROAD_ZERO);
+
+        if (Surface::Grass::Is(surfaceNormalized)) {
+            RenderSurface(visState, vel, vec_vel, Surface::Other::MIN, Surface::Grass::IDEAL, Surface::Grass::BASE, Surface::Grass::ZERO);
             return;
         }
 
-        if (IsIceSurface(surfaceNormalized)) {
-            if (VehicleState::GetVehicleType(visState) ==  VehicleState::VehicleType::CarRally) {
-                RenderSurface(visState, vel, vec_vel, 10, RALLY_ICE_PEAK, RALLY_ICE_ZERO, RALLY_ICE_SLIDEOUT, false);
+        if (Surface::Dirt::Is(surfaceNormalized)) {
+            RenderSurface(visState, vel, vec_vel, Surface::Other::MIN, Surface::Dirt::IDEAL, Surface::Dirt::BASE, Surface::Dirt::ZERO);
+            return;
+        }
+
+        if (Surface::Plastic::Is(surfaceNormalized)) {
+            RenderSurface(visState, vel, vec_vel, Surface::Other::MIN, Surface::Plastic::IDEAL, Surface::Plastic::BASE, Surface::Plastic::ZERO);
+            return;
+        }
+
+        if (Surface::Road::Is(surfaceNormalized)) {
+            RenderSurface(visState, vel, vec_vel, Surface::Road::MIN, Surface::Road::IDEAL, Surface::Road::BASE, Surface::Road::ZERO);
+            return;
+        }
+
+        if (Surface::Ice::Is(surfaceNormalized)) {
+            if (VehicleState::GetVehicleType(visState) == VehicleState::VehicleType::CarRally) {
+                RenderSurface(visState, vel, vec_vel, 10.0f, Surface::Ice::RALLY_PEAK, Surface::Ice::RALLY_ZERO, Surface::Ice::RALLY_SLIDEOUT, false);
             }
-            if (VehicleState::GetVehicleType(visState) ==  VehicleState::VehicleType::CarDesert) {
-                RenderSurface(visState, vel, vec_vel, 10, DESERT_ICE_PEAK, DESERT_ICE_ZERO, DESERT_ICE_BACK_PEAK, false);
+            if (VehicleState::GetVehicleType(visState) == VehicleState::VehicleType::CarDesert) {
+                RenderSurface(visState, vel, vec_vel, 10.0f, Surface::Ice::DESERT_PEAK, Surface::Ice::DESERT_ZERO, Surface::Ice::DESERT_BACK_PEAK, false);
             }
         }
-        if (IsWoodSurface(surfaceNormalized) && (S_PreviewWet || visState.WetnessValue01 > 0.0f)) {
+
+        if (Surface::Wood::Is(surfaceNormalized) && (S_PreviewWet || visState.WetnessValue01 > 0.0f)) {
             activeWood = true;
             if (S_PreviewIcy || ((visState.FLIcing01 + visState.FRIcing01 + visState.RLIcing01 + visState.RRIcing01) > 0.0f)) {
-                RenderSurface(visState, vel, vec_vel, WOOD_MIN, WOOD_WET_ICE_P1, WOOD_WET_ICE_VALLEY, WOOD_WET_ICE_P2, false);
+                RenderSurface(visState, vel, vec_vel, Surface::Wood::MIN, Surface::Wood::WET_ICE_P1, Surface::Wood::WET_ICE_VALLEY, Surface::Wood::WET_ICE_P2, false);
             } else {
-                RenderSurface(visState, vel, vec_vel, WOOD_MIN, WOOD_P1, WOOD_VALLEY, WOOD_P2);
+                RenderSurface(visState, vel, vec_vel, Surface::Wood::MIN, Surface::Wood::P1, Surface::Wood::VALLEY, Surface::Wood::P2);
             }
             return;
         }
@@ -508,10 +517,10 @@ class Protractor {
 
     void RenderIceGearLines(CSceneVehicleVisState@ visState, const float v, const vec3&in vel, float slip) {
         float[] lines;
-        lines.InsertLast(LerpToMidpoint(ICE_GEARUP_1, v));
-        lines.InsertLast(LerpToMidpoint(ICE_GEARUP_2, v));
-        lines.InsertLast(LerpToMidpoint(ICE_GEARUP_3, v));
-        lines.InsertLast(LerpToMidpoint(ICE_GEARUP_4, v));
+        lines.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_1, v));
+        lines.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_2, v));
+        lines.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_3, v));
+        lines.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_4, v));
         float t;
 
         vec4 color;
@@ -545,8 +554,8 @@ class Protractor {
 
             if (gearStateManager.expectedTrueRpm < gearStateManager.GEARDOWN_RPM_THRESH) {
                 float[] lines1;
-                lines1.InsertLast(LerpToMidpoint(ICE_GEARUP_1, v));
-                lines1.InsertLast(LerpToMidpoint(ICE_GEARUP_4, v));
+                lines1.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_1, v));
+                lines1.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_4, v));
                 color = gearStateManager.GetGeardownColor();
                 for (uint i = 0; i < lines1.Length; i++) {
                     slip = Math::Angle(visState.Dir, vel);
@@ -866,7 +875,7 @@ class Protractor {
                 OP_RES = -1;
             }
         } else {
-            if (GetSlipTotal(visState) == 0.0f && !(IsWoodSurface(visState.FLGroundContactMaterial) && visState.FLIcing01 > 0.0f && visState.WetnessValue01 > 0.0f)) {
+            if (GetSlipTotal(visState) == 0.0f && !(Surface::Wood::Is(visState.FLGroundContactMaterial) && visState.FLIcing01 > 0.0f && visState.WetnessValue01 > 0.0f)) {
                 if (S_ShowBadSlide) {
                     OP_RES = 1;
                     badSlide = true;

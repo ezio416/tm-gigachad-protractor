@@ -117,35 +117,14 @@ float GetTargetThetaMultFactor(CSceneVehicleVisState@ visState) {
         return 1.0f;
     }
 
-    float sum =
-        GetThetaMultForSurface(visState.FLGroundContactMaterial)
-            + GetThetaMultForSurface(visState.FRGroundContactMaterial)
-            + GetThetaMultForSurface(visState.RLGroundContactMaterial)
-            + GetThetaMultForSurface(visState.RRGroundContactMaterial);
+    float sum = 0.0f
+        + Surface::GetThetaMult(visState.FLGroundContactMaterial)
+        + Surface::GetThetaMult(visState.FRGroundContactMaterial)
+        + Surface::GetThetaMult(visState.RLGroundContactMaterial)
+        + Surface::GetThetaMult(visState.RRGroundContactMaterial)
+    ;
 
-    return sum / 4.0f;
-}
-
-float GetThetaMultForSurface(const EPlugSurfaceMaterialId surface) {
-    if (IsIceSurface(surface)) {
-        return 1.0f;
-    }
-    if (IsDirtSurface(surface)) {
-        return S_ThetaMultDirt;
-    }
-    if (IsRoadSurface(surface)) {
-        return S_ThetaMultRoad;
-    }
-    if (IsGrassSurface(surface)) {
-        return S_ThetaMultGrass;
-    }
-    if (IsPlasticSurface(surface)) {
-        return S_ThetaMultPlastic;
-    }
-    if (IsWoodSurface(surface)) {
-        return S_ThetaMultWood;
-    }
-    return -1000.0f;
+    return sum * 0.25f;
 }
 
 CSceneVehicleVisState@ GetVisState() {
@@ -164,50 +143,8 @@ CSceneVehicleVisState@ GetVisState() {
     return null;
 }
 
-bool IsDirtSurface(const EPlugSurfaceMaterialId surface) {
-    return
-        surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Dirt ||
-        surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::DirtRoad;
-}
-
-bool IsGrassSurface(const EPlugSurfaceMaterialId surface) {
-    return surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Grass ||
-        surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Green;
-}
-
-bool IsIceSurface(const EPlugSurfaceMaterialId surface) {
-    return
-        surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Ice ||
-        surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Concrete ||
-        surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::RoadIce ||
-        surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Snow;
-}
-
-bool IsPlasticSurface(const EPlugSurfaceMaterialId surface) {
-    return
-        surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Plastic ||
-        surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Rubber ||  // found on edges of some plastic items, e.g., the mesh roof decor thing
-        surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Water;  // ??? is this a good fit?
-}
-
 bool IsPreview() {
     return S_PreviewDirt || S_PreviewGrass || S_PreviewIce || S_PreviewPlastic || S_PreviewRoad || S_PreviewWood;
-}
-
-bool IsRoadSurface(const EPlugSurfaceMaterialId surface) {
-    return
-        surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Concrete ||
-        surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Asphalt ||
-        surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::RoadSynthetic ||
-        surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::TechMagnetic ||
-        surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::TechSuperMagnetic ||
-        surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::ResonantMetal;
-}
-
-bool IsWoodSurface(const EPlugSurfaceMaterialId surface) {
-    return
-        surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::Wood ||
-        surface == CSceneVehicleVisState::EPlugSurfaceMaterialId::SlidingWood;
 }
 
 float LerpToMidpoint(const vec2[]&in points, const float c) {

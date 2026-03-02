@@ -3,6 +3,8 @@ const string  pluginIcon  = Icons::Bars;
 Meta::Plugin@ pluginMeta  = Meta::ExecutingPlugin();
 const string  pluginTitle = pluginColor + pluginIcon + "\\$G " + pluginMeta.Name;
 
+const float HALF_PI = 1.570796f;
+
 float      g_dt = 0.0f;
 Protractor protractor;
 

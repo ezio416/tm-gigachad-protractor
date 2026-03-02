@@ -27,11 +27,11 @@ class ForwardProjection {
 
     bool ShouldRender(const EPlugSurfaceMaterialId surface) {
         return false
-            or (S_NoodlebobRoad    and IsRoadSurface(surface))
-            or (S_NoodlebobDirt    and IsDirtSurface(surface))
-            or (S_NoodlebobGrass   and IsGrassSurface(surface))
-            or (S_NoodlebobPlastic and IsPlasticSurface(surface))
-            or (S_NoodlebobIce     and IsIceSurface(surface))
+            or (S_NoodlebobRoad    and Surface::Road::Is(surface))
+            or (S_NoodlebobDirt    and Surface::Dirt::Is(surface))
+            or (S_NoodlebobGrass   and Surface::Grass::Is(surface))
+            or (S_NoodlebobPlastic and Surface::Plastic::Is(surface))
+            or (S_NoodlebobIce     and Surface::Ice::Is(surface))
         ;
     }
 
