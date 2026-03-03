@@ -68,14 +68,17 @@ namespace Surface {
         protractor.badSlide = false;
         int OP_RES = 0;
         if (speed < min_vel) {
-            if (S_ShowBadSlide && GetSlipTotal(visState) > 0.0f) {
+            if (S_ShowBadSlide and GetSlipTotal(visState) > 0.0f) {
                 OP_RES = 1;
                 protractor.badSlide = true;
             } else {
                 OP_RES = -1;
             }
         } else {
-            if (GetSlipTotal(visState) == 0.0f && !(Wood::Is(visState.FLGroundContactMaterial) && visState.FLIcing01 > 0.0f && visState.WetnessValue01 > 0.0f)) {
+            if (true
+                and GetSlipTotal(visState) == 0.0f
+                and !(Wood::Is(visState.FLGroundContactMaterial) and visState.FLIcing01 > 0.0f and visState.WetnessValue01 > 0.0f)
+            ) {
                 if (S_ShowBadSlide) {
                     OP_RES = 1;
                     protractor.badSlide = true;
@@ -83,11 +86,7 @@ namespace Surface {
                     OP_RES = -1;
                 }
             } else {
-                if (abs_sidespeed > outer_ss * S_OverslideFadeMult) {
-                    OP_RES = -1;
-                } else {
-                    OP_RES = 1;
-                }
+                OP_RES = abs_sidespeed > outer_ss * S_OverslideFadeMult ? -1 : 1;
             }
         }
 

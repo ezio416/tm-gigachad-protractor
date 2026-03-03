@@ -3,7 +3,10 @@ const string  pluginIcon  = Icons::Bars;
 Meta::Plugin@ pluginMeta  = Meta::ExecutingPlugin();
 const string  pluginTitle = pluginColor + pluginIcon + "\\$G " + pluginMeta.Name;
 
-const float HALF_PI = 1.570796f;
+const float HALF_PI    = Math::PI * 0.5f;
+const float THIRD_PI   = Math::PI / 3.0f;
+const float QUARTER_PI = HALF_PI * 0.5f;
+const float SIXTH_PI   = THIRD_PI * 0.5f;
 
 float      g_dt = 0.0f;
 Protractor protractor;
@@ -39,10 +42,12 @@ void Render() {
     }
 
     CGameCtnApp@ App = GetApp();
-    if (App.CurrentPlayground !is null and App.CurrentPlayground.UIConfigs.Length > 0) {
-        if (App.CurrentPlayground.UIConfigs[0].UISequence == CGamePlaygroundUIConfig::EUISequence::Intro) {
-            return;
-        }
+    if (true
+        and App.CurrentPlayground !is null
+        and App.CurrentPlayground.UIConfigs.Length > 0
+        and App.CurrentPlayground.UIConfigs[0].UISequence == CGamePlaygroundUIConfig::EUISequence::Intro
+    ) {
+        return;
     }
 
     if (App.GameScene !is null) {

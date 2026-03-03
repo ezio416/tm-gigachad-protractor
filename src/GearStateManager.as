@@ -126,7 +126,7 @@ const vec2[] IDEAL_ANGLES = {
 };
 
 float GetExpectedRpm(const float inSpeed, const int inGear, const float inSlip, const bool checkSlip) {
-    if (!checkSlip || !InSafeZone(inSlip, inSpeed)) {
+    if (!checkSlip or !InSafeZone(inSlip, inSpeed)) {
         return inSpeed * GetExpectedRpmBySpeedMult(inGear);
     }
     return 0.0f;
