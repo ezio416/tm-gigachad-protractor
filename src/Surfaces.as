@@ -48,14 +48,14 @@ namespace Surface {
         const float base_ss = ApproximateSideSpeed(base_config, speed);
         const float good_ss = Math::Lerp(outer_ss, target_ss, S_GoodSDThreshold);
 
-        const float slip = PreviewSlip(protractor.GetSlipSmoothed(visState.Left, vec_vel));
+        const float slip = PreviewSlip(GetSlipSmoothed(visState.Left, vec_vel));
         const float sideSpeed = speed * Math::Sin(PreviewSlip(Math::Angle(visState.Dir, vec_vel)));
         const float abs_sidespeed = Math::Abs(sideSpeed);
 
-        const vec2 startAndLength = protractor.GetStartAndLength();
+        const vec2 startAndLength = GetStartAndLength();
         const vec2[] targets = GetLinesToBeRendered(target_ss, good_ss, base_ss, outer_ss, show_good_ss);
 
-        protractor.RenderPlayerPointer(
+        RenderPlayerPointer(
             visState,
             startAndLength.x,
             startAndLength.y,
@@ -65,12 +65,12 @@ namespace Surface {
             ApplyOpacityToColor(GetPlayerPointerColor(abs_sidespeed, target_ss, good_ss, base_ss, outer_ss), 1.0f)
         );
 
-        protractor.badSlide = false;
+        badSlide = false;
         int OP_RES = 0;
         if (speed < min_vel) {
             if (S_ShowBadSlide and GetSlipTotal(visState) > 0.0f) {
                 OP_RES = 1;
-                protractor.badSlide = true;
+                badSlide = true;
             } else {
                 OP_RES = -1;
             }
@@ -81,7 +81,7 @@ namespace Surface {
             ) {
                 if (S_ShowBadSlide) {
                     OP_RES = 1;
-                    protractor.badSlide = true;
+                    badSlide = true;
                 } else {
                     OP_RES = -1;
                 }
@@ -91,12 +91,12 @@ namespace Surface {
         }
 
         if (OP_RES > 0) {
-            protractor.playerFadeOpacity = Math::Min(1.0f, protractor.playerFadeOpacity + S_PlayerOpacityDerivative);
+            playerFadeOpacity = Math::Min(1.0f, playerFadeOpacity + S_PlayerOpacityDerivative);
         } else {
-            protractor.playerFadeOpacity = Math::Max(0.0f, protractor.playerFadeOpacity - S_PlayerOpacityDerivative);
+            playerFadeOpacity = Math::Max(0.0f, playerFadeOpacity - S_PlayerOpacityDerivative);
         }
 
-        if (protractor.playerFadeOpacity == 0.0f) {
+        if (playerFadeOpacity == 0.0f) {
             return;
         }
 
@@ -108,7 +108,7 @@ namespace Surface {
                 upper = targets[j].x;
                 targetOpacity = Math::Max(Math::InvLerp(lower, upper, abs_sidespeed), S_BrightnessMin);
                 lower = upper;
-                protractor.RenderAngle(
+                RenderAngle(
                     visState,
                     startAndLength.x,
                     startAndLength.y / S_PlayerFraction,
@@ -323,6 +323,12 @@ namespace Surface {
             vec2(80.4f,   38.25f)
         };
 
+        float GetLineBrightness(const float slip, const float theta) {
+            const float diff = Math::Abs(slip - theta);
+            const float ret = Math::InvLerp(S_IceLineFadeRate, 0.0f, diff);
+            return Math::Max(ret, S_IceBrightnessMin);
+        }
+
         bool Is(const EPlugSurfaceMaterialId surface) {
             switch (surface) {
                 case EPlugSurfaceMaterialId::Concrete:
@@ -334,8 +340,272 @@ namespace Surface {
             return false;
         }
 
+        vec4 Opacity(const vec4&in color, const float slip, const float theta) {
+            vec4 c = color;
+            c.w *= Surface::Ice::GetLineBrightness(slip, theta);
+            return c;
+        }
+
+        void Render(CSceneVehicleVisState@ visState, const float vel, const vec3&in vec_vel) {
+            const float slip = PreviewSlip(CalcAngle(vec_vel, visState.Dir));
+            const float absSlip = Math::Abs(slip);
+
+            if (absSlip < SIXTH_PI) {
+                playerFadeOpacity = 0.0f;
+            } else if (absSlip < QUARTER_PI) {
+                playerFadeOpacity = Math::InvLerp(THIRD_PI, QUARTER_PI, absSlip);
+            } else if (absSlip > QUARTER_PI) {
+                playerFadeOpacity = 1.0f;
+            }
+
+            float t;
+
+            if (S_FixIceGuides) {
+                t = -slip;
+            } else {
+                t = -HALF_PI;
+            }
+
+            if (Math::Angle(vec_vel, visState.Left) > HALF_PI or IsPreview()) {
+                t *= -1.0f;
+            }
+
+            vec4 color;
+
+            if (gearStateManager.expectedTrueRpm > GEARUP_RPM_THRESH) {
+                color = gearStateManager.GetGearupColor();
+            } else if (gearStateManager.expectedTrueRpm < GEARDOWN_RPM_THRESH) {
+                color = gearStateManager.GetGeardownColor();
+            } else {
+                color = vec4(1.0f);
+            }
+
+            color.w = 1.0f;
+
+            RenderGearLines(visState, vel, vec_vel, slip);
+            RenderIdealAngle(visState, vel, vec_vel, slip);
+            RenderCustomAngle1(visState, vec_vel);
+            RenderCustomAngle2(visState, vec_vel);
+
+            RenderPlayerPointer(
+                visState,
+                S_IcePlayerPointerStart,
+                S_IcePlayerPointerLength,
+                S_FullspeedPlayerPointerWidth,
+                t,
+                vec3(),
+                color
+            );
+        }
+
+        void RenderAngle(CSceneVehicleVisState@ visState, const vec4&in color, const float t) {
+            ::RenderAngle(
+                visState,
+                S_IcePlayerPointerStart,
+                S_IcePlayerPointerLength / S_IcePlayerFraction,
+                S_FullspeedPlayerPointerWidth,
+                t,
+                vec3(),
+                color
+            );
+        }
+
+        void RenderCustomAngle1(CSceneVehicleVisState@ visState, const vec3&in vec_vel) {
+            if (!S_ShowCustomIceAngle) {
+                return;
+            }
+
+            const float angle = S_CustomIceAngle * 0.0174533f;
+            const float slip = Math::Angle(visState.Dir, vec_vel);
+            float t;
+
+            if (S_FixIceGuides) {
+                t = -angle;
+            } else {
+                t = slip - angle - HALF_PI;
+            }
+
+            if (Math::Angle(vec_vel, visState.Left) > HALF_PI or IsPreview()) {
+                t *= -1.0f;
+            }
+
+            RenderAngle(visState, S_CustomIceAngleColor, t);
+        }
+
+        void RenderCustomAngle2(CSceneVehicleVisState@ visState, const vec3&in vec_vel) {
+            if (!S_ShowCustomIceAngle2) {
+                return;
+            }
+
+            const float angle = S_CustomIceAngle2 * 0.0174533f;
+            const float slip = Math::Angle(visState.Dir, vec_vel);
+            float t;
+
+            if (S_FixIceGuides) {
+                t = -angle;
+            } else {
+                t = slip - angle - HALF_PI;
+            }
+
+            if (Math::Angle(vec_vel, visState.Left) > HALF_PI or IsPreview()) {
+                t *= -1.0f;
+            }
+
+            RenderAngle(visState, S_CustomIceAngle2Color, t);
+        }
+
         void RenderDesert(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
             Surface::Render(visState, speed, vec_vel, MIN, DESERT_PEAK, DESERT_ZERO, DESERT_BACK_PEAK, false);
+        }
+
+        void RenderGearLines(CSceneVehicleVisState@ visState, const float v, const vec3&in vel, float slip) {
+            float[] lines;
+            lines.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_1, v));
+            lines.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_2, v));
+            lines.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_3, v));
+            lines.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_4, v));
+            float t;
+
+            vec4 color;
+
+            if (S_IceGearLines) {
+                if (gearStateManager.expectedTrueRpm > GEARUP_RPM_THRESH) {
+                    color = gearStateManager.GetGearupColor();
+                    for (uint i = 0; i < lines.Length; i++) {
+                        switch (i) {
+                            case 1: case 2: continue;
+                        }
+
+                        if (S_FixIceGuides) {
+                            t = -lines[i];
+                        } else {
+                            t = slip - lines[i] - HALF_PI;
+                        }
+
+                        if (Math::Angle(vel, visState.Left) > HALF_PI or IsPreview()) {
+                            t *= -1.0f;
+                        }
+
+                        ::RenderAngle(
+                            visState,
+                            S_IcePlayerPointerStart,
+                            S_IcePlayerPointerLength / S_IcePlayerFraction,
+                            S_FullspeedPlayerPointerWidth,
+                            t,
+                            vec3(),
+                            Opacity(color, slip, t)
+                        );
+                    }
+                }
+
+                if (gearStateManager.expectedTrueRpm < GEARDOWN_RPM_THRESH) {
+                    float[] lines1;
+                    lines1.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_1, v));
+                    lines1.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_4, v));
+                    color = gearStateManager.GetGeardownColor();
+                    for (uint i = 0; i < lines1.Length; i++) {
+                        slip = Math::Angle(visState.Dir, vel);
+
+                        if (S_FixIceGuides) {
+                            t = -lines1[i];
+                        } else {
+                            t = slip - lines1[i] - HALF_PI;
+                        }
+
+                        if (Math::Angle(vel, visState.Left) > HALF_PI or IsPreview()) {
+                            t *= -1.0f;
+                        }
+
+                        ::RenderAngle(
+                            visState,
+                            S_IcePlayerPointerStart,
+                            S_IcePlayerPointerLength / S_IcePlayerFraction,
+                            S_FullspeedPlayerPointerWidth,
+                            t,
+                            vec3(),
+                            color
+                        );
+                    }
+                }
+            }
+
+            // handling shaded 'region' rendering:
+
+            const float relativePos = Math::InvLerp(GEARDOWN_RPM_THRESH, GEARUP_RPM_THRESH, int(gearStateManager.expectedTrueRpm));
+
+            // we show regions all the time, but fade in and out of them depending on where we are
+            // at 0.5, show no regions.
+            // above 0.5, show upper regions with opacity derived from relativePos in domain [0.5, 1.5]
+            // below 0.5, show lower regions with opacity derived from relativePos in domain [-0.5, 0.5]
+
+            if (S_IceRegionSafe) {
+                float appliedOpacity;
+                if (relativePos >= 0.5f) {
+                    appliedOpacity = gearStateManager.GetGearupMult();
+                    RenderRegion(
+                        visState,
+                        (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionStart,
+                        (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionEnd - (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionStart,
+                        lines[0],
+                        lines[1],
+                        vec3(),
+                        ApplyOpacityToColor(S_IceRegionGoodColor, appliedOpacity),
+                        slip,
+                        true,
+                        appliedOpacity
+                    );
+                    RenderRegion(
+                        visState,
+                        (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionStart,
+                        (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionEnd - (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionStart,
+                        lines[2],
+                        lines[3],
+                        vec3(),
+                        ApplyOpacityToColor(S_IceRegionGoodColor, appliedOpacity),
+                        slip,
+                        true,
+                        appliedOpacity
+                    );
+                    RenderRegion(
+                        visState,
+                        (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionStart,
+                        (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionEnd - (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionStart,
+                        lines[1],
+                        lines[2],
+                        vec3(),
+                        ApplyOpacityToColor(S_IceDangerWedgeColor, appliedOpacity),
+                        slip,
+                        false,
+                        appliedOpacity
+                    );
+
+                } else {
+                    appliedOpacity = Math::Min((0.5f - relativePos), 1);
+                    RenderRegion(
+                        visState,
+                        (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionStart,
+                        (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionEnd - (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionStart,
+                        lines[0],
+                        lines[1],
+                        vec3(),
+                        ApplyOpacityToColor(S_IceRegionGoodColor, appliedOpacity),
+                        slip,
+                        true,
+                        appliedOpacity
+                    );
+                }
+            }
+        }
+
+        void RenderIdealAngle(CSceneVehicleVisState@ visState, const float vel, const vec3&in vec_vel, const float slip) {
+            const float angle = gearStateManager.GetIdealAngle(vel);
+            float t = S_FixIceGuides ? -angle : slip - angle - HALF_PI;
+
+            if (Math::Angle(vec_vel, visState.Left) > HALF_PI or IsPreview()) {
+                t *= -1.0f;
+            }
+
+            RenderAngle(visState, Opacity(S_IceIdealAngleColor, slip, t), t);
         }
 
         void RenderRally(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {

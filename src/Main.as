@@ -9,8 +9,7 @@ const float THIRD_PI   = Math::PI / 3.0f;
 const float QUARTER_PI = HALF_PI * 0.5f;
 const float SIXTH_PI   = THIRD_PI * 0.5f;
 
-float      g_dt = 0.0f;
-Protractor protractor;
+float g_dt = 0.0f;
 
 void Main() {
     Skipped::Load();
@@ -34,10 +33,10 @@ void OnSettingsChanged() {
     }
 
     if (S_IcePointerFrontCorner) {
-        S_IcePointerFrontCorner = false;
         S_IcePointerOffsetX = 1.7f;
         S_IcePointerOffsetZ = -0.7f;
         S_IcePointerOffsetAngle = -0.6f;
+        S_IcePointerFrontCorner = false;
     }
 }
 
@@ -56,7 +55,7 @@ void Render() {
     }
 
     if (App.GameScene !is null) {
-        protractor.Render();
+        RenderProtractor();
     }
 }
 

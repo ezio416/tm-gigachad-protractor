@@ -40,10 +40,9 @@ class GearStateManager {
 
     vec4 GetGearupColor() {
         if (expectedTrueRpm > GEARUP_RPM_THRESH) {
-            const float mult = GetGearupMult();
             const float pos = GetGearupScore() / GetScoreMax();
             vec4 c = S_ColorUpshiftDanger * pos + S_ColorUpshiftNormal * (1 - pos);
-            c.w *= mult;
+            c.w *= GetGearupMult();
             return c;
         }
         return vec4();
@@ -87,6 +86,7 @@ class GearStateManager {
         if (!S_GearHUD) {
             return;
         }
+
         nvg::BeginPath();
         nvg::RoundedRect(S_GraphOffsetX, S_GraphOffsetY, S_GraphWidth, S_GraphHeight, S_BorderRadius);
         nvg::FillColor(S_ColorBackdrop);
