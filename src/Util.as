@@ -1,7 +1,7 @@
 enum RenderMode {
-    NORMAL,
-    ICE,
-    BACKWARDS
+    Normal,
+    Ice,
+    Backwards
 }
 
 vec4 ApplyOpacityToColor(const vec4&in inColor, const float opacity) {

@@ -8,7 +8,7 @@ class Protractor {
     GearStateManager       gearStateManager;
     HistoryTrail           historyTrail;
     float                  playerFadeOpacity;
-    RenderMode             renderMode           = RenderMode::NORMAL;
+    RenderMode             renderMode           = RenderMode::Normal;
     float[]                slipArr(100);
     int                    slipPos              = 0;
     float                  slipAngle            = 0.0f;
@@ -196,22 +196,23 @@ class Protractor {
     }
 
     float ProcessTheta(float theta) {
-        if (renderMode == RenderMode::ICE) {
+        if (renderMode == RenderMode::Ice) {
             if (S_FlipDisplayIce) {
                 theta = 2.0f * Math::PI - theta;
             }
             return theta;
         }
-        if (S_Simplified && renderMode == RenderMode::NORMAL && cam3 == 0) {
+
+        if (S_Simplified && renderMode == RenderMode::Normal && cam3 == 0) {
             return Math::PI - theta;
         }
 
-        if (renderMode == RenderMode::BACKWARDS) {
+        if (renderMode == RenderMode::Backwards) {
             theta *= -1.0f;
         }
 
         theta *= thetaMult;
-        if (S_FlipDisplay ^^ (renderMode == RenderMode::BACKWARDS)) {
+        if (S_FlipDisplay ^^ (renderMode == RenderMode::Backwards)) {
             theta = Math::PI + theta;
         }
 
@@ -261,13 +262,13 @@ class Protractor {
         gearStateManager.HandleUpdate(slipAngle, vel, (IsPreview() ? S_PreviewGear : visState.CurGear));
 
         if ((VehicleState::GetVehicleType(visState) == VehicleState::VehicleType::CarSport && !S_RallyOverride) && Surface::Ice::Is(surfaceNormalized) && visState.FLIcing01 > 0.0f) {
-            renderMode = RenderMode::ICE;
+            renderMode = RenderMode::Ice;
             RenderIce(visState, vel, vec_vel);
             return;
         }
 
         if (visState.FrontSpeed < 0.0f || (IsPreview() && S_PreviewSpeed < 0.0f)) {
-            renderMode = RenderMode::BACKWARDS;
+            renderMode = RenderMode::Backwards;
 
             if (Surface::Grass::Is(surfaceNormalized)) {
                 RenderSurface(visState, vel, vec_vel, Surface::Other::BW_MIN, Surface::Grass::BW_IDEAL, {}, Surface::Grass::BW_ZERO);
@@ -291,7 +292,7 @@ class Protractor {
             }
         }
 
-        renderMode = RenderMode::NORMAL;
+        renderMode = RenderMode::Normal;
 
         if (Surface::Grass::Is(surfaceNormalized)) {
             RenderSurface(visState, vel, vec_vel, Surface::Other::MIN, Surface::Grass::IDEAL, Surface::Grass::BASE, Surface::Grass::ZERO);
@@ -342,7 +343,7 @@ class Protractor {
         const vec3&in offset,
         const vec4&in color
     ) {
-        if (S_Simplified && renderMode == RenderMode::NORMAL && cam3 == 0) {
+        if (S_Simplified && renderMode == RenderMode::Normal && cam3 == 0) {
             RenderSimplifiedView(visState, start, length, width, theta, offset, color);
         } else {
             _RenderAngle(visState, start, length, width, theta, offset, color);
@@ -673,7 +674,7 @@ class Protractor {
         const vec3&in offset,
         vec4 color
     ) {
-        if (S_History && (renderMode != RenderMode::ICE || !S_HistoryHideIce)) {
+        if (S_History && (renderMode != RenderMode::Ice || !S_HistoryHideIce)) {
             historyTrail.Update(theta, color);
             RenderHistoryTrail(visState, pointer_start, pointer_length);
         }
@@ -695,7 +696,7 @@ class Protractor {
             !S_PointerGears ||
             (S_HideGear5 && visState.CurGear == 5) ||
             (IsPreview() && S_PreviewGear == 5) ||
-            (renderMode == RenderMode::ICE && !S_VerboseIceGears)) {
+            (renderMode == RenderMode::Ice && !S_VerboseIceGears)) {
             return;
         }
 
@@ -953,7 +954,7 @@ class Protractor {
             return;
         }
 
-        if (renderMode == RenderMode::ICE) {
+        if (renderMode == RenderMode::Ice) {
             offset.x += S_IcePointerOffsetX;
             offset.z += (theta < 0.0f ? -1.0f : 1.0f) * S_IcePointerOffsetZ;
             theta += (theta < 0.0f ? -1.0f : 1.0f) * S_IcePointerOffsetAngle;
@@ -978,7 +979,7 @@ class Protractor {
         const float fillDarknessCoef,
         const vec2&in radialRoot
     ) {
-        if (renderMode == RenderMode::ICE) {
+        if (renderMode == RenderMode::Ice) {
             offset.x += S_IcePointerOffsetX;
             offset.z += (thetaStart < 0.0f ? -1.0f : 1.0f) * S_IcePointerOffsetZ;
             thetaStart += (thetaStart < 0.0f ? -1.0f : 1.0f) * S_IcePointerOffsetAngle;
@@ -1053,7 +1054,7 @@ class Protractor {
     ) {
         theta = ProcessTheta(theta);
 
-        if (S_Simplified && renderMode == RenderMode::NORMAL && cam3 == 0) {
+        if (S_Simplified && renderMode == RenderMode::Normal && cam3 == 0) {
             color = ApplyOpacityToColor(color, S_SimplifiedOpacity);
             width = S_SimplifiedLineThickness;
         }
