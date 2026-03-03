@@ -294,46 +294,6 @@ bool S_PreviewWet = false;
 bool S_PreviewIcy = false;
 
 
-[Setting category="Noodlebob" name="Enable noodlebob"]
-bool S_Noodlebob = false;
-
-[Setting category="Noodlebob" name="Number of derivatives" min=2 max=10]
-int S_NoodlebobDerivateCount = 4;
-
-[Setting category="Noodlebob" name="Smoothing frames" min=5 max=100]
-int S_NoodlebobSmoothing = 66;
-
-[Setting category="Noodlebob" name="Forward projection number of points" min=2 max=20]
-int S_NoodlebobPoints = 9;
-
-[Setting category="Noodlebob" name="Noodlebob start offset" min=0 max=3]
-int S_NoodlebobOffsetStart = 0;
-
-[Setting category="Noodlebob" name="Forward projection scale" min=0.01f max=1.0f]
-float S_NoodlebobScale = 0.072f;
-
-[Setting category="Noodlebob" name="Noodlebob color" color]
-vec4 S_NoodlebobColor = vec4(0.0f, 0.0f, 0.0f, 0.25f);
-
-[Setting category="Noodlebob" name="Noodlebob width" min=1.0f max=20.0f]
-float S_NoodlebobWidth = 5.0f;
-
-[Setting category="Noodlebob" name="Road"]
-bool S_NoodlebobRoad = false;
-
-[Setting category="Noodlebob" name="Grass"]
-bool S_NoodlebobGrass = false;
-
-[Setting category="Noodlebob" name="Dirt"]
-bool S_NoodlebobDirt = false;
-
-[Setting category="Noodlebob" name="Plastic"]
-bool S_NoodlebobPlastic = false;
-
-[Setting category="Noodlebob" name="Ice"]
-bool S_NoodlebobIce = true;
-
-
 [Setting category="History" name="Enable run history view"]
 bool S_History = true;
 

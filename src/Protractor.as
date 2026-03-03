@@ -276,7 +276,6 @@ void RenderProtractor() {
     PreviewOpacityCheck();
     SetThetaMult(visState);
     HandleNormalizeSurface(visState);
-    UpdateAndRenderProjection(visState);
 
     float vel;
 
