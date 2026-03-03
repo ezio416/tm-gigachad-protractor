@@ -53,7 +53,7 @@ namespace Surface {
         const float abs_sidespeed = Math::Abs(sideSpeed);
 
         const vec2 startAndLength = protractor.GetStartAndLength();
-        const vec2[] targets = protractor.GetLinesToBeRendered(target_ss, good_ss, base_ss, outer_ss, show_good_ss);
+        const vec2[] targets = GetLinesToBeRendered(target_ss, good_ss, base_ss, outer_ss, show_good_ss);
 
         protractor.RenderPlayerPointer(
             visState,
@@ -62,7 +62,7 @@ namespace Surface {
             S_FullspeedPlayerPointerWidth,
             slip,
             vec3(),
-            ApplyOpacityToColor(protractor.GetPlayerPointerColor(abs_sidespeed, target_ss, good_ss, base_ss, outer_ss), 1.0f)
+            ApplyOpacityToColor(GetPlayerPointerColor(abs_sidespeed, target_ss, good_ss, base_ss, outer_ss), 1.0f)
         );
 
         protractor.badSlide = false;
