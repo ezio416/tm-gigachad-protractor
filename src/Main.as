@@ -5,10 +5,6 @@ const string  pluginTitle = pluginColor + pluginIcon + "\\$G " + pluginMeta.Name
 
 float g_dt = 0.0f;
 
-void Main() {
-    Skipped::Load();
-}
-
 void OnSettingsChanged() {
     if (S_ResetFront) {
         S_SDPointerStart = 3.8f;
@@ -31,7 +27,7 @@ void OnSettingsChanged() {
 }
 
 void Render() {
-    if (!S_Enabled or Skipped::Skipped(GetMapUid())) {
+    if (!S_Enabled) {
         return;
     }
 
@@ -50,26 +46,8 @@ void Render() {
 }
 
 void RenderMenu() {
-    if (UI::BeginMenu(pluginTitle)) {
-        if (UI::MenuItem("Enabled", "", S_Enabled)) {
-            S_Enabled = !S_Enabled;
-        }
-
-        const string uid = GetMapUid();
-
-        UI::BeginDisabled(uid.Length == 0);
-        if (Skipped::Skipped(uid)) {
-            if (UI::MenuItem("Enable on this map")) {
-                Skipped::Unskip(uid);
-            }
-        } else {
-            if (UI::MenuItem("Disable on this map")) {
-                Skipped::Skip(uid);
-            }
-        }
-        UI::EndDisabled();
-
-        UI::EndMenu();
+    if (UI::MenuItem(pluginTitle, "", S_Enabled)) {
+        S_Enabled = !S_Enabled;
     }
 }
 

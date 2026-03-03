@@ -56,11 +56,6 @@ vec4 GetColor(const int index) {
     return S_Color0;
 }
 
-string GetMapUid() {
-    CGameCtnApp@ App = GetApp();
-    return App.RootMap !is null ? App.RootMap.EdChallengeId : "";
-}
-
 CSmPlayer@ GetPlayer() {
     auto playground = GetPlayground();
     if (true
