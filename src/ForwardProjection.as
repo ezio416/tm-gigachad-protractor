@@ -13,6 +13,7 @@ vec3 GetDerivative(const int d_idx) {
     for (int i = 0; i < S_NoodlebobSmoothing; i++) {
         r += derivativeArrays[d_idx][i];
     }
+
     return r / S_NoodlebobSmoothing;
 }
 

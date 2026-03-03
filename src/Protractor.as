@@ -23,32 +23,40 @@ CameraMode GetCameraMode(CSceneVehicleVisState@ visState) {
     if (v1 > 1.9f and v1 < 2.0f and v2 > 0.85f and v2 < 0.9f) {
         return CameraMode::Cam3;
     }
+
     if (v1 > 2.3f and v1 < 2.4f and v2 > 2.7f and v2 < 2.8f) {
         return CameraMode::AltCam3;
     }
+
     return CameraMode::External;
 }
 
 vec2[] GetLinesToBeRendered(const float ideal, const float good, const float base, const float outer, const bool draw_good) {
     vec2[] ret;
+
     if (!S_Simplified) {
         ret.InsertLast(vec2(ideal, 0.0f));
+
         if (S_GoodAccel and draw_good) {
             ret.InsertLast(vec2(good, 1.0f));
         }
+
         if (S_BaseAccel) {
             ret.InsertLast(vec2(base, 2.0f));
         }
+
         if (S_ZeroAccel) {
             ret.InsertLast(vec2(outer, 3.0f));
         }
     }
+
     return ret;
 }
 
 vec4 GetPlayerPointerColor(const float sideSpeed, const float target, const float good, const float base, const float outer) {
     float pos;
     int lcol, ucol;
+
     if (sideSpeed < target) {
         pos = Math::InvLerp(0.0f, target, sideSpeed) ** 4;
         lcol = 2;
@@ -107,6 +115,7 @@ void HandleGearPointerFlip(const float theta) {
         gearPointerFlip = 1.0f;
         return;
     }
+
     if (Math::Abs(theta) > S_ThetaFlipThreshold) {
         gearPointerFlip = (theta < 0.0f ? -1.0f : 1.0f);
     }
@@ -134,6 +143,7 @@ void HandleRunStart() {
     if (GetPlayerStartTime() == currentRunStartTime) {
         return;
     }
+
     currentRunStartTime = GetPlayerStartTime();
     playerFadeOpacity = 0.0f;
 }
@@ -149,6 +159,7 @@ float ProcessTheta(float theta) {
         if (S_FlipDisplayIce) {
             theta = TWO_PI - theta;
         }
+
         return theta;
     }
 
@@ -165,7 +176,7 @@ float ProcessTheta(float theta) {
     }
 
     theta *= thetaMult;
-    if (S_FlipDisplay ^^ (renderMode == RenderMode::Backwards)) {
+    if (S_FlipDisplay xor (renderMode == RenderMode::Backwards)) {
         theta = Math::PI + theta;
     }
 
@@ -173,17 +184,20 @@ float ProcessTheta(float theta) {
 }
 
 vec3 ProjectAngle(CSceneVehicleVisState@ visState, const float r, const float theta) {
-    vec3 p = visState.Position;
-    p += visState.Dir * Math::Cos(theta) * r;
-    p += visState.Left * Math::Sin(theta) * r;
-    return p;
+    return vec3()
+        + visState.Position
+        + (visState.Dir  * Math::Cos(theta) * r)
+        + (visState.Left * Math::Sin(theta) * r)
+    ;
 }
 
 vec3 ProjectOffset(CSceneVehicleVisState@ visState, const vec3&in in_pos, const vec3&in offset) {
-    return in_pos +
-        visState.Dir * offset.x +
-        visState.Up * offset.y +
-        visState.Left * offset.z;
+    return vec3()
+        + in_pos
+        + (visState.Dir  * offset.x)
+        + (visState.Up   * offset.y)
+        + (visState.Left * offset.z)
+    ;
 }
 
 void RenderHistoryTrail(CSceneVehicleVisState@ visState, const float start, const float length) {

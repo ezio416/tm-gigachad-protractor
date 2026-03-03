@@ -27,37 +27,6 @@ vec4 ApplyOpacityToColor(const vec4&in inColor, const float opacity) {
     return outColor;
 }
 
-float ApproximateSideSpeed(const vec2[]&in data, const float speed) {
-    if (data.Length == 0) {
-        return 0.0f;
-    }
-
-    vec2 lower = data[0];
-    vec2 upper = data[data.Length - 1];
-    for (uint i = 0; i < data.Length; i++) {
-        const vec2 entry = data[i];
-        if (entry.x < speed and entry.x > lower.x) {
-            lower = entry;
-        }
-        if (entry.x > speed and entry.x < upper.x) {
-            upper = entry;
-        }
-    }
-
-    return Math::Lerp(lower.y, upper.y, Math::InvLerp(lower.x, upper.x, speed));
-}
-
-float CalcAngle(const vec3&in v1, const vec3&in v2) {
-    return IsPreview() ? S_PreviewSlip : Math::Angle(v1, v2);
-}
-
-float CalcVecAngle(const vec3&in vec1, const vec3&in vec2) {
-    if (vec1.Length() == 0.0f or vec2.Length() == 0.0f) {
-        return 0.0f;
-    }
-    return Math::Acos(Math::Dot(vec1, vec2) / (vec1.Length() * vec2.Length())) - HALF_PI;
-}
-
 vec4 GetColor(const int index) {
     switch (index) {
         case 0: return S_ColorOptimal;
@@ -94,12 +63,8 @@ CSmArenaClient@ GetPlayground() {
     return cast<CSmArenaClient>(GetApp().CurrentPlayground);
 }
 
-float GetSideSpeedAngle(const float vel, const float target_sidespeed) {
-    return Math::Asin(target_sidespeed / vel);
-}
-
 float GetSlipTotal(CSceneVehicleVisState@ visState) {
-    return visState.FLSlipCoef + visState.FRSlipCoef + visState.RLSlipCoef + visState.RRSlipCoef;
+    return visState.FLSlipCoef + visState.FRSlipCoef + visState.RRSlipCoef + visState.RLSlipCoef;
 }
 
 float GetTargetThetaMultFactor(CSceneVehicleVisState@ visState) {
@@ -115,14 +80,12 @@ float GetTargetThetaMultFactor(CSceneVehicleVisState@ visState) {
         return 1.0f;
     }
 
-    float sum = 0.0f
+    return 0.25f * (0.0f
         + Surface::GetThetaMult(visState.FLGroundContactMaterial)
         + Surface::GetThetaMult(visState.FRGroundContactMaterial)
         + Surface::GetThetaMult(visState.RLGroundContactMaterial)
         + Surface::GetThetaMult(visState.RRGroundContactMaterial)
-    ;
-
-    return sum * 0.25f;
+    );
 }
 
 CSceneVehicleVisState@ GetVisState() {
@@ -141,41 +104,6 @@ CSceneVehicleVisState@ GetVisState() {
 
 bool IsPreview() {
     return S_PreviewDirt or S_PreviewGrass or S_PreviewIce or S_PreviewPlastic or S_PreviewRoad or S_PreviewWood;
-}
-
-float LerpToMidpoint(const vec2[]&in points, const float c) {
-    if (points.Length == 0) {
-        return 0.0f;
-    }
-
-    vec2 lower = points[0];
-    vec2 upper = points[points.Length - 1];
-
-    if (c < lower.x) {
-        return lower.y;
-    }
-    if (c > upper.x) {
-        return upper.y;
-    }
-
-    upper = points[1];
-
-    for (uint i = 1; i < points.Length - 1; i++) {
-        if (points[i].x >= c) {
-            break;
-        }
-
-        lower = points[i];
-        upper = points[i + 1];
-    }
-
-    return Math::Lerp(lower.y, upper.y, Math::InvLerp(lower.x, upper.x, c));
-}
-
-float NormalizeSlipAngle(float slipAngle, const float frontSpeed) {
-    const int polarity = slipAngle < 0.0f ? -1 : 1;
-    slipAngle = Math::Abs(slipAngle);
-    return (frontSpeed < 0.0f ? Math::PI - slipAngle : slipAngle) * polarity;
 }
 
 float PreviewSlip(const float in_slip) {

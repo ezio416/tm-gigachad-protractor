@@ -9,8 +9,8 @@ class GearStateManager {
     float   lastColorFetchScore = 0.0f;
 
     int GetAndIncrementIdx() {
-        const int r = currentIndex;
-        frameTimes[r] = g_dt;
+        const int ret = currentIndex;
+        frameTimes[ret] = g_dt;
         currentIndex = (currentIndex + 1) % framesAveraged;
 
         if (currentIndex == 0) {
@@ -18,10 +18,11 @@ class GearStateManager {
             for (int i = 0; i < framesAveraged; i++) {
                 sum += frameTimes[i];
             }
+
             framesAveraged = int(S_MsAveraged / (sum / framesAveraged));
         }
 
-        return r;
+        return ret;
     }
 
     vec4 GetGeardownColor() {
@@ -35,33 +36,51 @@ class GearStateManager {
     }
 
     float GetGeardownMult() {
-        return Math::Min(Math::InvLerp(GEARDOWN_RPM_THRESH, GEARDOWN_RPM_THRESH - 3000, int(expectedTrueRpm)), 1);
+        return Math::Min(
+            1,
+            Math::InvLerp(
+                GEARDOWN_RPM_THRESH,
+                GEARDOWN_RPM_THRESH - 3000,
+                int(expectedTrueRpm)
+            )
+        );
     }
 
     vec4 GetGearupColor() {
         if (expectedTrueRpm > GEARUP_RPM_THRESH) {
             const float pos = GetGearupScore() / GetScoreMax();
-            vec4 c = S_ColorUpshiftDanger * pos + S_ColorUpshiftNormal * (1 - pos);
+            vec4 c = S_ColorUpshiftDanger * pos + S_ColorUpshiftNormal * (1.0f - pos);
             c.w *= GetGearupMult();
             return c;
         }
+
         return vec4();
     }
 
     float GetGearupMult() {
-        return Math::Min(Math::InvLerp(GEARUP_RPM_THRESH + 500, GEARUP_RPM_THRESH + 3000, int(expectedTrueRpm)), 1);
+        return Math::Min(
+            1,
+            Math::InvLerp(
+                GEARUP_RPM_THRESH + 500,
+                GEARUP_RPM_THRESH + 3000,
+                int(expectedTrueRpm)
+            )
+        );
     }
 
     float GetGearupScore() {
         if (Time::Now == lastColorFetchTime) {
             return lastColorFetchScore;
         }
-        float s = 0.0f;
+
+        float score = 0.0f;
         for (int i = 0; i < framesAveraged; i++) {
-            s += gearupScores[i];
+            score += gearupScores[i];
         }
-        lastColorFetchScore = Math::Min(s, GetScoreMax());
+
+        lastColorFetchScore = Math::Min(score, GetScoreMax());
         lastColorFetchTime = Time::Now;
+
         return lastColorFetchScore;
     }
 
@@ -106,8 +125,8 @@ class GearStateManager {
     }
 }
 
-const int   GEARDOWN_RPM_THRESH = 7500;
-const int   GEARUP_RPM_THRESH   = 10000;
+const uint  GEARDOWN_RPM_THRESH = 7500;
+const uint  GEARUP_RPM_THRESH   = 10000;
 const float SCORE_MAX           = 15000.0f;
 
 const vec2[] IDEAL_ANGLES = {
@@ -129,6 +148,7 @@ float GetExpectedRpm(const float inSpeed, const int inGear, const float inSlip, 
     if (!checkSlip or !InSafeZone(inSlip, inSpeed)) {
         return inSpeed * GetExpectedRpmBySpeedMult(inGear);
     }
+
     return 0.0f;
 }
 
@@ -141,22 +161,28 @@ float GetExpectedRpmBySpeedMult(const int inGear) {
         case 4: return 125.0f;
         case 5: return 90.0f;
     }
+
     return 0.0f;
 }
 
 bool InSafeZone(float inSlip, const float inSpeed) {
     inSlip = Math::Abs(inSlip);
+
     if (inSlip >= LerpToMidpoint(Surface::Ice::GEARUP_1, inSpeed)) {
         return false;
     }
+
     if (inSlip >= LerpToMidpoint(Surface::Ice::GEARUP_2, inSpeed)) {
         return true;
     }
+
     if (inSlip >= LerpToMidpoint(Surface::Ice::GEARUP_3, inSpeed)) {
         return false;
     }
+
     if (inSlip >= LerpToMidpoint(Surface::Ice::GEARUP_4, inSpeed)) {
         return true;
     }
+
     return false;
 }

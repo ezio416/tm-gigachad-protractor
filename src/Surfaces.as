@@ -74,6 +74,7 @@ namespace Surface {
             } else {
                 OP_RES = -1;
             }
+
         } else {
             if (true
                 and GetSlipTotal(visState) == 0.0f
@@ -85,6 +86,7 @@ namespace Surface {
                 } else {
                     OP_RES = -1;
                 }
+
             } else {
                 OP_RES = abs_sidespeed > outer_ss * S_OverslideFadeMult ? -1 : 1;
             }
