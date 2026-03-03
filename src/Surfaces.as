@@ -33,6 +33,95 @@ namespace Surface {
         return -1000.0f;
     }
 
+    void Render(
+        CSceneVehicleVisState@ visState,
+        const float speed,
+        const vec3&in vec_vel,
+        const float min_vel,
+        const vec2[]&in ideal_config,
+        const vec2[]&in base_config,
+        const vec2[]&in zero_config,
+        const bool show_good_ss = true
+    ) {
+        const float target_ss = ApproximateSideSpeed(ideal_config, speed);
+        const float outer_ss = ApproximateSideSpeed(zero_config, speed);
+        const float base_ss = ApproximateSideSpeed(base_config, speed);
+        const float good_ss = Math::Lerp(outer_ss, target_ss, S_GoodSDThreshold);
+
+        const float slip = PreviewSlip(protractor.GetSlipSmoothed(visState.Left, vec_vel));
+        const float sideSpeed = speed * Math::Sin(PreviewSlip(Math::Angle(visState.Dir, vec_vel)));
+        const float abs_sidespeed = Math::Abs(sideSpeed);
+
+        const vec2 startAndLength = protractor.GetStartAndLength();
+        const vec2[] targets = protractor.GetLinesToBeRendered(target_ss, good_ss, base_ss, outer_ss, show_good_ss);
+
+        protractor.RenderPlayerPointer(
+            visState,
+            startAndLength.x,
+            startAndLength.y,
+            S_FullspeedPlayerPointerWidth,
+            slip,
+            vec3(),
+            ApplyOpacityToColor(protractor.GetPlayerPointerColor(abs_sidespeed, target_ss, good_ss, base_ss, outer_ss), 1.0f)
+        );
+
+        protractor.badSlide = false;
+        int OP_RES = 0;
+        if (speed < min_vel) {
+            if (S_ShowBadSlide && GetSlipTotal(visState) > 0.0f) {
+                OP_RES = 1;
+                protractor.badSlide = true;
+            } else {
+                OP_RES = -1;
+            }
+        } else {
+            if (GetSlipTotal(visState) == 0.0f && !(Wood::Is(visState.FLGroundContactMaterial) && visState.FLIcing01 > 0.0f && visState.WetnessValue01 > 0.0f)) {
+                if (S_ShowBadSlide) {
+                    OP_RES = 1;
+                    protractor.badSlide = true;
+                } else {
+                    OP_RES = -1;
+                }
+            } else {
+                if (abs_sidespeed > outer_ss * S_OverslideFadeMult) {
+                    OP_RES = -1;
+                } else {
+                    OP_RES = 1;
+                }
+            }
+        }
+
+        if (OP_RES > 0) {
+            protractor.playerFadeOpacity = Math::Min(1.0f, protractor.playerFadeOpacity + S_PlayerOpacityDerivative);
+        } else {
+            protractor.playerFadeOpacity = Math::Max(0.0f, protractor.playerFadeOpacity - S_PlayerOpacityDerivative);
+        }
+
+        if (protractor.playerFadeOpacity == 0.0f) {
+            return;
+        }
+
+        float lower, upper, targetOpacity;
+        const int polarity = slip < 0.0f ? -1 : 1;
+        for (int i = -1; i <= 1; i += 2) {
+            lower = 0.0f;
+            for (uint j = 0; j < targets.Length; j++) {
+                upper = targets[j].x;
+                targetOpacity = Math::Max(Math::InvLerp(lower, upper, abs_sidespeed), S_BrightnessMin);
+                lower = upper;
+                protractor.RenderAngle(
+                    visState,
+                    startAndLength.x,
+                    startAndLength.y / S_PlayerFraction,
+                    S_FullspeedPlayerPointerWidth,
+                    (GetSideSpeedAngle(speed, targets[j].x * i)),
+                    vec3(),
+                    ApplyOpacityToColor(GetColor(int(targets[j].y)), i == polarity ? targetOpacity : S_BrightnessMin)
+                );
+            }
+        }
+    }
+
     namespace Dirt {
         const vec2[] BASE = {
             vec2(55.0f,  4.0f),
@@ -85,6 +174,14 @@ namespace Surface {
                     return true;
             }
             return false;
+        }
+
+        void Render(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
+            Surface::Render(visState, speed, vec_vel, Other::MIN, IDEAL, BASE, ZERO);
+        }
+
+        void RenderBackwards(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
+            Surface::Render(visState, speed, vec_vel, Other::BW_MIN, BW_IDEAL, {}, BW_ZERO);
         }
     }
 
@@ -140,9 +237,19 @@ namespace Surface {
             }
             return false;
         }
+
+        void Render(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
+            Surface::Render(visState, speed, vec_vel, Other::MIN, IDEAL, BASE, ZERO);
+        }
+
+        void RenderBackwards(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
+            Surface::Render(visState, speed, vec_vel, Other::BW_MIN, BW_IDEAL, {}, BW_ZERO);
+        }
     }
 
     namespace Ice {
+        const float MIN = 10.0f;
+
         const vec2[] DESERT_BACK_PEAK = {
             vec2(2.5f,    0.2f),
             vec2(84.2f,   79.5f),
@@ -227,6 +334,14 @@ namespace Surface {
             }
             return false;
         }
+
+        void RenderDesert(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
+            Surface::Render(visState, speed, vec_vel, MIN, DESERT_PEAK, DESERT_ZERO, DESERT_BACK_PEAK, false);
+        }
+
+        void RenderRally(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
+            Surface::Render(visState, speed, vec_vel, MIN, RALLY_PEAK, RALLY_ZERO, RALLY_SLIDEOUT, false);
+        }
     }
 
     namespace Other {
@@ -274,6 +389,15 @@ namespace Surface {
                     return true;
             }
             return false;
+        }
+
+        void Render(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
+            Surface::Render(visState, speed, vec_vel, Other::MIN, IDEAL, BASE, ZERO);
+        }
+
+        void RenderBackwards(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
+            // just using grass ideals for plastic BW for now
+            Surface::Grass::RenderBackwards(visState, speed, vec_vel);
         }
     }
 
@@ -335,6 +459,14 @@ namespace Surface {
             }
             return false;
         }
+
+        void Render(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
+            Surface::Render(visState, speed, vec_vel, MIN, IDEAL, BASE, ZERO);
+        }
+
+        void RenderBackwards(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
+            Surface::Render(visState, speed, vec_vel, Other::BW_MIN, BW_IDEAL, {}, BW_ZERO);
+        }
     }
 
     namespace Wood {
@@ -393,6 +525,14 @@ namespace Surface {
                     return true;
             }
             return false;
+        }
+
+        void Render(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
+            Surface::Render(visState, speed, vec_vel, MIN, P1, VALLEY, P2);
+        }
+
+        void RenderIcy(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
+            Surface::Render(visState, speed, vec_vel, MIN, WET_ICE_P1, WET_ICE_VALLEY, WET_ICE_P2, false);
         }
     }
 }

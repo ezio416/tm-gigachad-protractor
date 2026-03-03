@@ -269,23 +269,22 @@ class Protractor {
             renderMode = RenderMode::Backwards;
 
             if (Surface::Grass::Is(surfaceNormalized)) {
-                RenderSurface(visState, vel, vec_vel, Surface::Other::BW_MIN, Surface::Grass::BW_IDEAL, {}, Surface::Grass::BW_ZERO);
+                Surface::Grass::RenderBackwards(visState, vel, vec_vel);
                 return;
             }
 
             if (Surface::Dirt::Is(surfaceNormalized)) {
-                RenderSurface(visState, vel, vec_vel, Surface::Other::BW_MIN, Surface::Dirt::BW_IDEAL, {}, Surface::Dirt::BW_ZERO);
+                Surface::Dirt::RenderBackwards(visState, vel, vec_vel);
                 return;
             }
 
             if (Surface::Plastic::Is(surfaceNormalized)) {
-                // just using grass ideals for plastic BW for now
-                RenderSurface(visState, vel, vec_vel, Surface::Other::BW_MIN, Surface::Grass::BW_IDEAL, {}, Surface::Grass::BW_ZERO);
+                Surface::Plastic::RenderBackwards(visState, vel, vec_vel);
                 return;
             }
 
             if (Surface::Road::Is(surfaceNormalized)) {
-                RenderSurface(visState, vel, vec_vel, Surface::Other::BW_MIN, Surface::Road::BW_IDEAL, {}, Surface::Road::BW_ZERO);
+                Surface::Road::RenderBackwards(visState, vel, vec_vel);
                 return;
             }
         }
@@ -293,42 +292,47 @@ class Protractor {
         renderMode = RenderMode::Normal;
 
         if (Surface::Grass::Is(surfaceNormalized)) {
-            RenderSurface(visState, vel, vec_vel, Surface::Other::MIN, Surface::Grass::IDEAL, Surface::Grass::BASE, Surface::Grass::ZERO);
+            Surface::Grass::Render(visState, vel, vec_vel);
             return;
         }
 
         if (Surface::Dirt::Is(surfaceNormalized)) {
-            RenderSurface(visState, vel, vec_vel, Surface::Other::MIN, Surface::Dirt::IDEAL, Surface::Dirt::BASE, Surface::Dirt::ZERO);
+            Surface::Dirt::Render(visState, vel, vec_vel);
             return;
         }
 
         if (Surface::Plastic::Is(surfaceNormalized)) {
-            RenderSurface(visState, vel, vec_vel, Surface::Other::MIN, Surface::Plastic::IDEAL, Surface::Plastic::BASE, Surface::Plastic::ZERO);
+            Surface::Plastic::Render(visState, vel, vec_vel);
             return;
         }
 
         if (Surface::Road::Is(surfaceNormalized)) {
-            RenderSurface(visState, vel, vec_vel, Surface::Road::MIN, Surface::Road::IDEAL, Surface::Road::BASE, Surface::Road::ZERO);
+            Surface::Road::Render(visState, vel, vec_vel);
             return;
         }
 
         if (Surface::Ice::Is(surfaceNormalized)) {
-            if (VehicleState::GetVehicleType(visState) == VehicleState::VehicleType::CarRally) {
-                RenderSurface(visState, vel, vec_vel, 10.0f, Surface::Ice::RALLY_PEAK, Surface::Ice::RALLY_ZERO, Surface::Ice::RALLY_SLIDEOUT, false);
-            }
-            if (VehicleState::GetVehicleType(visState) == VehicleState::VehicleType::CarDesert) {
-                RenderSurface(visState, vel, vec_vel, 10.0f, Surface::Ice::DESERT_PEAK, Surface::Ice::DESERT_ZERO, Surface::Ice::DESERT_BACK_PEAK, false);
-            }
-        }
+            switch (VehicleState::GetVehicleType(visState)) {
+                case VehicleState::VehicleType::CarRally:
+                    Surface::Ice::RenderRally(visState, vel, vec_vel);
+                    break;
 
-        if (Surface::Wood::Is(surfaceNormalized) && (S_PreviewWet || visState.WetnessValue01 > 0.0f)) {
-            activeWood = true;
-            if (S_PreviewIcy || ((visState.FLIcing01 + visState.FRIcing01 + visState.RLIcing01 + visState.RRIcing01) > 0.0f)) {
-                RenderSurface(visState, vel, vec_vel, Surface::Wood::MIN, Surface::Wood::WET_ICE_P1, Surface::Wood::WET_ICE_VALLEY, Surface::Wood::WET_ICE_P2, false);
-            } else {
-                RenderSurface(visState, vel, vec_vel, Surface::Wood::MIN, Surface::Wood::P1, Surface::Wood::VALLEY, Surface::Wood::P2);
+                case VehicleState::VehicleType::CarDesert:
+                    Surface::Ice::RenderDesert(visState, vel, vec_vel);
             }
             return;
+        }
+
+        if (Surface::Wood::Is(surfaceNormalized) and (S_PreviewWet or visState.WetnessValue01 > 0.0f)) {
+            activeWood = true;
+            if (false
+                or S_PreviewIcy
+                or visState.FLIcing01 + visState.FRIcing01 + visState.RLIcing01 + visState.RRIcing01 > 0.0f
+            ) {
+                Surface::Wood::RenderIcy(visState, vel, vec_vel);
+            } else {
+                Surface::Wood::Render(visState, vel, vec_vel);
+            }
         }
     }
 
@@ -817,107 +821,6 @@ class Protractor {
         for (int i = -1; i <= 1; i += 2) {
             o.z = offset.z - (i * S_SimplifiedOffsetZ);
             _RenderAngle(visState, start, length, width, theta, o, color);
-        }
-    }
-
-    void RenderSurface(
-        CSceneVehicleVisState@ visState,
-        const float speed,
-        const vec3&in vec_vel,
-        const float min_vel,
-        const vec2[]&in ideal_config,
-        const vec2[]&in base_config,
-        const vec2[]&in zero_config
-    ) {
-        RenderSurface(visState, speed, vec_vel, min_vel, ideal_config, base_config, zero_config, true);
-    }
-
-    void RenderSurface(
-        CSceneVehicleVisState@ visState,
-        const float speed,
-        const vec3&in vec_vel,
-        const float min_vel,
-        const vec2[]&in ideal_config,
-        const vec2[]&in base_config,
-        const vec2[]&in zero_config,
-        const bool show_good_ss
-    ) {
-        const float target_ss = ApproximateSideSpeed(ideal_config, speed);
-        const float outer_ss = ApproximateSideSpeed(zero_config, speed);
-        const float base_ss = ApproximateSideSpeed(base_config, speed);
-        const float good_ss = Math::Lerp(outer_ss, target_ss, S_GoodSDThreshold);
-
-        const float slip = PreviewSlip(GetSlipSmoothed(visState.Left, vec_vel));
-        const float sideSpeed = speed * Math::Sin(PreviewSlip(Math::Angle(visState.Dir, vec_vel)));
-        const float abs_sidespeed = Math::Abs(sideSpeed);
-
-        const vec2 startAndLength = GetStartAndLength();
-        const vec2[] targets = GetLinesToBeRendered(target_ss, good_ss, base_ss, outer_ss, show_good_ss);
-
-        RenderPlayerPointer(
-            visState,
-            startAndLength.x,
-            startAndLength.y,
-            S_FullspeedPlayerPointerWidth,
-            slip,
-            vec3(),
-            ApplyOpacityToColor(GetPlayerPointerColor(abs_sidespeed, target_ss, good_ss, base_ss, outer_ss), 1.0f)
-        );
-
-        badSlide = false;
-        int OP_RES = 0;
-        if (speed < min_vel) {
-            if (S_ShowBadSlide && GetSlipTotal(visState) > 0.0f) {
-                OP_RES = 1;
-                badSlide = true;
-            } else {
-                OP_RES = -1;
-            }
-        } else {
-            if (GetSlipTotal(visState) == 0.0f && !(Surface::Wood::Is(visState.FLGroundContactMaterial) && visState.FLIcing01 > 0.0f && visState.WetnessValue01 > 0.0f)) {
-                if (S_ShowBadSlide) {
-                    OP_RES = 1;
-                    badSlide = true;
-                } else {
-                    OP_RES = -1;
-                }
-            } else {
-                if (abs_sidespeed > outer_ss * S_OverslideFadeMult) {
-                    OP_RES = -1;
-                } else {
-                    OP_RES = 1;
-                }
-            }
-        }
-
-        if (OP_RES > 0) {
-            playerFadeOpacity = Math::Min(1.0f, playerFadeOpacity + S_PlayerOpacityDerivative);
-        } else {
-            playerFadeOpacity = Math::Max(0.0f, playerFadeOpacity - S_PlayerOpacityDerivative);
-        }
-
-        if (playerFadeOpacity == 0.0f) {
-            return;
-        }
-
-        float lower, upper, targetOpacity;
-        const int polarity = slip < 0.0f ? -1 : 1;
-        for (int i = -1; i <= 1; i += 2) {
-            lower = 0.0f;
-            for (uint j = 0; j < targets.Length; j++) {
-                upper = targets[j].x;
-                targetOpacity = Math::Max(Math::InvLerp(lower, upper, abs_sidespeed), S_BrightnessMin);
-                lower = upper;
-                RenderAngle(
-                    visState,
-                    startAndLength.x,
-                    startAndLength.y / S_PlayerFraction,
-                    S_FullspeedPlayerPointerWidth,
-                    (GetSideSpeedAngle(speed, targets[j].x * i)),
-                    vec3(),
-                    ApplyOpacityToColor(GetColor(int(targets[j].y)), i == polarity ? targetOpacity : S_BrightnessMin)
-                );
-            }
         }
     }
 
