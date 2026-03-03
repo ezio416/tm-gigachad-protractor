@@ -186,12 +186,12 @@ namespace Surface {
         const vec2[] GEARUP_3 = {
             vec2(35.0f,  1.637f),
             vec2(46.0f,  1.6195f),
-            vec2(52.3f,  1.60950f),
+            vec2(52.3f,  1.6095f),
             vec2(75.95f, 1.596f)
         };
 
         const vec2[] GEARUP_4 = {
-            vec2(46.60f,  1.44f),
+            vec2(46.6f,   1.44f),
             vec2(56.2f,   1.502f),
             vec2(62.4f,   1.53f),
             vec2(78.52f,  1.526f),

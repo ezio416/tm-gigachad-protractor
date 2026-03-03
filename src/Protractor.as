@@ -124,10 +124,8 @@ class Protractor {
             surfaceNormalized = EPlugSurfaceMaterialId::Ice;
         } else if (S_PreviewWood) {
             surfaceNormalized = EPlugSurfaceMaterialId::Wood;
-        } else {
-            if (visState.FLGroundContactMaterial != EPlugSurfaceMaterialId::XXX_Null) {
-                surfaceNormalized = visState.FLGroundContactMaterial;
-            }
+        } else if (visState.FLGroundContactMaterial != EPlugSurfaceMaterialId::XXX_Null) {
+            surfaceNormalized = visState.FLGroundContactMaterial;
         }
     }
 
