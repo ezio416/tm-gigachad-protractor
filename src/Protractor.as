@@ -313,9 +313,9 @@ class Protractor {
 
         vec4 color;
 
-        if (gearStateManager.expectedTrueRpm > gearStateManager.GEARUP_RPM_THRESH) {
+        if (gearStateManager.expectedTrueRpm > GEARUP_RPM_THRESH) {
             color = gearStateManager.GetGearupColor();
-        } else if (gearStateManager.expectedTrueRpm < gearStateManager.GEARDOWN_RPM_THRESH) {
+        } else if (gearStateManager.expectedTrueRpm < GEARDOWN_RPM_THRESH) {
             color = gearStateManager.GetGeardownColor();
         } else {
             color = vec4(1.0f);
@@ -350,7 +350,7 @@ class Protractor {
         vec4 color;
 
         if (S_IceGearLines) {
-            if (gearStateManager.expectedTrueRpm > gearStateManager.GEARUP_RPM_THRESH) {
+            if (gearStateManager.expectedTrueRpm > GEARUP_RPM_THRESH) {
                 color = gearStateManager.GetGearupColor();
                 for (uint i = 0; i < lines.Length; i++) {
                     if (i == 1 || i == 2) {
@@ -376,7 +376,7 @@ class Protractor {
                 }
             }
 
-            if (gearStateManager.expectedTrueRpm < gearStateManager.GEARDOWN_RPM_THRESH) {
+            if (gearStateManager.expectedTrueRpm < GEARDOWN_RPM_THRESH) {
                 float[] lines1;
                 lines1.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_1, v));
                 lines1.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_4, v));
@@ -406,7 +406,7 @@ class Protractor {
 
         // handling shaded 'region' rendering:
 
-        const float relativePos = Math::InvLerp(gearStateManager.GEARDOWN_RPM_THRESH, gearStateManager.GEARUP_RPM_THRESH, int(gearStateManager.expectedTrueRpm));
+        const float relativePos = Math::InvLerp(GEARDOWN_RPM_THRESH, GEARUP_RPM_THRESH, int(gearStateManager.expectedTrueRpm));
 
         // we show regions all the time, but fade in and out of them depending on where we are
         // at 0.5, show no regions.
@@ -536,12 +536,12 @@ class Protractor {
             const float rpm = Math::Clamp(gearStateManager.expectedRpm, abs_min, abs_max);
 
             const float rpm_pos = Math::InvLerp(abs_min, abs_max, rpm) * pointer_length;
-            const float geardown_pos = Math::InvLerp(abs_min, abs_max, gearStateManager.GEARDOWN_RPM_THRESH) * pointer_length;
+            const float geardown_pos = Math::InvLerp(abs_min, abs_max, GEARDOWN_RPM_THRESH) * pointer_length;
 
-            if (rpm < gearStateManager.GEARDOWN_RPM_THRESH) {
-                const float color_pos = Math::InvLerp(abs_min, gearStateManager.GEARDOWN_RPM_THRESH, rpm);
+            if (rpm < GEARDOWN_RPM_THRESH) {
+                const float color_pos = Math::InvLerp(abs_min, GEARDOWN_RPM_THRESH, rpm);
                 const vec4 color1 = S_ColorUpshiftDanger * (1.0f - color_pos) + S_ColorUpshiftNormal * color_pos;
-                RenderAngle( // player pointer
+                RenderAngle(
                     visState,
                     pointer_start + rpm_pos,
                     geardown_pos - rpm_pos,
@@ -550,8 +550,8 @@ class Protractor {
                     i * offset_apply,
                     ApplyOpacityToColor(color1, playerFadeOpacity)
                 );
-            } else if (rpm < gearStateManager.GEARUP_RPM_THRESH) {
-                RenderAngle( // player pointer
+            } else if (rpm < GEARUP_RPM_THRESH) {
+                RenderAngle(
                     visState,
                     pointer_start + geardown_pos,
                     rpm_pos,
@@ -561,9 +561,9 @@ class Protractor {
                     ApplyOpacityToColor(S_ColorUpshiftNormal, playerFadeOpacity)
                 );
             } else {
-                const float color_pos = Math::InvLerp(gearStateManager.GEARUP_RPM_THRESH, abs_max, rpm);
+                const float color_pos = Math::InvLerp(GEARUP_RPM_THRESH, abs_max, rpm);
                 const vec4 color1 = S_ColorUpshiftDanger * color_pos + S_ColorUpshiftNormal * (1 - color_pos);
-                RenderAngle( // player pointer
+                RenderAngle(
                     visState,
                     pointer_start + geardown_pos,
                     rpm_pos,
