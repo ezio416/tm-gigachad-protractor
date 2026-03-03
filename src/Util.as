@@ -125,7 +125,7 @@ CSceneVehicleVisState@ GetVisState() {
         return null;
     }
 
-    CSceneVehicleVis@ vis = AllVis[Math::Clamp(S_PlayerIndex, 0, AllVis.Length)];
+    CSceneVehicleVis@ vis = AllVis[Math::Clamp(S_PlayerIndex, 0, AllVis.Length - 1)];
     return vis !is null ? vis.AsyncState : null;
 }
 
