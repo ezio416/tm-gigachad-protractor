@@ -85,7 +85,7 @@ class Protractor {
     float ProcessTheta(float theta) {
         if (renderMode == RenderMode::Ice) {
             if (S_FlipDisplayIce) {
-                theta = 2.0f * Math::PI - theta;
+                theta = TWO_PI  - theta;
             }
             return theta;
         }
@@ -663,7 +663,7 @@ class Protractor {
         // We need to draw a shaded region by drawing a closed path outlining
         // the "region" inbetwixt the lines of interest, then filling it.
 
-        const float angle_per_point = (flip * Math::PI * 2.0f) / S_IceRegionResolution;
+        const float angle_per_point = flip * TWO_PI / S_IceRegionResolution;
         const int points = int(diff / angle_per_point);
 
         // print("__renderRegion");

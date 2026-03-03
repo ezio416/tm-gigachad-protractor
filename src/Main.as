@@ -3,6 +3,7 @@ const string  pluginIcon  = Icons::Bars;
 Meta::Plugin@ pluginMeta  = Meta::ExecutingPlugin();
 const string  pluginTitle = pluginColor + pluginIcon + "\\$G " + pluginMeta.Name;
 
+const float TWO_PI     = Math::PI * 2.0f;
 const float HALF_PI    = Math::PI * 0.5f;
 const float THIRD_PI   = Math::PI / 3.0f;
 const float QUARTER_PI = HALF_PI * 0.5f;
