@@ -307,6 +307,21 @@ namespace Surface {
             vec2(80.26f,  1.508f)
         };
 
+        const vec2[] IDEAL_ANGLES = {
+            vec2(0.0f,   1.47f),
+            vec2(40.0f,  1.47f),
+            vec2(50.0f,  1.4f),
+            vec2(57.0f,  1.35f),
+            vec2(64.0f,  1.3f),
+            vec2(70.0f,  1.24f),
+            vec2(76.0f,  1.2f),
+            vec2(84.0f,  1.24f),
+            vec2(90.0f,  1.25f),
+            vec2(100.0f, 1.27f),
+            vec2(130.0f, 1.35f),
+            vec2(150.0f, 1.4f)
+        };
+
         const vec2[] RALLY_PEAK = {
             vec2(1.0f,   0.0f),
             vec2(400.0f, 0.0f)
@@ -325,6 +340,53 @@ namespace Surface {
             vec2(80.4f,   38.25f)
         };
 
+        vec4 GetGeardownColor() {
+            if (gearStateManager.expectedTrueRpm < GEARDOWN_RPM_THRESH) {
+                vec4 c = S_ColorUpshiftNormal;
+                c.w *= GetGeardownMult();
+                return c;
+            }
+
+            return vec4();
+        }
+
+        float GetGeardownMult() {
+            return Math::Min(
+                1,
+                Math::InvLerp(
+                    GEARDOWN_RPM_THRESH,
+                    GEARDOWN_RPM_THRESH - 3000,
+                    int(gearStateManager.expectedTrueRpm)
+                )
+            );
+        }
+
+        vec4 GetGearupColor() {
+            if (gearStateManager.expectedTrueRpm > GEARUP_RPM_THRESH) {
+                const float pos = gearStateManager.GetGearupScore() / gearStateManager.GetScoreMax();
+                vec4 c = S_ColorUpshiftDanger * pos + S_ColorUpshiftNormal * (1.0f - pos);
+                c.w *= GetGearupMult();
+                return c;
+            }
+
+            return vec4();
+        }
+
+        float GetGearupMult() {
+            return Math::Min(
+                1,
+                Math::InvLerp(
+                    GEARUP_RPM_THRESH + 500,
+                    GEARUP_RPM_THRESH + 3000,
+                    int(gearStateManager.expectedTrueRpm)
+                )
+            );
+        }
+
+        float GetIdealAngle(const float speed) {
+            return LerpToMidpoint(IDEAL_ANGLES, speed);
+        }
+
         float GetLineBrightness(const float slip, const float theta) {
             const float diff = Math::Abs(slip - theta);
             const float ret = Math::InvLerp(S_IceLineFadeRate, 0.0f, diff);
@@ -339,6 +401,28 @@ namespace Surface {
                 case EPlugSurfaceMaterialId::Snow:
                     return true;
             }
+            return false;
+        }
+
+        bool InSafeZone(float inSlip, const float inSpeed) {
+            inSlip = Math::Abs(inSlip);
+
+            if (inSlip >= LerpToMidpoint(Surface::Ice::GEARUP_1, inSpeed)) {
+                return false;
+            }
+
+            if (inSlip >= LerpToMidpoint(Surface::Ice::GEARUP_2, inSpeed)) {
+                return true;
+            }
+
+            if (inSlip >= LerpToMidpoint(Surface::Ice::GEARUP_3, inSpeed)) {
+                return false;
+            }
+
+            if (inSlip >= LerpToMidpoint(Surface::Ice::GEARUP_4, inSpeed)) {
+                return true;
+            }
+
             return false;
         }
 
@@ -375,9 +459,9 @@ namespace Surface {
             vec4 color;
 
             if (gearStateManager.expectedTrueRpm > GEARUP_RPM_THRESH) {
-                color = gearStateManager.GetGearupColor();
+                color = GetGearupColor();
             } else if (gearStateManager.expectedTrueRpm < GEARDOWN_RPM_THRESH) {
-                color = gearStateManager.GetGeardownColor();
+                color = GetGeardownColor();
             } else {
                 color = vec4(1.0f);
             }
@@ -472,7 +556,7 @@ namespace Surface {
 
             if (S_IceGearLines) {
                 if (gearStateManager.expectedTrueRpm > GEARUP_RPM_THRESH) {
-                    color = gearStateManager.GetGearupColor();
+                    color = GetGearupColor();
                     for (uint i = 0; i < lines.Length; i++) {
                         switch (i) {
                             case 1: case 2: continue;
@@ -504,7 +588,7 @@ namespace Surface {
                     float[] lines1;
                     lines1.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_1, v));
                     lines1.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_4, v));
-                    color = gearStateManager.GetGeardownColor();
+                    color = GetGeardownColor();
                     for (uint i = 0; i < lines1.Length; i++) {
                         slip = Math::Angle(visState.Dir, vel);
 
@@ -543,7 +627,7 @@ namespace Surface {
             if (S_IceRegionSafe) {
                 float appliedOpacity;
                 if (relativePos >= 0.5f) {
-                    appliedOpacity = gearStateManager.GetGearupMult();
+                    appliedOpacity = GetGearupMult();
                     RenderRegion(
                         visState,
                         (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionStart,
@@ -600,7 +684,7 @@ namespace Surface {
         }
 
         void RenderIdealAngle(CSceneVehicleVisState@ visState, const float vel, const vec3&in vec_vel, const float slip) {
-            const float angle = gearStateManager.GetIdealAngle(vel);
+            const float angle = GetIdealAngle(vel);
             float t = S_FixIceGuides ? -angle : slip - angle - HALF_PI;
 
             if (Math::Angle(vec_vel, visState.Left) > HALF_PI or IsPreview()) {
