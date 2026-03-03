@@ -3,7 +3,6 @@ class Protractor {
     bool                   badSlide            = false;
     CameraMode             camera              = CameraMode::External;
     int                    currentRunStartTime = 0;
-    ForwardProjection      forwardProjection;
     float                  gearPointerFlip     = 1.0f;
     GearStateManager       gearStateManager;
     HistoryTrail           historyTrail;
@@ -120,7 +119,7 @@ class Protractor {
         IsPreviewOpacityCheck();
         SetThetaMult(visState);
         HandleNormalizeSurface(visState);
-        forwardProjection.UpdateAndRender(visState);
+        UpdateAndRenderProjection(visState);
 
         float vel;
 

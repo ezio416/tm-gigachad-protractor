@@ -14,6 +14,10 @@ Protractor protractor;
 
 void Main() {
     Skipped::Load();
+
+    for (uint i = 0; i < DERIVATIVES_MAX; i++) {
+        derivativeArrays[i] = vec3[](SMOOTHING_MAX);
+    }
 }
 
 void OnSettingsChanged() {
