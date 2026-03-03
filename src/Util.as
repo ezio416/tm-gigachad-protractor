@@ -1,3 +1,9 @@
+enum CameraMode {
+    External,
+    Cam3,
+    AltCam3
+}
+
 enum RenderMode {
     Normal,
     Ice,

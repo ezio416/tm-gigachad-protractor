@@ -1,7 +1,7 @@
 class Protractor {
     bool                   activeWood          = false;
     bool                   badSlide            = false;
-    int                    cam3                = 0;
+    CameraMode             camera              = CameraMode::External;
     int                    currentRunStartTime = 0;
     ForwardProjection      forwardProjection;
     float                  gearPointerFlip     = 1.0f;
@@ -33,19 +33,11 @@ class Protractor {
     }
 
     vec2 GetStartAndLength() {
-        float start = S_SDPointerStart;
-        float length = S_SDPointerLength;
-
-        if (cam3 > 0) {
-            if (cam3 == 1) {
-                start = S_Cam3InternalStart;
-                length = S_Cam3InternalLength;
-            } else {
-                start = S_Cam3ExternalStart;
-                length = S_Cam3ExternalLength;
-            }
+        switch (camera) {
+            case CameraMode::Cam3:    return vec2(S_Cam3InternalStart, S_Cam3InternalLength);
+            case CameraMode::AltCam3: return vec2(S_Cam3ExternalStart, S_Cam3ExternalLength);
+            default:                  return vec2(S_SDPointerStart,    S_SDPointerLength);
         }
-        return vec2(start, length);
     }
 
     void HandleGearPointerFlip(const float theta) {
@@ -98,7 +90,7 @@ class Protractor {
             return theta;
         }
 
-        if (S_Simplified && renderMode == RenderMode::Normal && cam3 == 0) {
+        if (S_Simplified && renderMode == RenderMode::Normal && camera == CameraMode::External) {
             return Math::PI - theta;
         }
 
@@ -119,7 +111,7 @@ class Protractor {
         if (visState is null) {
             return;
         }
-        cam3 = IsCam3(visState);
+        camera = GetCameraMode(visState);
         HandleRunStart();
         IsPreviewOpacityCheck();
         SetThetaMult(visState);
@@ -228,7 +220,7 @@ class Protractor {
         const vec3&in offset,
         const vec4&in color
     ) {
-        if (S_Simplified && renderMode == RenderMode::Normal && cam3 == 0) {
+        if (S_Simplified && renderMode == RenderMode::Normal && camera == CameraMode::External) {
             RenderSimplifiedView(visState, start, length, width, theta, offset, color);
         } else {
             _RenderAngle(visState, start, length, width, theta, offset, color);
@@ -245,7 +237,7 @@ class Protractor {
         vec3 start_p, end_p;
         vec3 off;
 
-        if (S_Simplified && cam3 > 0) {
+        if (S_Simplified && camera != CameraMode::External) {
             return;
         }
 
@@ -605,7 +597,7 @@ class Protractor {
         vec3 offset,
         const vec4&in color
     ) {
-        if (cam3 > 0 && !S_SimplifiedCam3 && S_Simplified) {
+        if (camera != CameraMode::External && !S_SimplifiedCam3 && S_Simplified) {
             return;
         }
 
@@ -709,12 +701,12 @@ class Protractor {
     ) {
         theta = ProcessTheta(theta);
 
-        if (S_Simplified && renderMode == RenderMode::Normal && cam3 == 0) {
+        if (S_Simplified && renderMode == RenderMode::Normal && camera == CameraMode::External) {
             color = ApplyOpacityToColor(color, S_SimplifiedOpacity);
             width = S_SimplifiedLineThickness;
         }
 
-        for (int i = 0; i < (cam3 > 0 ? 1 : S_LayerCount); i++) {
+        for (int i = 0; i < (camera != CameraMode::External ? 1 : S_LayerCount); i++) {
             vec3 o = offset;
             const float y_offset = S_LayerHeight * i;
             o.y += y_offset;
@@ -738,6 +730,23 @@ class Protractor {
             nvg::ClosePath();
         }
     }
+}
+
+CameraMode GetCameraMode(CSceneVehicleVisState@ visState) {
+    const vec3 pos = visState.Position;
+    const vec3 cameraPos = Camera::GetCurrentPosition();
+    const vec3 pos_offset_forward = visState.Position + visState.Dir;
+
+    const float v1 = (cameraPos - pos_offset_forward).LengthSquared();
+    const float v2 = (cameraPos - pos).LengthSquared();
+
+    if (v1 > 1.9f && v1 < 2.0f && v2 > 0.85f && v2 < 0.9f) {
+        return CameraMode::Cam3;
+    }
+    if (v1 > 2.3f && v1 < 2.4f && v2 > 2.7f && v2 < 2.8f) {
+        return CameraMode::AltCam3;
+    }
+    return CameraMode::External;
 }
 
 float GetIceLineBrightness(const float slip, const float theta) {
@@ -797,29 +806,6 @@ vec4 IO(const vec4&in color, const float slip, const float theta) {
     vec4 c = color;
     c.w *= GetIceLineBrightness(slip, theta);
     return c;
-}
-
-/*
-Return codes:
-0: Not cam 3.
-1: Cam 3 in-car.
-2: Cam three full.
-*/
-int IsCam3(CSceneVehicleVisState@ visState) {
-    const vec3 pos = visState.Position;
-    const vec3 cameraPos = Camera::GetCurrentPosition();
-    const vec3 pos_offset_forward = visState.Position + visState.Dir;
-
-    const float v1 = (cameraPos - pos_offset_forward).LengthSquared();
-    const float v2 = (cameraPos - pos).LengthSquared();
-
-    if (v1 > 1.9f && v1 < 2.0f && v2 > 0.85f && v2 < 0.9f) {
-        return 1;
-    }
-    if (v1 > 2.3f && v1 < 2.4f && v2 > 2.7f && v2 < 2.8f) {
-        return 2;
-    }
-    return 0;
 }
 
 vec3 ProjectAngle(CSceneVehicleVisState@ visState, const float r, const float theta) {
