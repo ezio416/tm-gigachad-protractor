@@ -495,10 +495,6 @@ void RenderRegion(
     inner_thetaEnd *= flip;
 
     const vec2 radialRoot = Camera::ToScreenSpace(ProjectAngle(visState, (start + length) * S_IceRegionRadialInsetFraction, flip * -ProcessTheta(slip)));
-    const vec2 outermostPos = Camera::ToScreenSpace(ProjectAngle(visState, (start + length), ((thetaStart + thetaEnd) * 0.5f)));
-    const vec2 innerPos = Camera::ToScreenSpace(ProjectAngle(visState, (start), ((thetaStart + thetaEnd) * 0.5f)));
-    vec2 radialParams = vec2((radialRoot - innerPos).Length(), (radialRoot - outermostPos).Length());
-    radialParams *= 0.2f;
 
     fillColor = ApplyOpacityToColor(fillColor, appliedOpacity);
     const vec4 warnColor = ApplyOpacityToColor(S_IceRegionWarning, appliedOpacity);
