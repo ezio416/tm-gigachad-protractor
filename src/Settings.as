@@ -13,9 +13,6 @@ int S_SlipSmoothing = 1;
 [Setting category="General" name="Show warning line on early slide/noslide"]
 bool S_ShowBadSlide = false;
 
-[Setting category="General" name="Fade out on overslide"]
-bool S_OverslideFade = true;
-
 [Setting category="General" name="Overslide fade location" min=1.0f max=3.0f]
 float S_OverslideFadeMult = 1.5f;
 
@@ -43,9 +40,6 @@ float S_GoodSDThreshold = 0.9f;
 [Setting category="General" name="Draw base acceleration line"]
 bool S_BaseAccel = true;
 
-[Setting category="General" name="'Base' speedslide threshold" min=0.1f max=0.9f]
-float S_BaseSDThreshold = 0.5f;
-
 [Setting category="General" name="Draw zero-acceleration line"]
 bool S_ZeroAccel = true;
 
@@ -63,11 +57,9 @@ bool S_VerboseIceGears = false;
 
 
 [Setting category="Display" name="Normal gearup color indicator" color]
-// vec4 S_ColorUpshiftNormal(0, 108.0/255.0, 103.0/255.0, 0.5);
 vec4 S_ColorUpshiftNormal(1.0f);
 
 [Setting category="Display" name="Danger gearup color indicator" color]
-// vec4 S_ColorUpshiftDanger(241.0/255.0, 148.0/255.0, 180.0/255.0, 0.5);
 vec4 S_ColorUpshiftDanger(1.0f, 0.0f, 0.0f, 1.0f);
 
 [Setting category="Display" name="Assist line length fraction" min=1.0f max=10.0f]
@@ -103,9 +95,6 @@ float S_IcePlayerPointerLength = 1.5f;
 
 [Setting category="Ice" name="Ice assist line length fraction" min=1.0f max=10.0f]
 float S_IcePlayerFraction = 2.0f;
-
-[Setting category="Ice" name="Ice player pointer color" color]
-vec4 S_ColorIcePlayerPointer = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 [Setting category="Ice" name="Display on front of car"]
 bool S_FlipDisplayIce = true;
@@ -152,9 +141,6 @@ float S_IceLineFadeRate = 0.3f;
 [Setting category="Ice" name="Ice ideal angle color" color]
 vec4 S_IceIdealAngleColor = vec4(0.0f, 1.0f, 0.0f, 1.0f);
 
-[Setting category="Ice" name="Show regions"]
-bool S_IceRegions = true;
-
 [Setting category="Ice" name="Show gear lines"]
 bool S_IceGearLines = false;
 
@@ -166,15 +152,6 @@ vec4 S_IceRegionGoodColor = vec4(0.0f, 1.0f, 0.0f, 0.5f);
 
 [Setting category="Ice" name="Draw colored regions for safe zones"]
 bool S_IceRegionSafe = true;
-
-[Setting category="Ice" name="Draw outline over safe region"]
-bool S_IceRegionSafeOutline = false;
-
-[Setting category="Ice" name="Ice region outline color" color]
-vec4 S_IceRegionOutlineColor = vec4(0.0f, 0.0f, 0.0f, 0.5f);
-
-[Setting category="Ice" name="Ice region outline thickness" min=0.0f max=5.0f]
-float S_IceRegionThickness = 2.0f;
 
 [Setting category="Ice" name="Ice region warning inset frac" min=0.0f max=0.5f]
 float S_IceRegionInset = 0.023f;
