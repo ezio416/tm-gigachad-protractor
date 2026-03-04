@@ -506,19 +506,6 @@ void _RenderRegion(
     const float angle_per_point = flip * TWO_PI / S_IceRegionResolution;
     const int points = int(diff / angle_per_point);
 
-    // print("__renderRegion");
-    // print("start:\t" + tostring(start));
-    // print("length:\t" + tostring(length));
-    // print("diff:\t" + tostring(diff));
-    // print("thetaStart:\t" + tostring(thetaStart));
-    // print("thetaEnd:\t" + tostring(thetaEnd));
-    // print("offset:\t" + tostring(offset));
-    // print("fillColor:\t" + tostring(fillColor));
-    // print("points:\t" + tostring(points));
-    // print("angle_per_point:\t" + tostring(angle_per_point));
-    // print("radialRoot:\t" + tostring(radialRoot));
-    // print("position:\t" + tostring(visState.Position));
-
     for (int i = 0; i < points; i++) {
         nvg::BeginPath();
         nvg::MoveTo(Camera::ToScreenSpace(ProjectOffset(visState, ProjectAngle(visState, start, thetaStart + (i * angle_per_point)), offset)));
