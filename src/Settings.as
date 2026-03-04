@@ -303,34 +303,3 @@ float S_HistoryDistanceFactor = 1.0f;
 
 [Setting category="Overrides" name="Rally Car"]
 bool S_RallyOverride = false;
-
-
-// [Setting category="Gear Display" name="Graph Width" min=50 max=2000]
-int S_GraphWidth = 100;
-
-// [Setting category="Gear Display" name="Graph Height" min=50 max=1000]
-int S_GraphHeight = 200;
-
-// [Setting category="Gear Display" name="Graph X Offset" min=0 max=4000]
-int S_GraphOffsetX = 32;
-
-// [Setting category="Gear Display" name="Graph Y Offset" min=0 max=2000]
-int S_GraphOffsetY = 600;
-
-// [Setting category="Gear Display" name="Border Radius" min=0 max=50]
-float S_BorderRadius = 5.0f;
-
-// [Setting category="Gear Display" name="Backdrop Color" color]
-vec4 S_ColorBackdrop = vec4(0.0f, 0.0f, 0.0f, 0.7f);
-
-// [Setting category="Gear Display" name="Border Color" color]
-vec4 S_ColorBorder = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-
-// [Setting category="Gear Display" name="Border Width" min=0 max=10]
-float S_BorderWidth = 1.0f;
-
-// [Setting category="Gear Display" name="Milliseconds Averaged" min=200 max=1000]
-int S_MsAveraged = 250;
-
-// [Setting category="Gear Display" name="Enable Gear Hud"]
-bool S_GearHUD = false;

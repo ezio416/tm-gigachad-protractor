@@ -1,8 +1,10 @@
+const uint  GEARDOWN_RPM_THRESH = 7500;
+const uint  GEARUP_RPM_THRESH   = 10000;
+
 bool                   badSlide            = false;
 CameraMode             camera              = CameraMode::External;
 int                    currentRunStartTime = 0;
 float                  gearPointerFlip     = 1.0f;
-GearStateManager       gearStateManager;
 HistoryTrail           historyTrail;
 float                  playerFadeOpacity;
 RenderMode             renderMode          = RenderMode::Normal;
@@ -209,7 +211,7 @@ void RenderPlayerPointer(
     const float abs_min = 7000.0f;
 
     for (int i = 1; i >= (S_GearBothSides ? -1 : 1); i -= 2) {
-        const float rpm = Math::Clamp(gearStateManager.expectedRpm, abs_min, abs_max);
+        const float rpm = Math::Clamp(Surface::Ice::expectedRpm, abs_min, abs_max);
         const float rpm_pos = Math::InvLerp(abs_min, abs_max, rpm) * pointer_length;
         const float geardown_pos = Math::InvLerp(abs_min, abs_max, GEARDOWN_RPM_THRESH) * pointer_length;
 
@@ -281,7 +283,7 @@ void RenderProtractor() {
         return;
     }
 
-    gearStateManager.HandleUpdate(slipAngle, vel, (IsPreview() ? S_PreviewGear : visState.CurGear));
+    Surface::Ice::HandleUpdate(slipAngle, vel, (IsPreview() ? S_PreviewGear : visState.CurGear));
 
     if (true
         and VehicleState::GetVehicleType(visState) == VehicleState::VehicleType::CarSport

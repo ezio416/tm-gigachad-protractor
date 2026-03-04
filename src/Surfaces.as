@@ -249,7 +249,8 @@ namespace Surface {
     }
 
     namespace Ice {
-        const float MIN = 10.0f;
+        const float MIN       = 10.0f;
+        const float SCORE_MAX = 15000.0f;
 
         const vec2[] DESERT_BACK_PEAK = {
             vec2(2.5f,    0.2f),
@@ -340,8 +341,55 @@ namespace Surface {
             vec2(80.4f,   38.25f)
         };
 
+        int     currentIndex        = 0;
+        float   expectedRpm         = 0.0f;
+        float   expectedTrueRpm     = 0.0f;
+        int     framesAveraged      = 100;
+        float[] frameTimes(500);
+        float[] gearupScores(500);
+        uint64  lastColorFetchTime  = 0;
+        float   lastColorFetchScore = 0.0f;
+
+        int GetAndIncrementIdx() {
+            const int ret = currentIndex;
+            frameTimes[ret] = g_dt;
+            currentIndex = (currentIndex + 1) % framesAveraged;
+
+            if (currentIndex == 0) {
+                float sum = 0.0f;
+                for (int i = 0; i < framesAveraged; i++) {
+                    sum += frameTimes[i];
+                }
+
+                framesAveraged = int(250 / (sum / framesAveraged));
+            }
+
+            return ret;
+        }
+
+        float GetExpectedRpm(const float inSpeed, const int inGear, const float inSlip, const bool checkSlip) {
+            if (!checkSlip or !InSafeZone(inSlip, inSpeed)) {
+                return inSpeed * GetExpectedRpmBySpeedMult(inGear);
+            }
+
+            return 0.0f;
+        }
+
+        float GetExpectedRpmBySpeedMult(const int inGear) {
+            switch (inGear) {
+                case 0: return -375.0f;
+                case 1: return 425.0f;
+                case 2: return 275.0f;  // 270 is from grass - different across surfaces?
+                case 3: return 180.0f;
+                case 4: return 125.0f;
+                case 5: return 90.0f;
+            }
+
+            return 0.0f;
+        }
+
         vec4 GetGeardownColor() {
-            if (gearStateManager.expectedTrueRpm < GEARDOWN_RPM_THRESH) {
+            if (expectedTrueRpm < GEARDOWN_RPM_THRESH) {
                 vec4 c = S_UpshiftNormalColor;
                 c.w *= GetGeardownMult();
                 return c;
@@ -356,14 +404,14 @@ namespace Surface {
                 Math::InvLerp(
                     GEARDOWN_RPM_THRESH,
                     GEARDOWN_RPM_THRESH - 3000,
-                    int(gearStateManager.expectedTrueRpm)
+                    int(expectedTrueRpm)
                 )
             );
         }
 
         vec4 GetGearupColor() {
-            if (gearStateManager.expectedTrueRpm > GEARUP_RPM_THRESH) {
-                const float pos = gearStateManager.GetGearupScore() / gearStateManager.GetScoreMax();
+            if (expectedTrueRpm > GEARUP_RPM_THRESH) {
+                const float pos = GetGearupScore() / GetGearupScoreMax();
                 vec4 c = S_UpshiftDangerColor * pos + S_UpshiftNormalColor * (1.0f - pos);
                 c.w *= GetGearupMult();
                 return c;
@@ -378,9 +426,29 @@ namespace Surface {
                 Math::InvLerp(
                     GEARUP_RPM_THRESH + 500,
                     GEARUP_RPM_THRESH + 3000,
-                    int(gearStateManager.expectedTrueRpm)
+                    int(expectedTrueRpm)
                 )
             );
+        }
+
+        float GetGearupScore() {
+            if (Time::Now == lastColorFetchTime) {
+                return lastColorFetchScore;
+            }
+
+            float score = 0.0f;
+            for (int i = 0; i < framesAveraged; i++) {
+                score += gearupScores[i];
+            }
+
+            lastColorFetchScore = Math::Min(score, GetGearupScoreMax());
+            lastColorFetchTime = Time::Now;
+
+            return lastColorFetchScore;
+        }
+
+        float GetGearupScoreMax() {
+            return SCORE_MAX * framesAveraged;
         }
 
         float GetIdealAngle(const float speed) {
@@ -391,6 +459,13 @@ namespace Surface {
             const float diff = Math::Abs(slip - theta);
             const float ret = Math::InvLerp(S_IceLineFadeRate, 0.0f, diff);
             return Math::Max(ret, S_IceBrightnessMin);
+        }
+
+        void HandleUpdate(const float inSlip, const float inSpeed, const int inGear) {
+            const int index = GetAndIncrementIdx();
+            expectedRpm = GetExpectedRpm(inSpeed, inGear, inSlip, true);
+            expectedTrueRpm = GetExpectedRpm(inSpeed, inGear, inSlip, false);
+            gearupScores[index] = Math::Min(expectedRpm, SCORE_MAX);
         }
 
         bool Is(const EPlugSurfaceMaterialId surface) {
@@ -458,9 +533,9 @@ namespace Surface {
 
             vec4 color;
 
-            if (gearStateManager.expectedTrueRpm > GEARUP_RPM_THRESH) {
+            if (expectedTrueRpm > GEARUP_RPM_THRESH) {
                 color = GetGearupColor();
-            } else if (gearStateManager.expectedTrueRpm < GEARDOWN_RPM_THRESH) {
+            } else if (expectedTrueRpm < GEARDOWN_RPM_THRESH) {
                 color = GetGeardownColor();
             } else {
                 color = vec4(1.0f);
@@ -555,7 +630,7 @@ namespace Surface {
             vec4 color;
 
             if (S_IceGearLines) {
-                if (gearStateManager.expectedTrueRpm > GEARUP_RPM_THRESH) {
+                if (expectedTrueRpm > GEARUP_RPM_THRESH) {
                     color = GetGearupColor();
                     for (uint i = 0; i < lines.Length; i++) {
                         switch (i) {
@@ -584,7 +659,7 @@ namespace Surface {
                     }
                 }
 
-                if (gearStateManager.expectedTrueRpm < GEARDOWN_RPM_THRESH) {
+                if (expectedTrueRpm < GEARDOWN_RPM_THRESH) {
                     float[] lines1;
                     lines1.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_1, v));
                     lines1.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_4, v));
@@ -617,7 +692,7 @@ namespace Surface {
 
             // handling shaded 'region' rendering:
 
-            const float relativePos = Math::InvLerp(GEARDOWN_RPM_THRESH, GEARUP_RPM_THRESH, int(gearStateManager.expectedTrueRpm));
+            const float relativePos = Math::InvLerp(GEARDOWN_RPM_THRESH, GEARUP_RPM_THRESH, int(expectedTrueRpm));
 
             // we show regions all the time, but fade in and out of them depending on where we are
             // at 0.5, show no regions.
