@@ -53,7 +53,7 @@ float S_ThetaMultWood = 1.0f;
 [Setting category="SD Pointer" name="Spacing (backwards)" min=0.1f max=4.0f]
 float S_ThetaMultBW = 1.0f;
 
-[Setting category="SD Pointer" name="Spacing (derivative)" min=0.1f max=0.5f]
+[Setting category="SD Pointer" name="Spacing derivative" min=0.1f max=0.5f]
 float S_ThetaMultDerivative = 0.35f;
 
 [Setting category="SD Pointer" name="Optimal acceleration assist lines"]
