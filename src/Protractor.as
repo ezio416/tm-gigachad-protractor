@@ -115,11 +115,7 @@ void HandleRunStart() {
 
 float ProcessTheta(float theta) {
     if (renderMode == RenderMode::Ice) {
-        if (S_FlipDisplayIce) {
-            theta = TWO_PI - theta;
-        }
-
-        return theta;
+        return TWO_PI - theta;
     }
 
     if (true
@@ -171,7 +167,7 @@ void RenderPlayerPointer(
     const vec3&in offset,
     vec4 color
 ) {
-    if (S_History and (renderMode != RenderMode::Ice or !S_HistoryHideIce)) {
+    if (S_History and (renderMode != RenderMode::Ice or S_HistoryIce)) {
         historyTrail.Update(theta, color);
         historyTrail.Render(visState, pointer_start, pointer_length);
     }
@@ -194,9 +190,9 @@ void RenderPlayerPointer(
 
     if (false
         or !S_Gears
+        or renderMode == RenderMode::Ice
         or (S_HideGear5 and visState.CurGear == 5)
         or (IsPreview() and S_PreviewGear == 5)
-        or (renderMode == RenderMode::Ice and !S_VerboseIceGears)
     ) {
         return;
     }
@@ -386,15 +382,11 @@ void RenderRegion(
     const float appliedOpacity
 ) {
     // this is to inset [not warning, just to make it look visually good]
-    float diff = thetaEnd - thetaStart;
+    const float diff = thetaEnd - thetaStart;
     const int flip = (Math::Angle(visState.WorldVel, visState.Left) > HALF_PI or IsPreview()) ? -1 : 1;
-    thetaStart += diff * S_IceRegionInsetFraction;
-    thetaEnd -= diff * S_IceRegionInsetFraction;
 
-    diff = thetaEnd - thetaStart;
-
-    float inner_thetaStart = thetaStart + (diff > 0.0f ? 1.0f : -1.0f) * S_IceRegionInset;
-    float inner_thetaEnd = thetaEnd - (diff > 0.0f ? 1.0f : -1.0f) * S_IceRegionInset;
+    float inner_thetaStart = thetaStart + (diff > 0.0f ? 1.0f : -1.0f) * S_IceRegionWarningWidth;
+    float inner_thetaEnd = thetaEnd - (diff > 0.0f ? 1.0f : -1.0f) * S_IceRegionWarningWidth;
 
     thetaStart *= flip;
     thetaEnd *= flip;
@@ -404,7 +396,7 @@ void RenderRegion(
     const vec2 radialRoot = Camera::ToScreenSpace(ProjectAngle(visState, (start + length) * S_IceRegionRadialInsetFraction, flip * -ProcessTheta(slip)));
 
     fillColor = ApplyOpacityToColor(fillColor, appliedOpacity);
-    const vec4 warnColor = ApplyOpacityToColor(S_IceRegionWarning, appliedOpacity);
+    const vec4 warnColor = ApplyOpacityToColor(S_IceRegionWarningColor, appliedOpacity);
 
     if (renderWarnZone) {
         _RenderRegion(visState, start, length, inner_thetaStart, inner_thetaEnd, offset, fillColor, S_IceRadialDarkFraction, radialRoot);
@@ -460,12 +452,6 @@ void _RenderAngle(
         return;
     }
 
-    if (renderMode == RenderMode::Ice) {
-        offset.x += S_IcePointerOffsetX;
-        offset.z += (theta < 0.0f ? -1.0f : 1.0f) * S_IcePointerOffsetZ;
-        theta += (theta < 0.0f ? -1.0f : 1.0f) * S_IcePointerOffsetAngle;
-    }
-
     __RenderAngle(visState, start, length, width, theta, offset, color);
 }
 
@@ -480,13 +466,6 @@ void _RenderRegion(
     const float fillDarknessCoef,
     const vec2&in radialRoot
 ) {
-    if (renderMode == RenderMode::Ice) {
-        offset.x += S_IcePointerOffsetX;
-        offset.z += (thetaStart < 0.0f ? -1.0f : 1.0f) * S_IcePointerOffsetZ;
-        thetaStart += (thetaStart < 0.0f ? -1.0f : 1.0f) * S_IcePointerOffsetAngle;
-        thetaEnd += (thetaEnd < 0.0f ? -1.0f : 1.0f) * S_IcePointerOffsetAngle;
-    }
-
     const float diff = thetaEnd - thetaStart;
     const int flip = (Math::Angle(visState.WorldVel, visState.Left) > HALF_PI or IsPreview()) ? 1 : -1;
 
@@ -499,7 +478,7 @@ void _RenderRegion(
     // We need to draw a shaded region by drawing a closed path outlining
     // the "region" inbetwixt the lines of interest, then filling it.
 
-    const float angle_per_point = flip * TWO_PI / S_IceRegionResolution;
+    const float angle_per_point = flip * TWO_PI / 50.0f;
     const int points = int(diff / angle_per_point);
 
     for (int i = 0; i < points; i++) {

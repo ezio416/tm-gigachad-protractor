@@ -8,7 +8,7 @@ int S_PlayerIndex = 0;
 bool S_ShowBadSlide = false;
 
 
-[Setting category="SD Pointer" name="Minimum brightness" min=0.0f max=1.0f]
+[Setting category="SD Pointer" name="Minimum line brightness" min=0.0f max=1.0f]
 float S_BrightnessMin = 0.1f;
 
 [Setting category="SD Pointer" name="Opacity derivative" min=0.001f max=0.01f]
@@ -104,112 +104,82 @@ bool S_HideGear5 = true;
 [Setting category="SD Pointer" name="Show gears on both sides" if="S_Gears"]
 bool S_GearBothSides = true;
 
-[Setting category="SD Pointer" name="Show full gear lines on ice" if="S_Gears"]  // TODO
-bool S_VerboseIceGears = false;
 
-
-[Setting category="Ice" name="Ice Player pointer start" min=0.0f max=16.0f]
-float S_IcePlayerPointerStart = 2.856f;
-
-[Setting category="Ice" name="Ice Player pointer length" min=0.0f max=16.0f]
-float S_IcePlayerPointerLength = 1.5f;
-
-[Setting category="Ice" name="Ice assist line length fraction" min=1.0f max=10.0f]
-float S_IcePlayerFraction = 2.0f;
-
-[Setting category="Ice" name="Display on front of car"]
-bool S_FlipDisplayIce = true;
-
-[Setting category="Ice" name="Pointer X offset" min=-3.0f max=3.0f]
-float S_IcePointerOffsetX = 0.0f;
-
-[Setting category="Ice" name="Pointer Z offset" min=-3.0f max=3.0f]
-float S_IcePointerOffsetZ = 0.0f;
-
-[Setting category="Ice" name="Pointer angle offset" min=-1.41f max=1.41f]
-float S_IcePointerOffsetAngle = 0.0f;
-
-[Setting category="Ice" name="Set pointer to front corner"]
-bool S_IcePointerFrontCorner = false;
-
-[Setting category="Ice" name="Fix guides to car instead of pointer"]
-bool S_FixIceGuides = true;
-
-[Setting category="Ice" name="Show custom angle"]
-bool S_ShowCustomIceAngle = false;
-
-[Setting category="Ice" name="Ice custom angle (in degrees)" min=0.0f max=180.0f]
-float S_CustomIceAngle = 90.0f;
-
-[Setting category="Ice" name="Ice custom angle color" color]
-vec4 S_CustomIceAngleColor = vec4(1.0f, 0.0f, 1.0f, 1.0f);
-
-[Setting category="Ice" name="Show custom angle 2"]
-bool S_ShowCustomIceAngle2 = false;
-
-[Setting category="Ice" name="Ice custom angle 2 (in degrees)" min=0.0f max=180.0f]
-float S_CustomIceAngle2 = 92.0f;
-
-[Setting category="Ice" name="Ice custom angle color 2" color]
-vec4 S_CustomIceAngle2Color = vec4(0.0f, 0.0f, 1.0f, 1.0f);
-
-[Setting category="Ice" name="Ice line minimum brightness" min=0.0f max=1.0f]
+[Setting category="Ice" name="Minimum line brightness" min=0.0f max=1.0f]
 float S_IceBrightnessMin = 0.1f;
 
-[Setting category="Ice" name="Ice line fade rate (higher = slower)" min=0.1f max=1.0f]
-float S_IceLineFadeRate = 0.3f;
+[Setting category="Ice" name="Start" min=0.0f max=16.0f]
+float S_IceStart = 2.856f;
 
-[Setting category="Ice" name="Ice ideal angle color" color]
-vec4 S_IceIdealAngleColor = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+[Setting category="Ice" name="Length" min=0.0f max=16.0f]
+float S_IceLength = 1.5f;
+
+[Setting category="Ice" name="Assist line length fraction" min=1.0f max=10.0f]
+float S_IceAssistLength = 2.0f;
+
+[Setting category="Ice" name="Ideal angle color" color]
+vec4 S_IceIdealAngleColor(0.0f, 1.0f, 0.0f, 1.0f);
+
+[Setting category="Ice" name="Show custom angle"]
+bool S_IceShowCustomAngle = false;
+
+[Setting category="Ice" name="Custom angle" min=0.0f max=180.0f description="in degrees" if="S_IceShowCustomAngle"]
+float S_IceCustomAngle = 90.0f;
+
+[Setting category="Ice" name="Custom angle color" color if="S_IceShowCustomAngle"]
+vec4 S_IceCustomAngleColor(1.0f, 0.0f, 1.0f, 1.0f);
+
+[Setting category="Ice" name="Show second custom angle"]
+bool S_IceShowCustomAngle2 = false;
+
+[Setting category="Ice" name="Second custom angle" min=0.0f max=180.0f description="in degrees" if="S_IceShowCustomAngle2"]
+float S_IceCustomAngle2 = 92.0f;
+
+[Setting category="Ice" name="Second custom angle color" color if="S_IceShowCustomAngle2"]
+vec4 S_IceCustomAngle2Color(0.0f, 0.0f, 1.0f, 1.0f);
 
 [Setting category="Ice" name="Show gear lines"]
 bool S_IceGearLines = false;
 
-[Setting category="Ice" name="Resolution (points per circle)" min=2 max=300]
-int S_IceRegionResolution = 80;
+[Setting category="Ice" name="Show regions"]
+bool S_IceRegions = true;
 
-[Setting category="Ice" name="Ice safe region color" color]
-vec4 S_IceRegionGoodColor = vec4(0.0f, 1.0f, 0.0f, 0.5f);
-
-[Setting category="Ice" name="Draw colored regions for safe zones"]
-bool S_IceRegionSafe = true;
-
-[Setting category="Ice" name="Ice region warning inset frac" min=0.0f max=0.5f]
-float S_IceRegionInset = 0.023f;
-
-[Setting category="Ice" name="Ice region start (relative to player pointer)" min=0.0f max=1.0f]
+[Setting category="Ice" name="Regions start" min=0.0f max=1.0f description="relative to pointer" if="S_IceRegions"]
 float S_IceRegionStart = 0.561f;
 
-[Setting category="Ice" name="Ice region end (relative to player pointer)" min=0.0f max=1.0f]
+[Setting category="Ice" name="Regions end" min=0.0f max=1.0f description="relative to pointer" if="S_IceRegions"]
 float S_IceRegionEnd = 0.891f;
 
-[Setting category="Ice" name="Ice warning region color" color]
-vec4 S_IceRegionWarning = vec4(0.871f, 0.922f, 0.204f, 1.0f);
+[Setting category="Ice" name="Safe color" color if="S_IceRegions"]
+vec4 S_IceRegionGoodColor(0.0f, 1.0f, 0.0f, 0.5f);
 
-[Setting category="Ice" name="Ice region inset frac" min=0.0f max=0.1f]
-float S_IceRegionInsetFraction = 0.0f;
+[Setting category="Ice" name="Warning color" color if="S_IceRegions"]
+vec4 S_IceRegionWarningColor(0.871f, 0.922f, 0.204f, 1.0f);
 
-[Setting category="Ice" name="Ice radial root inset fraction" min=0.0f max=3.0f]
+[Setting category="Ice" name="Warning width" min=0.001f max=0.2f if="S_IceRegions"]
+float S_IceRegionWarningWidth = 0.023f;
+
+[Setting category="Ice" name="Danger wedge color" color if="S_IceRegions"]
+vec4 S_IceRegionDangerColor(1.0f, 0.0f, 0.0f, 1.0f);
+
+[Setting category="Ice" name="Radial root inset fraction" min=0.0f max=3.0f if="S_IceRegions"]
 float S_IceRegionRadialInsetFraction = 0.887f;
 
-[Setting category="Ice" name="Ice gradient inner diameter" min=0.0f max=200.0f]
+[Setting category="Ice" name="Radial dark color fraction" min=0.0f max=1.0f if="S_IceRegions"]
+float S_IceRadialDarkFraction = 0.0f;
+
+[Setting category="Ice" name="Gradient inner diameter" min=0.0f max=200.0f if="S_IceRegions"]
 float S_IceGradientInnerDiameter = 23.656f;
 
-[Setting category="Ice" name="Ice gradient outer diameter" min=0.0f max=200.0f]
+[Setting category="Ice" name="Gradient outer diameter" min=0.0f max=200.0f if="S_IceRegions"]
 float S_IceGradientOuterDiameter = 70.968f;
-
-[Setting category="Ice" name="Ice radial dark color frac" min=0.0f max=1.0f]
-float S_IceRadialDarkFraction = 1.0f;
-
-[Setting category="Ice" name="Ice danger wedge color" color]
-vec4 S_IceDangerWedgeColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
-
-[Setting category="Ice" name="Hide history on ice"]
-bool S_HistoryHideIce = true;
 
 
 [Setting category="History Trail" name="Enabled"]
 bool S_History = true;
+
+[Setting category="History Trail" name="Show on ice"]
+bool S_HistoryIce = false;
 
 [Setting category="History Trail" name="Number of points to draw" min=1 max=100]
 int S_HistoryPoints = 60;

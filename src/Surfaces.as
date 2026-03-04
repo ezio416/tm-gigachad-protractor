@@ -457,7 +457,7 @@ namespace Surface {
 
         float GetLineBrightness(const float slip, const float theta) {
             const float diff = Math::Abs(slip - theta);
-            const float ret = Math::InvLerp(S_IceLineFadeRate, 0.0f, diff);
+            const float ret = Math::InvLerp(0.3f, 0.0f, diff);
             return Math::Max(ret, S_IceBrightnessMin);
         }
 
@@ -519,13 +519,7 @@ namespace Surface {
                 playerFadeOpacity = 1.0f;
             }
 
-            float t;
-
-            if (S_FixIceGuides) {
-                t = -slip;
-            } else {
-                t = -HALF_PI;
-            }
+            float t = -slip;
 
             if (Math::Angle(vec_vel, visState.Left) > HALF_PI or IsPreview()) {
                 t *= -1.0f;
@@ -550,8 +544,8 @@ namespace Surface {
 
             RenderPlayerPointer(
                 visState,
-                S_IcePlayerPointerStart,
-                S_IcePlayerPointerLength,
+                S_IceStart,
+                S_IceLength,
                 S_Width,
                 t,
                 vec3(),
@@ -562,8 +556,8 @@ namespace Surface {
         void RenderAngle(CSceneVehicleVisState@ visState, const vec4&in color, const float t) {
             ::RenderAngle(
                 visState,
-                S_IcePlayerPointerStart,
-                S_IcePlayerPointerLength / S_IcePlayerFraction,
+                S_IceStart,
+                S_IceLength / S_IceAssistLength,
                 S_Width,
                 t,
                 vec3(),
@@ -572,47 +566,33 @@ namespace Surface {
         }
 
         void RenderCustomAngle1(CSceneVehicleVisState@ visState, const vec3&in vec_vel) {
-            if (!S_ShowCustomIceAngle) {
+            if (!S_IceShowCustomAngle) {
                 return;
             }
 
-            const float angle = S_CustomIceAngle * 0.0174533f;
-            const float slip = Math::Angle(visState.Dir, vec_vel);
-            float t;
-
-            if (S_FixIceGuides) {
-                t = -angle;
-            } else {
-                t = slip - angle - HALF_PI;
-            }
+            const float angle = S_IceCustomAngle * 0.0174533f;
+            float t = -angle;
 
             if (Math::Angle(vec_vel, visState.Left) > HALF_PI or IsPreview()) {
                 t *= -1.0f;
             }
 
-            RenderAngle(visState, S_CustomIceAngleColor, t);
+            RenderAngle(visState, S_IceCustomAngleColor, t);
         }
 
         void RenderCustomAngle2(CSceneVehicleVisState@ visState, const vec3&in vec_vel) {
-            if (!S_ShowCustomIceAngle2) {
+            if (!S_IceShowCustomAngle2) {
                 return;
             }
 
-            const float angle = S_CustomIceAngle2 * 0.0174533f;
-            const float slip = Math::Angle(visState.Dir, vec_vel);
-            float t;
-
-            if (S_FixIceGuides) {
-                t = -angle;
-            } else {
-                t = slip - angle - HALF_PI;
-            }
+            const float angle = S_IceCustomAngle2 * 0.0174533f;
+            float t = -angle;
 
             if (Math::Angle(vec_vel, visState.Left) > HALF_PI or IsPreview()) {
                 t *= -1.0f;
             }
 
-            RenderAngle(visState, S_CustomIceAngle2Color, t);
+            RenderAngle(visState, S_IceCustomAngle2Color, t);
         }
 
         void RenderDesert(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
@@ -637,11 +617,7 @@ namespace Surface {
                             case 1: case 2: continue;
                         }
 
-                        if (S_FixIceGuides) {
-                            t = -lines[i];
-                        } else {
-                            t = slip - lines[i] - HALF_PI;
-                        }
+                        t = -lines[i];
 
                         if (Math::Angle(vel, visState.Left) > HALF_PI or IsPreview()) {
                             t *= -1.0f;
@@ -649,8 +625,8 @@ namespace Surface {
 
                         ::RenderAngle(
                             visState,
-                            S_IcePlayerPointerStart,
-                            S_IcePlayerPointerLength / S_IcePlayerFraction,
+                            S_IceStart,
+                            S_IceLength / S_IceAssistLength,
                             S_Width,
                             t,
                             vec3(),
@@ -667,11 +643,7 @@ namespace Surface {
                     for (uint i = 0; i < lines1.Length; i++) {
                         slip = Math::Angle(visState.Dir, vel);
 
-                        if (S_FixIceGuides) {
-                            t = -lines1[i];
-                        } else {
-                            t = slip - lines1[i] - HALF_PI;
-                        }
+                        t = -lines1[i];
 
                         if (Math::Angle(vel, visState.Left) > HALF_PI or IsPreview()) {
                             t *= -1.0f;
@@ -679,8 +651,8 @@ namespace Surface {
 
                         ::RenderAngle(
                             visState,
-                            S_IcePlayerPointerStart,
-                            S_IcePlayerPointerLength / S_IcePlayerFraction,
+                            S_IceStart,
+                            S_IceLength / S_IceAssistLength,
                             S_Width,
                             t,
                             vec3(),
@@ -699,14 +671,14 @@ namespace Surface {
             // above 0.5, show upper regions with opacity derived from relativePos in domain [0.5, 1.5]
             // below 0.5, show lower regions with opacity derived from relativePos in domain [-0.5, 0.5]
 
-            if (S_IceRegionSafe) {
+            if (S_IceRegions) {
                 float appliedOpacity;
                 if (relativePos >= 0.5f) {
                     appliedOpacity = GetGearupMult();
                     RenderRegion(
                         visState,
-                        (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionStart,
-                        (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionEnd - (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionStart,
+                        (S_IceStart + S_IceLength) * S_IceRegionStart,
+                        (S_IceStart + S_IceLength) * S_IceRegionEnd - (S_IceStart + S_IceLength) * S_IceRegionStart,
                         lines[0],
                         lines[1],
                         vec3(),
@@ -717,8 +689,8 @@ namespace Surface {
                     );
                     RenderRegion(
                         visState,
-                        (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionStart,
-                        (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionEnd - (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionStart,
+                        (S_IceStart + S_IceLength) * S_IceRegionStart,
+                        (S_IceStart + S_IceLength) * S_IceRegionEnd - (S_IceStart + S_IceLength) * S_IceRegionStart,
                         lines[2],
                         lines[3],
                         vec3(),
@@ -729,12 +701,12 @@ namespace Surface {
                     );
                     RenderRegion(
                         visState,
-                        (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionStart,
-                        (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionEnd - (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionStart,
+                        (S_IceStart + S_IceLength) * S_IceRegionStart,
+                        (S_IceStart + S_IceLength) * S_IceRegionEnd - (S_IceStart + S_IceLength) * S_IceRegionStart,
                         lines[1],
                         lines[2],
                         vec3(),
-                        ApplyOpacityToColor(S_IceDangerWedgeColor, appliedOpacity),
+                        ApplyOpacityToColor(S_IceRegionDangerColor, appliedOpacity),
                         slip,
                         false,
                         appliedOpacity
@@ -744,8 +716,8 @@ namespace Surface {
                     appliedOpacity = Math::Min((0.5f - relativePos), 1);
                     RenderRegion(
                         visState,
-                        (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionStart,
-                        (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionEnd - (S_IcePlayerPointerStart + S_IcePlayerPointerLength) * S_IceRegionStart,
+                        (S_IceStart + S_IceLength) * S_IceRegionStart,
+                        (S_IceStart + S_IceLength) * S_IceRegionEnd - (S_IceStart + S_IceLength) * S_IceRegionStart,
                         lines[0],
                         lines[1],
                         vec3(),
@@ -760,7 +732,7 @@ namespace Surface {
 
         void RenderIdealAngle(CSceneVehicleVisState@ visState, const float vel, const vec3&in vec_vel, const float slip) {
             const float angle = GetIdealAngle(vel);
-            float t = S_FixIceGuides ? -angle : slip - angle - HALF_PI;
+            float t = -angle;
 
             if (Math::Angle(vec_vel, visState.Left) > HALF_PI or IsPreview()) {
                 t *= -1.0f;

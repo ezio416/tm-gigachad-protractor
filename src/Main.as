@@ -5,15 +5,6 @@ const string  pluginTitle = pluginColor + pluginIcon + "\\$G " + pluginMeta.Name
 
 float g_dt = 0.0f;
 
-void OnSettingsChanged() {
-    if (S_IcePointerFrontCorner) {
-        S_IcePointerOffsetX = 1.7f;
-        S_IcePointerOffsetZ = -0.7f;
-        S_IcePointerOffsetAngle = -0.6f;
-        S_IcePointerFrontCorner = false;
-    }
-}
-
 void Render() {
     if (!S_Enabled) {
         return;
