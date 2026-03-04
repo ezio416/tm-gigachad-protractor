@@ -25,4 +25,4 @@ Originally created by [Devin](https://openplanet.dev/u/jschmitz2), as of Februar
 - Manama
 - [Ayr](https://openplanet.dev/u/Ayr)
 
-![image](images/gcp.jpg)
+![image](images/gcp.png)
