@@ -15,14 +15,14 @@ For more information on what this does, see these videos:
 Originally created by [Devin](https://openplanet.dev/u/jschmitz2), as of February 2026 this is now being maintained by [Ezio](https://openplanet.dev/u/ezio416).
 
 ### Special thanks to the beta testers:
-- AR
-- XertroV
-- MisfitMaid
-- Greep
+- [AR](https://openplanet.dev/u/st-AR-gazer)
+- [XertroV](https://openplanet.dev/u/XertroV)
+- [MisfitMaid](https://openplanet.dev/u/sylae)
+- [Greep](https://openplanet.dev/u/89matt89)
 - Bux
-- nbeerten
+- [nbeerten](https://openplanet.dev/u/nbeerten)
 - Magpie
 - Manama
-- Ayr
+- [Ayr](https://openplanet.dev/u/Ayr)
 
 ![image](images/gcp.jpg)
