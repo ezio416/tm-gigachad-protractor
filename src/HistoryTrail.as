@@ -67,7 +67,7 @@ class HistoryTrail {
     void Update(const float slip, const vec4&in color) {
         const uint64 now = Time::Now;
 
-        if (int(now - lastUpdateTime) > (S_HistorySeconds / float(S_HistoryPoints)) * 1000) {
+        if (int(now - lastUpdateTime) > (S_HistorySeconds / float(S_HistoryPoints)) * 1000.0f) {
             historyTrailArr[currentIndex].Update(slip, color);
             currentIndex = CalcNext(1);
             lastUpdateTime = now;
