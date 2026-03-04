@@ -47,13 +47,13 @@ float S_ThetaMultGrass = 4.0f;
 [Setting category="SD Pointer" name="Spacing (plastic)" min=1.0f max=16.0f]
 float S_ThetaMultPlastic = 4.0f;
 
-[Setting category="SD Pointer" name="Spacing (wood)" min=0.1f max=2.0f]  // TODO
+[Setting category="SD Pointer" name="Spacing (wood)" min=0.1f max=2.0f]
 float S_ThetaMultWood = 1.0f;
 
 [Setting category="SD Pointer" name="Spacing (backwards)" min=0.1f max=4.0f]
 float S_ThetaMultBW = 1.0f;
 
-[Setting category="SD Pointer" name="Spacing (derivative)" min=0.1f max=0.5f]  // TODO
+[Setting category="SD Pointer" name="Spacing (derivative)" min=0.1f max=0.5f]
 float S_ThetaMultDerivative = 0.35f;
 
 [Setting category="SD Pointer" name="Optimal acceleration assist lines"]
