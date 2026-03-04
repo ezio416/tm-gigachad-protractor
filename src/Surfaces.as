@@ -66,28 +66,15 @@ namespace Surface {
             )
         );
 
-        badSlide = false;
         int opRes = 0;
         if (speed < minSpeed) {
-            if (S_ShowBadSlide and GetSlipTotal(visState) > 0.0f) {
-                opRes = 1;
-                badSlide = true;
-            } else {
-                opRes = -1;
-            }
-
+            opRes = -1;
         } else {
             if (true
                 and GetSlipTotal(visState) == 0.0f
                 and !(Wood::Is(visState.FLGroundContactMaterial) and visState.FLIcing01 > 0.0f and visState.WetnessValue01 > 0.0f)
             ) {
-                if (S_ShowBadSlide) {
-                    opRes = 1;
-                    badSlide = true;
-                } else {
-                    opRes = -1;
-                }
-
+                opRes = -1;
             } else {
                 opRes = absSideSpeed > outerSD ? -1 : 1;
             }

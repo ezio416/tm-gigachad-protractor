@@ -3,7 +3,6 @@ const uint  GEARUP_RPM_THRESH    = 10000;
 const float POINTER_ABSOLUTE_MAX = 13000.0f;
 const float POINTER_ABSOLUTE_MIN = 7000.0f;
 
-bool                   badSlide            = false;
 CameraMode             camera              = CameraMode::External;
 int                    currentRunStartTime = 0;
 float                  gearPointerFlip     = 1.0f;
@@ -189,10 +188,7 @@ void RenderPlayerPointer(
         pointerWidth,
         theta,
         offset,
-        ApplyOpacityToColor(
-            badSlide and S_ShowBadSlide and !IsPreview() ? S_BaseAccelColor : color,
-            playerFadeOpacity
-        )
+        ApplyOpacityToColor(color, playerFadeOpacity)
     );
 
     if (false

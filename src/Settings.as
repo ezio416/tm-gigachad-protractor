@@ -4,9 +4,6 @@ bool S_Enabled = true;
 [Setting category="General" name="Player index" min=0 max=10]
 int S_PlayerIndex = 0;
 
-[Setting category="General" name="Show warning line on early slide/noslide"]  // TODO
-bool S_ShowBadSlide = false;
-
 
 [Setting category="SD Pointer" name="Minimum line brightness" min=0.0f max=1.0f]
 float S_BrightnessMin = 0.1f;
