@@ -15,21 +15,27 @@ namespace Surface {
         if (Ice::Is(surface)) {
             return 1.0f;
         }
+
         if (Dirt::Is(surface)) {
             return S_ThetaMultDirt;
         }
+
         if (Road::Is(surface)) {
             return S_ThetaMultRoad;
         }
+
         if (Grass::Is(surface)) {
             return S_ThetaMultGrass;
         }
+
         if (Plastic::Is(surface)) {
             return S_ThetaMultPlastic;
         }
+
         if (Wood::Is(surface)) {
             return S_ThetaMultWood;
         }
+
         return -1000.0f;
     }
 
