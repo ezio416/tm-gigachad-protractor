@@ -118,12 +118,6 @@ bool IsPreview() {
     return S_PreviewDirt or S_PreviewGrass or S_PreviewIce or S_PreviewPlastic or S_PreviewRoad or S_PreviewWood;
 }
 
-void PreviewOpacityCheck() {
-    if (IsPreview()) {
-        playerFadeOpacity = 1.0f;
-    }
-}
-
 float PreviewSlip(const float in_slip) {
     return IsPreview() ? S_PreviewSlip : in_slip;
 }
