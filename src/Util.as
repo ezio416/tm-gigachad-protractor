@@ -11,12 +11,11 @@ enum RenderMode {
 }
 
 CameraMode GetCameraMode(CSceneVehicleVisState@ visState) {
-    const vec3 pos = visState.Position;
     const vec3 cameraPos = Camera::GetCurrentPosition();
     const vec3 pos_offset_forward = visState.Position + visState.Dir;
 
     const float v1 = (cameraPos - pos_offset_forward).LengthSquared();
-    const float v2 = (cameraPos - pos).LengthSquared();
+    const float v2 = (cameraPos - visState.Position).LengthSquared();
 
     if (v1 > 1.9f and v1 < 2.0f and v2 > 0.85f and v2 < 0.9f) {
         return CameraMode::Cam3;
@@ -31,11 +30,12 @@ CameraMode GetCameraMode(CSceneVehicleVisState@ visState) {
 
 vec4 GetColor(const int index) {
     switch (index) {
-        case 0:  return S_OptimalAccelColor;
-        case 1:  return S_GoodAccelColor;
-        case 2:  return S_BaseAccelColor;
-        default: return S_ZeroAccelColor;
+        case 0: return S_OptimalAccelColor;
+        case 1: return S_GoodAccelColor;
+        case 2: return S_BaseAccelColor;
     }
+
+    return S_ZeroAccelColor;
 }
 
 CSmPlayer@ GetPlayer() {
@@ -47,6 +47,7 @@ CSmPlayer@ GetPlayer() {
     ) {
         return cast<CSmPlayer>(playground.GameTerminals[0].GUIPlayer);
     }
+
     return null;
 }
 
@@ -67,8 +68,9 @@ vec2 GetStartAndLength() {
     switch (camera) {
         case CameraMode::Cam3:    return vec2(S_Cam3InternalStart, S_Cam3InternalLength);
         case CameraMode::AltCam3: return vec2(S_Cam3ExternalStart, S_Cam3ExternalLength);
-        default:                  return vec2(S_Start,             S_Length);
     }
+
+    return vec2(S_Start, S_Length);
 }
 
 float GetTargetThetaMultFactor(CSceneVehicleVisState@ visState) {
