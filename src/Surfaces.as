@@ -522,10 +522,9 @@ namespace Surface {
                 playerFadeOpacity = 1.0f;
             }
 
-            float t = -slip;
-
+            float theta = -slip;
             if (Math::Angle(vec_vel, visState.Left) > HALF_PI or IsPreview()) {
-                t *= -1.0f;
+                theta *= -1.0f;
             }
 
             vec4 color;
@@ -550,52 +549,43 @@ namespace Surface {
                 S_IceStart,
                 S_IceLength,
                 S_Width,
-                t,
+                theta,
                 vec3(),
                 color
             );
         }
 
-        void RenderAngle(CSceneVehicleVisState@ visState, const vec4&in color, const float t) {
+        void RenderAngle(CSceneVehicleVisState@ visState, const vec4&in color, const float theta) {
             ::RenderAngle(
                 visState,
                 S_IceStart,
                 S_IceLength / S_IceAssistLength,
                 S_Width,
-                t,
+                theta,
                 vec3(),
                 color
             );
         }
 
-        void RenderCustomAngle1(CSceneVehicleVisState@ visState, const vec3&in vec_vel) {
-            if (!S_IceShowCustomAngle) {
-                return;
-            }
-
-            const float angle = S_IceCustomAngle * 0.0174533f;
-            float t = -angle;
-
+        void RenderCustomAngle(CSceneVehicleVisState@ visState, float theta, const vec3&in vec_vel, const vec4&in color) {
+            theta *= -0.0174533f;
             if (Math::Angle(vec_vel, visState.Left) > HALF_PI or IsPreview()) {
-                t *= -1.0f;
+                theta *= -1.0f;
             }
 
-            RenderAngle(visState, S_IceCustomAngleColor, t);
+            RenderAngle(visState, color, theta);
+        }
+
+        void RenderCustomAngle1(CSceneVehicleVisState@ visState, const vec3&in vec_vel) {
+            if (S_IceShowCustomAngle) {
+                RenderCustomAngle(visState, S_IceCustomAngle, vec_vel, S_IceCustomAngleColor);
+            }
         }
 
         void RenderCustomAngle2(CSceneVehicleVisState@ visState, const vec3&in vec_vel) {
-            if (!S_IceShowCustomAngle2) {
-                return;
+            if (S_IceShowCustomAngle2) {
+                RenderCustomAngle(visState, S_IceCustomAngle2, vec_vel, S_IceCustomAngle2Color);
             }
-
-            const float angle = S_IceCustomAngle2 * 0.0174533f;
-            float t = -angle;
-
-            if (Math::Angle(vec_vel, visState.Left) > HALF_PI or IsPreview()) {
-                t *= -1.0f;
-            }
-
-            RenderAngle(visState, S_IceCustomAngle2Color, t);
         }
 
         void RenderDesert(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
@@ -603,16 +593,17 @@ namespace Surface {
         }
 
         void RenderGearLines(CSceneVehicleVisState@ visState, const float v, const vec3&in vel, float slip) {
-            float[] lines;
-            lines.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_1, v));
-            lines.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_2, v));
-            lines.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_3, v));
-            lines.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_4, v));
-            float t;
-
-            vec4 color;
+            const float[] lines = {
+                LerpToMidpoint(Surface::Ice::GEARUP_1, v),
+                LerpToMidpoint(Surface::Ice::GEARUP_2, v),
+                LerpToMidpoint(Surface::Ice::GEARUP_3, v),
+                LerpToMidpoint(Surface::Ice::GEARUP_4, v)
+            };
 
             if (S_IceGearLines) {
+                float theta;
+                vec4 color;
+
                 if (expectedTrueRpm > GEARUP_RPM_THRESH) {
                     color = GetGearupColor();
                     for (uint i = 0; i < lines.Length; i++) {
@@ -620,10 +611,9 @@ namespace Surface {
                             case 1: case 2: continue;
                         }
 
-                        t = -lines[i];
-
+                        theta = -lines[i];
                         if (Math::Angle(vel, visState.Left) > HALF_PI or IsPreview()) {
-                            t *= -1.0f;
+                            theta *= -1.0f;
                         }
 
                         ::RenderAngle(
@@ -631,9 +621,9 @@ namespace Surface {
                             S_IceStart,
                             S_IceLength / S_IceAssistLength,
                             S_Width,
-                            t,
+                            theta,
                             vec3(),
-                            Opacity(color, slip, t)
+                            Opacity(color, slip, theta)
                         );
                     }
                 }
@@ -646,10 +636,9 @@ namespace Surface {
                     for (uint i = 0; i < lines1.Length; i++) {
                         slip = Math::Angle(visState.Dir, vel);
 
-                        t = -lines1[i];
-
+                        theta = -lines1[i];
                         if (Math::Angle(vel, visState.Left) > HALF_PI or IsPreview()) {
-                            t *= -1.0f;
+                            theta *= -1.0f;
                         }
 
                         ::RenderAngle(
@@ -657,7 +646,7 @@ namespace Surface {
                             S_IceStart,
                             S_IceLength / S_IceAssistLength,
                             S_Width,
-                            t,
+                            theta,
                             vec3(),
                             color
                         );
@@ -720,7 +709,7 @@ namespace Surface {
                     );
 
                 } else {
-                    appliedOpacity = Math::Min((0.5f - relativePos), 1);
+                    appliedOpacity = Math::Min(1, 0.5f - relativePos);
 
                     RenderRegion(
                         visState,
@@ -739,14 +728,12 @@ namespace Surface {
         }
 
         void RenderIdealAngle(CSceneVehicleVisState@ visState, const float vel, const vec3&in vec_vel, const float slip) {
-            const float angle = GetIdealAngle(vel);
-            float t = -angle;
-
+            float theta = -GetIdealAngle(vel);
             if (Math::Angle(vec_vel, visState.Left) > HALF_PI or IsPreview()) {
-                t *= -1.0f;
+                theta *= -1.0f;
             }
 
-            RenderAngle(visState, Opacity(S_IceIdealAngleColor, slip, t), t);
+            RenderAngle(visState, Opacity(S_IceIdealAngleColor, slip, theta), theta);
         }
 
         void RenderRally(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
