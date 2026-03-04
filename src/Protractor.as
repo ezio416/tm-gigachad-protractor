@@ -315,7 +315,6 @@ void RenderProtractor() {
     Surface::Ice::HandleUpdate(slipAngle, speed, (IsPreview() ? S_PreviewGear : visState.CurGear));
 
     if (true
-        and !S_RallyOverride
         and visState.FLIcing01 > 0.0f
         and Surface::Ice::Is(surfaceNormalized)
         and VehicleState::GetVehicleType(visState) == VehicleState::VehicleType::CarSport

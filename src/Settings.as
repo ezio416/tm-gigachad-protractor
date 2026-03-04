@@ -261,12 +261,8 @@ bool S_PreviewIcy = false;
 [Setting category="Preview" name="Speed" min=0.0f max=1000.0f]
 float S_PreviewSpeed = 500.0f;
 
-[Setting category="Preview" name="Slip" min=-3.14f max=3.14f]
+[Setting category="Preview" name="Slip" min=-3.141f max=3.141f]
 float S_PreviewSlip = 0.1f;
 
 [Setting category="Preview" name="Gear" min=1 max=5]
 int S_PreviewGear = 5;
-
-
-[Setting category="Overrides" name="Rally Car"]
-bool S_RallyOverride = false;
