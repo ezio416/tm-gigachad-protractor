@@ -10,23 +10,6 @@ enum RenderMode {
     Backwards
 }
 
-vec4 ApplyOpacityToColor(const vec4&in inColor, const float opacity) {
-    if (false
-        or Math::IsInf(opacity)
-        or Math::IsNaN(opacity)
-        or Math::IsInf(inColor.x)
-        or Math::IsNaN(inColor.x)
-    ) {
-        return vec4();
-    }
-
-    vec4 outColor = inColor;
-    outColor.w = Math::Min(opacity, outColor.w);
-    outColor.w = Math::Max(outColor.w, 0.0f);
-
-    return outColor;
-}
-
 CameraMode GetCameraMode(CSceneVehicleVisState@ visState) {
     const vec3 pos = visState.Position;
     const vec3 cameraPos = Camera::GetCurrentPosition();

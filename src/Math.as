@@ -4,6 +4,23 @@ const float THIRD_PI   = Math::PI / 3.0f;
 const float QUARTER_PI = HALF_PI  * 0.5f;
 const float SIXTH_PI   = THIRD_PI * 0.5f;
 
+vec4 ApplyOpacityToColor(const vec4&in inColor, const float opacity) {
+    if (false
+        or Math::IsInf(opacity)
+        or Math::IsNaN(opacity)
+        or Math::IsInf(inColor.x)
+        or Math::IsNaN(inColor.x)
+    ) {
+        return vec4();
+    }
+
+    vec4 outColor = inColor;
+    outColor.w = Math::Min(opacity, outColor.w);
+    outColor.w = Math::Max(outColor.w, 0.0f);
+
+    return outColor;
+}
+
 float ApproximateSideSpeed(const vec2[]&in data, const float speed) {
     if (data.Length == 0) {
         return 0.0f;
