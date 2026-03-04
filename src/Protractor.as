@@ -502,12 +502,6 @@ void _RenderRegion(
     nvg::FillPaint(nvg::RadialGradient(radialRoot, S_IceGradientInnerDiameter, S_IceGradientOuterDiameter, fillColor, fillColorDark));
     nvg::Fill();
     nvg::ClosePath();
-
-    // nvg::BeginPath();
-    // nvg::Circle(radialRoot, 8);
-    // nvg::StrokeColor(vec4(1));
-    // nvg::Stroke();
-    // nvg::ClosePath();
 }
 
 void __RenderAngle(
