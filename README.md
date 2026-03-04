@@ -14,4 +14,15 @@ For more information on what this does, see these videos:
 
 Originally created by [Devin](https://openplanet.dev/u/jschmitz2), as of February 2026 this is now being maintained by [Ezio](https://openplanet.dev/u/ezio416).
 
+### Special thanks to the beta testers:
+- AR
+- XertroV
+- MisfitMaid
+- Greep
+- Bux
+- nbeerten
+- Magpie
+- Manama
+- Ayr
+
 ![image](images/gcp.jpg)
