@@ -14,13 +14,13 @@ float                  slipAngle           = 0.0f;
 EPlugSurfaceMaterialId surfaceNormalized;
 float                  thetaMult;
 
-vec2[] GetLinesToBeRendered(const float ideal, const float good, const float base, const float outer, const bool draw_good) {
+vec2[] GetLinesToBeRendered(const float ideal, const float good, const float base, const float outer, const bool drawGood) {
     vec2[] ret;
 
     if (!S_Simplified) {
         ret.InsertLast(vec2(ideal, 0.0f));
 
-        if (S_GoodAccel and draw_good) {
+        if (S_GoodAccel and drawGood) {
             ret.InsertLast(vec2(good, 1.0f));
         }
 
@@ -61,10 +61,6 @@ vec4 GetPlayerPointerColor(const float sideSpeed, const float target, const floa
     }
 
     return GetColor(lcol) * (1.0f - pos) + GetColor(ucol) * pos;
-}
-
-float GetSlipSmoothed(const vec3&in left, const vec3&in vel) {
-    return IsPreview() ? S_PreviewSlip : CalcVecAngle(left, vel);
 }
 
 float ProcessTheta(float theta) {
@@ -147,18 +143,18 @@ void _RenderAngle(
         width = S_SimplifiedWidth;
     }
 
-    const vec3 v_start = ProjectOffset(visState, ProjectAngle(visState, start, theta), offset);
-    const vec3 v_end = ProjectOffset(visState, ProjectAngle(visState, start + length, theta), offset);
+    const vec3 startPoint = ProjectOffset(visState, ProjectAngle(visState, start, theta), offset);
+    const vec3 endPoint = ProjectOffset(visState, ProjectAngle(visState, start + length, theta), offset);
 
-    if (Camera::IsBehind(v_start) or Camera::IsBehind(v_end)) {
+    if (Camera::IsBehind(startPoint) or Camera::IsBehind(endPoint)) {
         return;
     }
 
     nvg::BeginPath();
-    nvg::MoveTo(Camera::ToScreenSpace(v_start));
-    nvg::LineTo(Camera::ToScreenSpace(v_end));
+    nvg::MoveTo(Camera::ToScreenSpace(startPoint));
+    nvg::LineTo(Camera::ToScreenSpace(endPoint));
     nvg::StrokeColor(ApplyOpacityToColor(color, playerFadeOpacity));
-    nvg::StrokeWidth(width / (v_start - Camera::GetCurrentPosition()).Length() * 7.0f);
+    nvg::StrokeWidth(width / (startPoint - Camera::GetCurrentPosition()).Length() * 7.0f);
     nvg::LineCap(nvg::LineCapType::Round);
     nvg::Stroke();
     nvg::ClosePath();
@@ -166,16 +162,16 @@ void _RenderAngle(
 
 void RenderPlayerPointer(
     CSceneVehicleVisState@ visState,
-    const float pointer_start,
-    const float pointer_length,
-    const float pointer_width,
+    const float pointerStart,
+    const float pointerLength,
+    const float pointerWidth,
     const float theta,
     const vec3&in offset,
     vec4 color
 ) {
     if (S_History and (renderMode != RenderMode::Ice or S_HistoryIce)) {
         historyTrail.Update(theta, color);
-        historyTrail.Render(visState, pointer_start, pointer_length);
+        historyTrail.Render(visState, pointerStart, pointerLength);
     }
 
     if (S_GearBothSides) {
@@ -186,9 +182,9 @@ void RenderPlayerPointer(
 
     RenderAngle(
         visState,
-        pointer_start,
-        pointer_length,
-        pointer_width,
+        pointerStart,
+        pointerLength,
+        pointerWidth,
         theta,
         offset,
         ApplyOpacityToColor(
@@ -206,26 +202,26 @@ void RenderPlayerPointer(
         return;
     }
 
-    float rpm, rpm_pos, geardown_pos, color_pos;
+    float rpm, rpmPos, geardownPos, colorPos;
     const vec3 offset_apply = vec3(Math::Sin(theta), 0.0f, gearPointerFlip * Math::Cos(theta)) * S_GearPointerOffset;
 
     for (int i = 1; i >= (S_GearBothSides ? -1 : 1); i -= 2) {
         rpm = Math::Clamp(Surface::Ice::expectedRpm, POINTER_ABSOLUTE_MIN, POINTER_ABSOLUTE_MAX);
-        rpm_pos = Math::InvLerp(POINTER_ABSOLUTE_MIN, POINTER_ABSOLUTE_MAX, rpm) * pointer_length;
-        geardown_pos = Math::InvLerp(POINTER_ABSOLUTE_MIN, POINTER_ABSOLUTE_MAX, GEARDOWN_RPM_THRESH) * pointer_length;
+        rpmPos = Math::InvLerp(POINTER_ABSOLUTE_MIN, POINTER_ABSOLUTE_MAX, rpm) * pointerLength;
+        geardownPos = Math::InvLerp(POINTER_ABSOLUTE_MIN, POINTER_ABSOLUTE_MAX, GEARDOWN_RPM_THRESH) * pointerLength;
 
         if (rpm < GEARDOWN_RPM_THRESH) {
-            color_pos = Math::InvLerp(POINTER_ABSOLUTE_MIN, GEARDOWN_RPM_THRESH, rpm);
+            colorPos = Math::InvLerp(POINTER_ABSOLUTE_MIN, GEARDOWN_RPM_THRESH, rpm);
 
             RenderAngle(
                 visState,
-                pointer_start + rpm_pos,
-                geardown_pos - rpm_pos,
-                pointer_width,
+                pointerStart + rpmPos,
+                geardownPos - rpmPos,
+                pointerWidth,
                 theta,
                 i * offset_apply,
                 ApplyOpacityToColor(
-                    S_UpshiftDangerColor * (1.0f - color_pos) + S_UpshiftNormalColor * color_pos,
+                    S_UpshiftDangerColor * (1.0f - colorPos) + S_UpshiftNormalColor * colorPos,
                     playerFadeOpacity
                 )
             );
@@ -233,26 +229,26 @@ void RenderPlayerPointer(
         } else if (rpm < GEARUP_RPM_THRESH) {
             RenderAngle(
                 visState,
-                pointer_start + geardown_pos,
-                rpm_pos,
-                pointer_width,
+                pointerStart + geardownPos,
+                rpmPos,
+                pointerWidth,
                 theta,
                 i * offset_apply,
                 ApplyOpacityToColor(S_UpshiftNormalColor, playerFadeOpacity)
             );
 
         } else {
-            color_pos = Math::InvLerp(GEARUP_RPM_THRESH, POINTER_ABSOLUTE_MAX, rpm);
+            colorPos = Math::InvLerp(GEARUP_RPM_THRESH, POINTER_ABSOLUTE_MAX, rpm);
 
             RenderAngle(
                 visState,
-                pointer_start + geardown_pos,
-                rpm_pos,
-                pointer_width,
+                pointerStart + geardownPos,
+                rpmPos,
+                pointerWidth,
                 theta,
                 i * offset_apply,
                 ApplyOpacityToColor(
-                    S_UpshiftDangerColor * color_pos + S_UpshiftNormalColor * (1 - color_pos),
+                    S_UpshiftDangerColor * colorPos + S_UpshiftNormalColor * (1 - colorPos),
                     playerFadeOpacity
                 )
             );
@@ -284,8 +280,9 @@ void RenderProtractor() {
         surfaceNormalized = visState.FLGroundContactMaterial;
     }
 
-    if (GetPlayerStartTime() != currentRunStartTime) {
-        currentRunStartTime = GetPlayerStartTime();
+    const int startTime = GetPlayerStartTime();
+    if (currentRunStartTime != startTime) {
+        currentRunStartTime = startTime;
         playerFadeOpacity = 0.0f;
     }
 
@@ -302,22 +299,22 @@ void RenderProtractor() {
         }
     }
 
-    float vel;
+    float speed;
 
     if (IsPreview()) {
-        vel = S_PreviewSpeed / 3.6f;
+        speed = S_PreviewSpeed / 3.6f;
     } else {
-        vel = visState.WorldVel.Length();
+        speed = visState.WorldVel.Length();
         slipAngle = NormalizeSlipAngle(CalcVecAngle(visState.Left, visState.WorldVel), visState.FrontSpeed);
     }
 
-    if (vel < 10.0f) {
+    if (speed < 10.0f) {
         return;
     }
 
-    const vec3 vec_vel = visState.WorldVel / vel;
+    const vec3 vel = visState.WorldVel / speed;
 
-    Surface::Ice::HandleUpdate(slipAngle, vel, (IsPreview() ? S_PreviewGear : visState.CurGear));
+    Surface::Ice::HandleUpdate(slipAngle, speed, (IsPreview() ? S_PreviewGear : visState.CurGear));
 
     if (true
         and !S_RallyOverride
@@ -326,7 +323,7 @@ void RenderProtractor() {
         and VehicleState::GetVehicleType(visState) == VehicleState::VehicleType::CarSport
     ) {
         renderMode = RenderMode::Ice;
-        Surface::Ice::Render(visState, vel, vec_vel);
+        Surface::Ice::Render(visState, speed, vel);
         return;
     }
 
@@ -334,22 +331,22 @@ void RenderProtractor() {
         renderMode = RenderMode::Backwards;
 
         if (Surface::Grass::Is(surfaceNormalized)) {
-            Surface::Grass::RenderBackwards(visState, vel, vec_vel);
+            Surface::Grass::RenderBackwards(visState, speed, vel);
             return;
         }
 
         if (Surface::Dirt::Is(surfaceNormalized)) {
-            Surface::Dirt::RenderBackwards(visState, vel, vec_vel);
+            Surface::Dirt::RenderBackwards(visState, speed, vel);
             return;
         }
 
         if (Surface::Plastic::Is(surfaceNormalized)) {
-            Surface::Plastic::RenderBackwards(visState, vel, vec_vel);
+            Surface::Plastic::RenderBackwards(visState, speed, vel);
             return;
         }
 
         if (Surface::Road::Is(surfaceNormalized)) {
-            Surface::Road::RenderBackwards(visState, vel, vec_vel);
+            Surface::Road::RenderBackwards(visState, speed, vel);
             return;
         }
     }
@@ -357,33 +354,33 @@ void RenderProtractor() {
     renderMode = RenderMode::Normal;
 
     if (Surface::Grass::Is(surfaceNormalized)) {
-        Surface::Grass::Render(visState, vel, vec_vel);
+        Surface::Grass::Render(visState, speed, vel);
         return;
     }
 
     if (Surface::Dirt::Is(surfaceNormalized)) {
-        Surface::Dirt::Render(visState, vel, vec_vel);
+        Surface::Dirt::Render(visState, speed, vel);
         return;
     }
 
     if (Surface::Plastic::Is(surfaceNormalized)) {
-        Surface::Plastic::Render(visState, vel, vec_vel);
+        Surface::Plastic::Render(visState, speed, vel);
         return;
     }
 
     if (Surface::Road::Is(surfaceNormalized)) {
-        Surface::Road::Render(visState, vel, vec_vel);
+        Surface::Road::Render(visState, speed, vel);
         return;
     }
 
     if (Surface::Ice::Is(surfaceNormalized)) {
         switch (VehicleState::GetVehicleType(visState)) {
             case VehicleState::VehicleType::CarRally:
-                Surface::Ice::RenderRally(visState, vel, vec_vel);
+                Surface::Ice::RenderRally(visState, speed, vel);
                 break;
 
             case VehicleState::VehicleType::CarDesert:
-                Surface::Ice::RenderDesert(visState, vel, vec_vel);
+                Surface::Ice::RenderDesert(visState, speed, vel);
         }
 
         return;
@@ -397,92 +394,9 @@ void RenderProtractor() {
             or visState.RRIcing01 > 0.0f
             or visState.RLIcing01 > 0.0f
         ) {
-            Surface::Wood::RenderIcy(visState, vel, vec_vel);
+            Surface::Wood::RenderIcy(visState, speed, vel);
         } else {
-            Surface::Wood::Render(visState, vel, vec_vel);
+            Surface::Wood::Render(visState, speed, vel);
         }
     }
-}
-
-void RenderRegion(
-    CSceneVehicleVisState@ visState,
-    const float start,
-    const float length,
-    float thetaStart,
-    float thetaEnd,
-    const vec3&in offset,
-    vec4 fillColor,
-    const float slip,
-    const bool renderWarnZone,
-    const float appliedOpacity
-) {
-    const float diffFactor = (thetaEnd - thetaStart > 0.0f ? 1.0f : -1.0f) * S_IceRegionWarningWidth;
-    const int flip = IsPreview() or Math::Angle(visState.WorldVel, visState.Left) > HALF_PI ? -1 : 1;
-    const float inner_thetaStart = (thetaStart + diffFactor) * flip;
-    const float inner_thetaEnd = (thetaEnd - diffFactor) * flip;
-
-    thetaStart *= flip;
-    thetaEnd *= flip;
-
-    const vec2 radialRoot = Camera::ToScreenSpace(ProjectAngle(
-        visState,
-        (start + length) * S_IceRegionRadialInsetFraction,
-        flip * -ProcessTheta(slip)
-    ));
-
-    fillColor = ApplyOpacityToColor(fillColor, appliedOpacity);
-    const vec4 warnColor = ApplyOpacityToColor(S_IceRegionWarningColor, appliedOpacity);
-
-    if (renderWarnZone) {
-        _RenderRegion(visState, start, length, inner_thetaStart, inner_thetaEnd, offset, fillColor, radialRoot);
-        _RenderRegion(visState, start, length, thetaStart, inner_thetaStart, offset, warnColor, radialRoot);
-        _RenderRegion(visState, start, length, inner_thetaEnd, thetaEnd, offset, warnColor, radialRoot);
-    } else {
-        _RenderRegion(visState, start, length, thetaStart, thetaEnd, offset, fillColor, radialRoot);
-    }
-}
-
-void _RenderRegion(
-    CSceneVehicleVisState@ visState,
-    const float start,
-    const float length,
-    float thetaStart,
-    float thetaEnd,
-    vec3 offset,
-    vec4 fillColor,
-    const vec2&in radialRoot
-) {
-    const float diff = thetaEnd - thetaStart;
-    const int flip = (Math::Angle(visState.WorldVel, visState.Left) > HALF_PI or IsPreview()) ? 1 : -1;
-
-    fillColor = ApplyOpacityToColor(fillColor, playerFadeOpacity);
-
-    vec4 fillColorDark = fillColor * S_IceRadialDarkFraction;
-    fillColorDark.w *= 0.1f;
-
-    const float angle_per_point = flip * TWO_PI / 50.0f;
-    const int points = int(diff / angle_per_point);
-    const nvg::Paint gradient = nvg::RadialGradient(radialRoot, S_IceGradientInnerDiameter, S_IceGradientOuterDiameter, fillColor, fillColorDark);
-
-    for (int i = 0; i < points; i++) {
-        nvg::BeginPath();
-        nvg::MoveTo(Camera::ToScreenSpace(ProjectOffset(visState, ProjectAngle(visState, start, thetaStart + (i * angle_per_point)), offset)));
-        LineTo(ProjectOffset(visState, ProjectAngle(visState, start, thetaStart + ((i + 1) * angle_per_point)), offset));
-        LineTo(ProjectOffset(visState, ProjectAngle(visState, start + length, thetaStart + ((i + 1) * angle_per_point)), offset));
-        LineTo(ProjectOffset(visState, ProjectAngle(visState, start + length, thetaStart + (i * angle_per_point)), offset));
-        LineTo(ProjectOffset(visState, ProjectAngle(visState, start, thetaStart + (i * angle_per_point)), offset));
-        nvg::FillPaint(gradient);
-        nvg::Fill();
-        nvg::ClosePath();
-    }
-
-    nvg::BeginPath();
-    nvg::MoveTo(Camera::ToScreenSpace(ProjectOffset(visState, ProjectAngle(visState, start, thetaStart + (points * angle_per_point)), offset)));
-    LineTo(ProjectOffset(visState, ProjectAngle(visState, start, thetaEnd), offset));
-    LineTo(ProjectOffset(visState, ProjectAngle(visState, start + length, thetaEnd), offset));
-    LineTo(ProjectOffset(visState, ProjectAngle(visState, start + length, thetaStart + (points * angle_per_point)), offset));
-    LineTo(ProjectOffset(visState, ProjectAngle(visState, start, thetaStart + (points * angle_per_point)), offset));
-    nvg::FillPaint(gradient);
-    nvg::Fill();
-    nvg::ClosePath();
 }

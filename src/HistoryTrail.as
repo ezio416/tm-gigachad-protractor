@@ -16,8 +16,8 @@ class HistoryTrail {
             return;
         }
 
-        float opacity, next_opacity, rel_fade, stroke_width, height_offset, next_rel_fade, next_height_offset, start_theta, end_theta;
-        vec3 start_p, end_p, off;
+        float opacity, nextOpacity, relFade, strokeWidth, heightOffset, nextRelFade, nextHeightOffset, startTheta, endTheta;
+        vec3 startPoint, endPoint, off;
 
         off.x += S_SimplifiedOffsetX;
 
@@ -26,46 +26,47 @@ class HistoryTrail {
             opacity = S_HistoryStartOpacity;
 
             for (int j = 1; j < S_HistoryPoints - 2; j++) {
-                next_opacity = opacity * (1.0f - (1.0f / S_HistoryPoints)) ** S_HistoryDecayFactor;  //- (1 / (S_HistoryPoints * 10));
+                nextOpacity = opacity * (1.0f - (1.0f / S_HistoryPoints)) ** S_HistoryDecayFactor;  //- (1 / (S_HistoryPoints * 10));
 
-                rel_fade = Math::InvLerp(0.0f, S_HistoryStartOpacity, opacity);
-                stroke_width = Math::Lerp(S_HistoryWidthMin, S_HistoryWidthMax, rel_fade);
-                height_offset = Math::Lerp(S_HistoryStartHeight, S_HistoryEndHeight, rel_fade ** S_HistoryDistanceFactor);
+                relFade = Math::InvLerp(0.0f, S_HistoryStartOpacity, opacity);
+                strokeWidth = Math::Lerp(S_HistoryWidthMin, S_HistoryWidthMax, relFade);
+                heightOffset = Math::Lerp(S_HistoryStartHeight, S_HistoryEndHeight, relFade ** S_HistoryDistanceFactor);
 
-                next_rel_fade = Math::InvLerp(0.0f, S_HistoryStartOpacity, next_opacity);
-                next_height_offset = Math::Lerp(S_HistoryStartHeight, S_HistoryEndHeight, next_rel_fade ** S_HistoryDistanceFactor);
+                nextRelFade = Math::InvLerp(0.0f, S_HistoryStartOpacity, nextOpacity);
+                nextHeightOffset = Math::Lerp(S_HistoryStartHeight, S_HistoryEndHeight, nextRelFade ** S_HistoryDistanceFactor);
 
-                start_theta = ProcessTheta(GetAtIdx(j).slip);
-                end_theta = ProcessTheta(GetAtIdx(j + 1).slip);
+                startTheta = ProcessTheta(GetAtIdx(j).slip);
+                endTheta = ProcessTheta(GetAtIdx(j + 1).slip);
 
-                start_p = ProjectAngle(visState, height_offset + S_HistoryStartOffset + start + length, start_theta);
-                end_p = ProjectAngle(visState, next_height_offset + S_HistoryStartOffset + start + length, end_theta);
+                startPoint = ProjectAngle(visState, heightOffset + S_HistoryStartOffset + start + length, startTheta);
+                endPoint = ProjectAngle(visState, nextHeightOffset + S_HistoryStartOffset + start + length, endTheta);
 
                 if (S_Simplified) {
-                    start_p = ProjectOffset(visState, start_p, off);
-                    end_p = ProjectOffset(visState, end_p, off);
+                    startPoint = ProjectOffset(visState, startPoint, off);
+                    endPoint = ProjectOffset(visState, endPoint, off);
                 }
 
-                if (Camera::IsBehind(start_p) or Camera::IsBehind(end_p)) {
+                if (Camera::IsBehind(startPoint) or Camera::IsBehind(endPoint)) {
                     continue;
                 }
 
                 nvg::BeginPath();
-                nvg::MoveTo(Camera::ToScreenSpace(start_p));
-                nvg::LineTo(Camera::ToScreenSpace(end_p));
+                nvg::MoveTo(Camera::ToScreenSpace(startPoint));
+                nvg::LineTo(Camera::ToScreenSpace(endPoint));
                 nvg::StrokeColor(ApplyOpacityToColor(GetAtIdx(j).color, playerFadeOpacity * opacity));
-                nvg::StrokeWidth(stroke_width / (start_p - Camera::GetCurrentPosition()).Length() * 30.0f);
+                nvg::StrokeWidth(strokeWidth / (startPoint - Camera::GetCurrentPosition()).Length() * 30.0f);
                 nvg::LineCap(nvg::LineCapType::Round);
                 nvg::Stroke();
                 nvg::ClosePath();
 
-                opacity = next_opacity;
+                opacity = nextOpacity;
             }
         }
     }
 
     void Update(const float slip, const vec4&in color) {
         const uint64 now = Time::Now;
+
         if (int(now - lastUpdateTime) > (S_HistorySeconds / float(S_HistoryPoints)) * 1000) {
             historyTrailArr[currentIndex].Update(slip, color);
             currentIndex = CalcNext(1);
@@ -75,8 +76,8 @@ class HistoryTrail {
 }
 
 class HistoryTrailObject {
-    float slip;
     vec4  color;
+    float slip;
 
     void Update(const float slip, const vec4&in color) {
         this.slip = slip;

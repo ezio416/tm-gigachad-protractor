@@ -36,24 +36,22 @@ namespace Surface {
     void Render(
         CSceneVehicleVisState@ visState,
         const float speed,
-        const vec3&in vec_vel,
-        const float min_vel,
-        const vec2[]&in ideal_config,
-        const vec2[]&in base_config,
-        const vec2[]&in zero_config,
-        const bool show_good_ss = true
+        const vec3&in vel,
+        const float minSpeed,
+        const vec2[]&in ideal,
+        const vec2[]&in base,
+        const vec2[]&in zero,
+        const bool showGoodSD = true
     ) {
-        const float target_ss = ApproximateSideSpeed(ideal_config, speed);
-        const float outer_ss = ApproximateSideSpeed(zero_config, speed);
-        const float base_ss = ApproximateSideSpeed(base_config, speed);
-        const float good_ss = Math::Lerp(outer_ss, target_ss, S_GoodAccelThreshold);
-
-        const float slip = PreviewSlip(GetSlipSmoothed(visState.Left, vec_vel));
-        const float sideSpeed = speed * Math::Sin(PreviewSlip(Math::Angle(visState.Dir, vec_vel)));
-        const float abs_sidespeed = Math::Abs(sideSpeed);
-
+        const float targetSD = ApproximateSideSpeed(ideal, speed);
+        const float outerSD = ApproximateSideSpeed(zero, speed);
+        const float baseSD = ApproximateSideSpeed(base, speed);
+        const float goodSD = Math::Lerp(outerSD, targetSD, S_GoodAccelThreshold);
+        const float slip = PreviewSlip(GetSlipSmoothed(visState.Left, vel));
+        const float sideSpeed = speed * Math::Sin(PreviewSlip(Math::Angle(visState.Dir, vel)));
+        const float absSideSpeed = Math::Abs(sideSpeed);
         const vec2 startAndLength = GetStartAndLength();
-        const vec2[] targets = GetLinesToBeRendered(target_ss, good_ss, base_ss, outer_ss, show_good_ss);
+        const vec2[] targets = GetLinesToBeRendered(targetSD, goodSD, baseSD, outerSD, showGoodSD);
 
         RenderPlayerPointer(
             visState,
@@ -62,17 +60,20 @@ namespace Surface {
             S_Width,
             slip,
             vec3(),
-            ApplyOpacityToColor(GetPlayerPointerColor(abs_sidespeed, target_ss, good_ss, base_ss, outer_ss), 1.0f)
+            ApplyOpacityToColor(
+                GetPlayerPointerColor(absSideSpeed, targetSD, goodSD, baseSD, outerSD),
+                1.0f
+            )
         );
 
         badSlide = false;
-        int OP_RES = 0;
-        if (speed < min_vel) {
+        int opRes = 0;
+        if (speed < minSpeed) {
             if (S_ShowBadSlide and GetSlipTotal(visState) > 0.0f) {
-                OP_RES = 1;
+                opRes = 1;
                 badSlide = true;
             } else {
-                OP_RES = -1;
+                opRes = -1;
             }
 
         } else {
@@ -81,18 +82,18 @@ namespace Surface {
                 and !(Wood::Is(visState.FLGroundContactMaterial) and visState.FLIcing01 > 0.0f and visState.WetnessValue01 > 0.0f)
             ) {
                 if (S_ShowBadSlide) {
-                    OP_RES = 1;
+                    opRes = 1;
                     badSlide = true;
                 } else {
-                    OP_RES = -1;
+                    opRes = -1;
                 }
 
             } else {
-                OP_RES = abs_sidespeed > outer_ss ? -1 : 1;
+                opRes = absSideSpeed > outerSD ? -1 : 1;
             }
         }
 
-        if (OP_RES > 0) {
+        if (opRes > 0) {
             playerFadeOpacity = Math::Min(1.0f, playerFadeOpacity + S_OpacityDerivative);
         } else {
             playerFadeOpacity = Math::Max(0.0f, playerFadeOpacity - S_OpacityDerivative);
@@ -104,11 +105,12 @@ namespace Surface {
 
         float lower, upper, targetOpacity;
         const int polarity = slip < 0.0f ? -1 : 1;
+
         for (int i = -1; i <= 1; i += 2) {
             lower = 0.0f;
             for (uint j = 0; j < targets.Length; j++) {
                 upper = targets[j].x;
-                targetOpacity = Math::Max(Math::InvLerp(lower, upper, abs_sidespeed), S_BrightnessMin);
+                targetOpacity = Math::Max(Math::InvLerp(lower, upper, absSideSpeed), S_BrightnessMin);
                 lower = upper;
                 RenderAngle(
                     visState,
@@ -117,7 +119,10 @@ namespace Surface {
                     S_Width,
                     (GetSideSpeedAngle(speed, targets[j].x * i)),
                     vec3(),
-                    ApplyOpacityToColor(GetColor(int(targets[j].y)), i == polarity ? targetOpacity : S_BrightnessMin)
+                    ApplyOpacityToColor(
+                        GetColor(int(targets[j].y)),
+                        i == polarity ? targetOpacity : S_BrightnessMin
+                    )
                 );
             }
         }
@@ -178,12 +183,12 @@ namespace Surface {
             return false;
         }
 
-        void Render(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
-            Surface::Render(visState, speed, vec_vel, Other::MIN, IDEAL, BASE, ZERO);
+        void Render(CSceneVehicleVisState@ visState, const float speed, const vec3&in vel) {
+            Surface::Render(visState, speed, vel, Other::MIN, IDEAL, BASE, ZERO);
         }
 
-        void RenderBackwards(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
-            Surface::Render(visState, speed, vec_vel, Other::BW_MIN, BW_IDEAL, {}, BW_ZERO);
+        void RenderBackwards(CSceneVehicleVisState@ visState, const float speed, const vec3&in vel) {
+            Surface::Render(visState, speed, vel, Other::BW_MIN, BW_IDEAL, {}, BW_ZERO);
         }
     }
 
@@ -241,12 +246,12 @@ namespace Surface {
             return false;
         }
 
-        void Render(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
-            Surface::Render(visState, speed, vec_vel, Other::MIN, IDEAL, BASE, ZERO);
+        void Render(CSceneVehicleVisState@ visState, const float speed, const vec3&in vel) {
+            Surface::Render(visState, speed, vel, Other::MIN, IDEAL, BASE, ZERO);
         }
 
-        void RenderBackwards(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
-            Surface::Render(visState, speed, vec_vel, Other::BW_MIN, BW_IDEAL, {}, BW_ZERO);
+        void RenderBackwards(CSceneVehicleVisState@ visState, const float speed, const vec3&in vel) {
+            Surface::Render(visState, speed, vel, Other::BW_MIN, BW_IDEAL, {}, BW_ZERO);
         }
     }
 
@@ -344,6 +349,7 @@ namespace Surface {
         };
 
         int     currentIndex        = 0;
+        float   dt                  = 0.0f;
         float   expectedRpm         = 0.0f;
         float   expectedTrueRpm     = 0.0f;
         int     framesAveraged      = 100;
@@ -353,8 +359,8 @@ namespace Surface {
         float   lastColorFetchScore = 0.0f;
 
         int GetAndIncrementIdx() {
-            const int ret = currentIndex;
-            frameTimes[ret] = g_dt;
+            const int index = currentIndex;
+            frameTimes[index] = dt;
             currentIndex = (currentIndex + 1) % framesAveraged;
 
             if (currentIndex == 0) {
@@ -366,19 +372,19 @@ namespace Surface {
                 framesAveraged = int(250 / (sum / framesAveraged));
             }
 
-            return ret;
+            return index;
         }
 
-        float GetExpectedRpm(const float inSpeed, const int inGear, const float inSlip, const bool checkSlip) {
-            if (!checkSlip or !InSafeZone(inSlip, inSpeed)) {
-                return inSpeed * GetExpectedRpmBySpeedMult(inGear);
+        float GetExpectedRpm(const float speed, const int gear, const float slip, const bool checkSlip) {
+            if (!checkSlip or !InSafeZone(slip, speed)) {
+                return speed * GetExpectedRpmBySpeedMult(gear);
             }
 
             return 0.0f;
         }
 
-        float GetExpectedRpmBySpeedMult(const int inGear) {
-            switch (inGear) {
+        float GetExpectedRpmBySpeedMult(const int gear) {
+            switch (gear) {
                 case 0: return -375.0f;
                 case 1: return 425.0f;
                 case 2: return 275.0f;  // 270 is from grass - different across surfaces?
@@ -463,10 +469,10 @@ namespace Surface {
             return Math::Max(ret, S_IceBrightnessMin);
         }
 
-        void HandleUpdate(const float inSlip, const float inSpeed, const int inGear) {
+        void HandleUpdate(const float slip, const float speed, const int gear) {
             const int index = GetAndIncrementIdx();
-            expectedRpm = GetExpectedRpm(inSpeed, inGear, inSlip, true);
-            expectedTrueRpm = GetExpectedRpm(inSpeed, inGear, inSlip, false);
+            expectedRpm = GetExpectedRpm(speed, gear, slip, true);
+            expectedTrueRpm = GetExpectedRpm(speed, gear, slip, false);
             gearupScores[index] = Math::Min(expectedRpm, SCORE_MAX);
         }
 
@@ -482,22 +488,22 @@ namespace Surface {
             return false;
         }
 
-        bool InSafeZone(float inSlip, const float inSpeed) {
-            inSlip = Math::Abs(inSlip);
+        bool InSafeZone(float slip, const float speed) {
+            slip = Math::Abs(slip);
 
-            if (inSlip >= LerpToMidpoint(Surface::Ice::GEARUP_1, inSpeed)) {
+            if (slip >= LerpToMidpoint(Surface::Ice::GEARUP_1, speed)) {
                 return false;
             }
 
-            if (inSlip >= LerpToMidpoint(Surface::Ice::GEARUP_2, inSpeed)) {
+            if (slip >= LerpToMidpoint(Surface::Ice::GEARUP_2, speed)) {
                 return true;
             }
 
-            if (inSlip >= LerpToMidpoint(Surface::Ice::GEARUP_3, inSpeed)) {
+            if (slip >= LerpToMidpoint(Surface::Ice::GEARUP_3, speed)) {
                 return false;
             }
 
-            if (inSlip >= LerpToMidpoint(Surface::Ice::GEARUP_4, inSpeed)) {
+            if (slip >= LerpToMidpoint(Surface::Ice::GEARUP_4, speed)) {
                 return true;
             }
 
@@ -510,8 +516,8 @@ namespace Surface {
             return c;
         }
 
-        void Render(CSceneVehicleVisState@ visState, const float vel, const vec3&in vec_vel) {
-            const float slip = PreviewSlip(CalcAngle(vec_vel, visState.Dir));
+        void Render(CSceneVehicleVisState@ visState, const float speed, const vec3&in vel) {
+            const float slip = PreviewSlip(CalcAngle(vel, visState.Dir));
             const float absSlip = Math::Abs(slip);
 
             if (absSlip < SIXTH_PI) {
@@ -523,7 +529,7 @@ namespace Surface {
             }
 
             float theta = -slip;
-            if (Math::Angle(vec_vel, visState.Left) > HALF_PI or IsPreview()) {
+            if (Math::Angle(vel, visState.Left) > HALF_PI or IsPreview()) {
                 theta *= -1.0f;
             }
 
@@ -539,10 +545,10 @@ namespace Surface {
 
             color.w = 1.0f;
 
-            RenderGearLines(visState, vel, vec_vel, slip);
-            RenderIdealAngle(visState, vel, vec_vel, slip);
-            RenderCustomAngle1(visState, vec_vel);
-            RenderCustomAngle2(visState, vec_vel);
+            RenderGearLines(visState, speed, vel, slip);
+            RenderIdealAngle(visState, speed, vel, slip);
+            RenderCustomAngle1(visState, vel);
+            RenderCustomAngle2(visState, vel);
 
             RenderPlayerPointer(
                 visState,
@@ -567,37 +573,37 @@ namespace Surface {
             );
         }
 
-        void RenderCustomAngle(CSceneVehicleVisState@ visState, float theta, const vec3&in vec_vel, const vec4&in color) {
+        void RenderCustomAngle(CSceneVehicleVisState@ visState, float theta, const vec3&in vel, const vec4&in color) {
             theta *= -0.0174533f;
-            if (Math::Angle(vec_vel, visState.Left) > HALF_PI or IsPreview()) {
+            if (Math::Angle(vel, visState.Left) > HALF_PI or IsPreview()) {
                 theta *= -1.0f;
             }
 
             RenderAngle(visState, color, theta);
         }
 
-        void RenderCustomAngle1(CSceneVehicleVisState@ visState, const vec3&in vec_vel) {
+        void RenderCustomAngle1(CSceneVehicleVisState@ visState, const vec3&in vel) {
             if (S_IceShowCustomAngle) {
-                RenderCustomAngle(visState, S_IceCustomAngle, vec_vel, S_IceCustomAngleColor);
+                RenderCustomAngle(visState, S_IceCustomAngle, vel, S_IceCustomAngleColor);
             }
         }
 
-        void RenderCustomAngle2(CSceneVehicleVisState@ visState, const vec3&in vec_vel) {
+        void RenderCustomAngle2(CSceneVehicleVisState@ visState, const vec3&in vel) {
             if (S_IceShowCustomAngle2) {
-                RenderCustomAngle(visState, S_IceCustomAngle2, vec_vel, S_IceCustomAngle2Color);
+                RenderCustomAngle(visState, S_IceCustomAngle2, vel, S_IceCustomAngle2Color);
             }
         }
 
-        void RenderDesert(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
-            Surface::Render(visState, speed, vec_vel, MIN, DESERT_PEAK, DESERT_ZERO, DESERT_BACK_PEAK, false);
+        void RenderDesert(CSceneVehicleVisState@ visState, const float speed, const vec3&in vel) {
+            Surface::Render(visState, speed, vel, MIN, DESERT_PEAK, DESERT_ZERO, DESERT_BACK_PEAK, false);
         }
 
-        void RenderGearLines(CSceneVehicleVisState@ visState, const float v, const vec3&in vel, float slip) {
+        void RenderGearLines(CSceneVehicleVisState@ visState, const float speed, const vec3&in vel, float slip) {
             const float[] lines = {
-                LerpToMidpoint(Surface::Ice::GEARUP_1, v),
-                LerpToMidpoint(Surface::Ice::GEARUP_2, v),
-                LerpToMidpoint(Surface::Ice::GEARUP_3, v),
-                LerpToMidpoint(Surface::Ice::GEARUP_4, v)
+                LerpToMidpoint(Surface::Ice::GEARUP_1, speed),
+                LerpToMidpoint(Surface::Ice::GEARUP_2, speed),
+                LerpToMidpoint(Surface::Ice::GEARUP_3, speed),
+                LerpToMidpoint(Surface::Ice::GEARUP_4, speed)
             };
 
             if (S_IceGearLines) {
@@ -629,10 +635,13 @@ namespace Surface {
                 }
 
                 if (expectedTrueRpm < GEARDOWN_RPM_THRESH) {
-                    float[] lines1;
-                    lines1.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_1, v));
-                    lines1.InsertLast(LerpToMidpoint(Surface::Ice::GEARUP_4, v));
+                    const float[] lines1 = {
+                        LerpToMidpoint(Surface::Ice::GEARUP_1, speed),
+                        LerpToMidpoint(Surface::Ice::GEARUP_4, speed)
+                    };
+
                     color = GetGeardownColor();
+
                     for (uint i = 0; i < lines1.Length; i++) {
                         slip = Math::Angle(visState.Dir, vel);
 
@@ -709,7 +718,7 @@ namespace Surface {
                     );
 
                 } else {
-                    appliedOpacity = Math::Min(1, 0.5f - relativePos);
+                    appliedOpacity = Math::Min(1.0f, 0.5f - relativePos);
 
                     RenderRegion(
                         visState,
@@ -727,17 +736,100 @@ namespace Surface {
             }
         }
 
-        void RenderIdealAngle(CSceneVehicleVisState@ visState, const float vel, const vec3&in vec_vel, const float slip) {
-            float theta = -GetIdealAngle(vel);
-            if (Math::Angle(vec_vel, visState.Left) > HALF_PI or IsPreview()) {
+        void RenderIdealAngle(CSceneVehicleVisState@ visState, const float speed, const vec3&in vel, const float slip) {
+            float theta = -GetIdealAngle(speed);
+            if (Math::Angle(vel, visState.Left) > HALF_PI or IsPreview()) {
                 theta *= -1.0f;
             }
 
             RenderAngle(visState, Opacity(S_IceIdealAngleColor, slip, theta), theta);
         }
 
-        void RenderRally(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
-            Surface::Render(visState, speed, vec_vel, MIN, RALLY_PEAK, RALLY_ZERO, RALLY_SLIDEOUT, false);
+        void RenderRally(CSceneVehicleVisState@ visState, const float speed, const vec3&in vel) {
+            Surface::Render(visState, speed, vel, MIN, RALLY_PEAK, RALLY_ZERO, RALLY_SLIDEOUT, false);
+        }
+
+        void RenderRegion(
+            CSceneVehicleVisState@ visState,
+            const float start,
+            const float length,
+            float thetaStart,
+            float thetaEnd,
+            const vec3&in offset,
+            vec4 fillColor,
+            const float slip,
+            const bool renderWarnZone,
+            const float appliedOpacity
+        ) {
+            const float diffFactor = (thetaEnd - thetaStart > 0.0f ? 1.0f : -1.0f) * S_IceRegionWarningWidth;
+            const int flip = IsPreview() or Math::Angle(visState.WorldVel, visState.Left) > HALF_PI ? -1 : 1;
+            const float thetaStartInner = (thetaStart + diffFactor) * flip;
+            const float thetaEndInner = (thetaEnd - diffFactor) * flip;
+
+            thetaStart *= flip;
+            thetaEnd *= flip;
+
+            const vec2 radialRoot = Camera::ToScreenSpace(ProjectAngle(
+                visState,
+                (start + length) * S_IceRegionRadialInsetFraction,
+                flip * -ProcessTheta(slip)
+            ));
+
+            fillColor = ApplyOpacityToColor(fillColor, appliedOpacity);
+            const vec4 warnColor = ApplyOpacityToColor(S_IceRegionWarningColor, appliedOpacity);
+
+            if (renderWarnZone) {
+                _RenderRegion(visState, start, length, thetaStartInner, thetaEndInner, offset, fillColor, radialRoot);
+                _RenderRegion(visState, start, length, thetaStart, thetaStartInner, offset, warnColor, radialRoot);
+                _RenderRegion(visState, start, length, thetaEndInner, thetaEnd, offset, warnColor, radialRoot);
+            } else {
+                _RenderRegion(visState, start, length, thetaStart, thetaEnd, offset, fillColor, radialRoot);
+            }
+        }
+
+        void _RenderRegion(
+            CSceneVehicleVisState@ visState,
+            const float start,
+            const float length,
+            float thetaStart,
+            float thetaEnd,
+            vec3 offset,
+            vec4 fillColor,
+            const vec2&in radialRoot
+        ) {
+            const float diff = thetaEnd - thetaStart;
+            const int flip = (Math::Angle(visState.WorldVel, visState.Left) > HALF_PI or IsPreview()) ? 1 : -1;
+
+            fillColor = ApplyOpacityToColor(fillColor, playerFadeOpacity);
+
+            vec4 fillColorDark = fillColor * S_IceRadialDarkFraction;
+            fillColorDark.w *= 0.1f;
+
+            const float anglePerPoint = flip * TWO_PI / 50.0f;
+            const int points = int(diff / anglePerPoint);
+            const nvg::Paint gradient = nvg::RadialGradient(radialRoot, S_IceGradientInnerDiameter, S_IceGradientOuterDiameter, fillColor, fillColorDark);
+
+            for (int i = 0; i < points; i++) {
+                nvg::BeginPath();
+                nvg::MoveTo(Camera::ToScreenSpace(ProjectOffset(visState, ProjectAngle(visState, start, thetaStart + (i * anglePerPoint)), offset)));
+                LineTo(ProjectOffset(visState, ProjectAngle(visState, start, thetaStart + ((i + 1) * anglePerPoint)), offset));
+                LineTo(ProjectOffset(visState, ProjectAngle(visState, start + length, thetaStart + ((i + 1) * anglePerPoint)), offset));
+                LineTo(ProjectOffset(visState, ProjectAngle(visState, start + length, thetaStart + (i * anglePerPoint)), offset));
+                LineTo(ProjectOffset(visState, ProjectAngle(visState, start, thetaStart + (i * anglePerPoint)), offset));
+                nvg::FillPaint(gradient);
+                nvg::Fill();
+                nvg::ClosePath();
+            }
+
+            nvg::BeginPath();
+            nvg::MoveTo(Camera::ToScreenSpace(ProjectOffset(visState, ProjectAngle(visState, start, thetaStart + (points * anglePerPoint)), offset)));
+            LineTo(ProjectOffset(visState, ProjectAngle(visState, start, thetaEnd), offset));
+            LineTo(ProjectOffset(visState, ProjectAngle(visState, start + length, thetaEnd), offset));
+            LineTo(ProjectOffset(visState, ProjectAngle(visState, start + length, thetaStart + (points * anglePerPoint)), offset));
+            LineTo(ProjectOffset(visState, ProjectAngle(visState, start, thetaStart + (points * anglePerPoint)), offset));
+            nvg::FillPaint(gradient);
+            nvg::Fill();
+            nvg::ClosePath();
         }
     }
 
@@ -789,13 +881,13 @@ namespace Surface {
             return false;
         }
 
-        void Render(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
-            Surface::Render(visState, speed, vec_vel, Other::MIN, IDEAL, BASE, ZERO);
+        void Render(CSceneVehicleVisState@ visState, const float speed, const vec3&in vel) {
+            Surface::Render(visState, speed, vel, Other::MIN, IDEAL, BASE, ZERO);
         }
 
-        void RenderBackwards(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
+        void RenderBackwards(CSceneVehicleVisState@ visState, const float speed, const vec3&in vel) {
             // just using grass ideals for plastic BW for now
-            Surface::Grass::RenderBackwards(visState, speed, vec_vel);
+            Surface::Grass::RenderBackwards(visState, speed, vel);
         }
     }
 
@@ -859,12 +951,12 @@ namespace Surface {
             return false;
         }
 
-        void Render(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
-            Surface::Render(visState, speed, vec_vel, MIN, IDEAL, BASE, ZERO);
+        void Render(CSceneVehicleVisState@ visState, const float speed, const vec3&in vel) {
+            Surface::Render(visState, speed, vel, MIN, IDEAL, BASE, ZERO);
         }
 
-        void RenderBackwards(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
-            Surface::Render(visState, speed, vec_vel, Other::BW_MIN, BW_IDEAL, {}, BW_ZERO);
+        void RenderBackwards(CSceneVehicleVisState@ visState, const float speed, const vec3&in vel) {
+            Surface::Render(visState, speed, vel, Other::BW_MIN, BW_IDEAL, {}, BW_ZERO);
         }
     }
 
@@ -927,12 +1019,12 @@ namespace Surface {
             return false;
         }
 
-        void Render(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
-            Surface::Render(visState, speed, vec_vel, MIN, P1, VALLEY, P2);
+        void Render(CSceneVehicleVisState@ visState, const float speed, const vec3&in vel) {
+            Surface::Render(visState, speed, vel, MIN, P1, VALLEY, P2);
         }
 
-        void RenderIcy(CSceneVehicleVisState@ visState, const float speed, const vec3&in vec_vel) {
-            Surface::Render(visState, speed, vec_vel, MIN, WET_ICE_P1, WET_ICE_VALLEY, WET_ICE_P2, false);
+        void RenderIcy(CSceneVehicleVisState@ visState, const float speed, const vec3&in vel) {
+            Surface::Render(visState, speed, vel, MIN, WET_ICE_P1, WET_ICE_VALLEY, WET_ICE_P2, false);
         }
     }
 }

@@ -3,8 +3,6 @@ const string  pluginIcon  = Icons::Bars;
 Meta::Plugin@ pluginMeta  = Meta::ExecutingPlugin();
 const string  pluginTitle = pluginColor + pluginIcon + "\\$G " + pluginMeta.Name;
 
-float g_dt = 0.0f;
-
 void Render() {
     if (!S_Enabled) {
         return;
@@ -31,5 +29,5 @@ void RenderMenu() {
 }
 
 void Update(float dt) {
-    g_dt = dt;
+    Surface::Ice::dt = dt;
 }
