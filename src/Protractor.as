@@ -156,7 +156,7 @@ void RenderAngle(
         and renderMode == RenderMode::Normal
         and camera == CameraMode::External
     ) {
-        RenderSimplifiedView(visState, start, length, width, theta, offset, color);
+        RenderSimplifiedView(visState, width, theta, offset, color);
     } else {
         _RenderAngle(visState, start, length, width, theta, offset, color);
     }
@@ -417,20 +417,16 @@ void RenderRegion(
 
 void RenderSimplifiedView(
     CSceneVehicleVisState@ visState,
-    float start,
-    float length,
     const float width,
     const float theta,
     const vec3&in offset,
     const vec4&in color
 ) {
     vec3 o = offset;
-    start = S_SimplifiedStart;
-    length = S_SimplifiedLength;
     o.x += S_SimplifiedOffsetX;
     for (int i = -1; i <= 1; i += 2) {
         o.z = offset.z - (i * S_SimplifiedOffsetZ);
-        _RenderAngle(visState, start, length, width, theta, o, color);
+        _RenderAngle(visState, S_SimplifiedStart, S_SimplifiedLength, width, theta, o, color);
     }
 }
 
