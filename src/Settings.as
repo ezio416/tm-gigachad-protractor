@@ -1,90 +1,111 @@
-[Setting category="General" name="Enable utility"]
+[Setting category="General" name="Enabled"]
 bool S_Enabled = true;
 
 [Setting category="General" name="Player index" min=0 max=10]
 int S_PlayerIndex = 0;
 
-[Setting category="General" name="Min line brightness" min=0.0f max=1.0f]
-float S_BrightnessMin = 0.1f;
-
-[Setting category="General" name="Slip smoothing" min=1 max=100]
-int S_SlipSmoothing = 1;
-
-[Setting category="General" name="Show warning line on early slide/noslide"]
+[Setting category="General" name="Show warning line on early slide/noslide"]  // TODO
 bool S_ShowBadSlide = false;
 
-[Setting category="General" name="Overslide fade location" min=1.0f max=3.0f]
-float S_OverslideFadeMult = 1.5f;
 
-[Setting category="General" name="SD start offset" min=0.0f max=16.0f]
-float S_SDPointerStart = 3.8f;
+[Setting category="SD Pointer" name="Minimum brightness" min=0.0f max=1.0f]
+float S_BrightnessMin = 0.1f;
 
-[Setting category="General" name="SD pointer length" min=0.0f max=16.0f]
-float S_SDPointerLength = 8.0f;
+[Setting category="SD Pointer" name="Opacity derivative" min=0.001f max=0.01f]
+float S_OpacityDerivative = 0.003f;
 
-[Setting category="General" name="Display on back of car"]
-bool S_FlipDisplay = false;
+[Setting category="SD Pointer" name="Start" min=0.0f max=16.0f]
+float S_Start = 3.8f;
 
-[Setting category="General" name="Reset pointer for front"]
-bool S_ResetFront = false;
+[Setting category="SD Pointer" name="Start (cam 3)" min=0.1f max=10.0f]
+float S_Cam3InternalStart = 5.629f;
 
-[Setting category="General" name="Reset pointer for back"]
-bool S_ResetBack = false;
+[Setting category="SD Pointer" name="Start (alt cam 3)" min=0.1f max=10.0f]
+float S_Cam3ExternalStart = 2.792f;
 
-[Setting category="General" name="Draw good acceleration line"]
+[Setting category="SD Pointer" name="Length" min=0.0f max=16.0f]
+float S_Length = 8.0f;
+
+[Setting category="SD Pointer" name="Length (cam 3)" min=0.1f max=100.0f]
+float S_Cam3InternalLength = 50.0f;
+
+[Setting category="SD Pointer" name="Length (alt cam 3)" min=0.1f max=100]
+float S_Cam3ExternalLength = 5.0f;
+
+[Setting category="SD Pointer" name="Assist line length fraction" min=1.0f max=10.0f]
+float S_AssistLength = 4.0f;
+
+[Setting category="SD Pointer" name="Width" min=1.0f max=10.0f]
+float S_Width = 4.7f;
+
+[Setting category="SD Pointer" name="Spacing (road)" min=1.0f max=16.0f]
+float S_ThetaMultRoad = 4.0f;
+
+[Setting category="SD Pointer" name="Spacing (dirt)" min=1.0f max=16.0f]
+float S_ThetaMultDirt = 4.0f;
+
+[Setting category="SD Pointer" name="Spacing (grass)" min=1.0f max=16.0f]
+float S_ThetaMultGrass = 4.0f;
+
+[Setting category="SD Pointer" name="Spacing (plastic)" min=1.0f max=16.0f]
+float S_ThetaMultPlastic = 4.0f;
+
+[Setting category="SD Pointer" name="Spacing (wood)" min=0.1f max=2.0f]  // TODO
+float S_ThetaMultWood = 1.0f;
+
+[Setting category="SD Pointer" name="Spacing (backwards)" min=0.1f max=4.0f]
+float S_ThetaMultBW = 1.0f;
+
+[Setting category="SD Pointer" name="Spacing (derivative)" min=0.1f max=0.5f]  // TODO
+float S_ThetaMultDerivative = 0.35f;
+
+[Setting category="SD Pointer" name="Optimal acceleration assist lines"]  // TODO
+bool S_OptimalAccel = true;
+
+[Setting category="SD Pointer" name="Optimal acceleration color" color if="S_OptimalAccel"]
+vec4 S_OptimalAccelColor(0.0f, 1.0f, 0.0f, 1.0f);
+
+[Setting category="SD Pointer" name="Good acceleration assist lines"]
 bool S_GoodAccel = true;
 
-[Setting category="General" name="'Good' speedslide threshold" min=0.1f max=0.995f]
-float S_GoodSDThreshold = 0.9f;
+[Setting category="SD Pointer" name="Good acceleration color" color if="S_GoodAccel"]
+vec4 S_GoodAccelColor(0.0f, 0.0f, 1.0f, 1.0f);
 
-[Setting category="General" name="Draw base acceleration line"]
+[Setting category="SD Pointer" name="Good acceleration threshold" min=0.1f max=0.995f if="S_GoodAccel"]
+float S_GoodAccelThreshold = 0.9f;
+
+[Setting category="SD Pointer" name="Base acceleration assist lines"]
 bool S_BaseAccel = true;
 
-[Setting category="General" name="Draw zero-acceleration line"]
+[Setting category="SD Pointer" name="Base acceleration color" color if="S_BaseAccel"]
+vec4 S_BaseAccelColor(1.0f, 0.0f, 0.0f, 1.0f);
+
+[Setting category="SD Pointer" name="Zero acceleration assist lines"]
 bool S_ZeroAccel = true;
 
-[Setting category="General" name="Show gears in pointer line"]
-bool S_PointerGears = false;
+[Setting category="SD Pointer" name="Zero acceleration color" color if="S_ZeroAccel"]
+vec4 S_ZeroAccelColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-[Setting category="General" name="Hide gears when in gear 5"]
+[Setting category="SD Pointer" name="Show gears"]
+bool S_Gears = false;
+
+[Setting category="SD Pointer" name="Gears offset" min=0.0f max=1.0f if="S_Gears"]
+float S_GearPointerOffset = 0.2f;
+
+[Setting category="SD Pointer" name="Normal gearup color" color if="S_Gears"]
+vec4 S_UpshiftNormalColor(1.0f);
+
+[Setting category="SD Pointer" name="Danger gearup color" color if="S_Gears"]
+vec4 S_UpshiftDangerColor(1.0f, 0.0f, 0.0f, 1.0f);
+
+[Setting category="SD Pointer" name="Hide gears when in gear 5" if="S_Gears"]
 bool S_HideGear5 = true;
 
-[Setting category="General" name="Show gear view on both sides"]
+[Setting category="SD Pointer" name="Show gears on both sides" if="S_Gears"]
 bool S_GearBothSides = true;
 
-[Setting category="General" name="Show full gear lines on ice"]
+[Setting category="SD Pointer" name="Show full gear lines on ice" if="S_Gears"]  // TODO
 bool S_VerboseIceGears = false;
-
-
-[Setting category="Display" name="Normal gearup color indicator" color]
-vec4 S_ColorUpshiftNormal(1.0f);
-
-[Setting category="Display" name="Danger gearup color indicator" color]
-vec4 S_ColorUpshiftDanger(1.0f, 0.0f, 0.0f, 1.0f);
-
-[Setting category="Display" name="Assist line length fraction" min=1.0f max=10.0f]
-float S_PlayerFraction = 4.0f;
-
-[Setting category="Display" name="Player pointer line width" min=1.0f max=10.0f]
-float S_FullspeedPlayerPointerWidth = 4.7f;
-
-[Setting category="Display" name="Number of layers" min=1 max=10]
-int S_LayerCount = 1;
-
-[Setting category="Display" name="Layer height" min=0.1f max=1.0f]
-float S_LayerHeight = 0.1f;
-
-[Setting category="Display" name="Line background color" color]
-vec4 S_ColorLineBackground = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-
-[Setting category="Display" name="Show line background"]
-bool S_LineBackground = true;
-
-[Setting category="Display" name="Line background width" min=1.05f max=2.0f]
-float S_LineBackgroundWidth = 1.1f;
-
-[Setting category="Display" name="Line background color fraction (lower = darker)" min=0.0f max=1.0f]
-float S_LineBackgroundColorFraction = 0.1f;
 
 
 [Setting category="Ice" name="Ice Player pointer start" min=0.0f max=16.0f]
@@ -187,126 +208,78 @@ vec4 S_IceDangerWedgeColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 bool S_HistoryHideIce = true;
 
 
-[Setting category="Colors" name="Optimal color" color]
-vec4 S_ColorOptimal(0.0f, 1.0f, 0.0f, 1.0f);
-
-[Setting category="Colors" name="90% color" color]
-vec4 S_Color90(0.0f, 0.0f, 1.0f, 1.0f);
-
-[Setting category="Colors" name="50% color" color]
-vec4 S_Color50(1.0f, 0.0f, 0.0f, 1.0f);
-
-[Setting category="Colors" name="No accel color" color]
-vec4 S_Color0(0.0f, 0.0f, 0.0f, 1.0f);
-
-
-[Setting category="Theta mults" name="Road" min=1.0f max=16.0f]
-float S_ThetaMultRoad = 4.0f;
-
-[Setting category="Theta mults" name="Dirt" min=1.0f max=16.0f]
-float S_ThetaMultDirt = 4.0f;
-
-[Setting category="Theta mults" name="Grass" min=1.0f max=16.0f]
-float S_ThetaMultGrass = 4.0f;
-
-[Setting category="Theta mults" name="Plastic" min=1.0f max=16.0f]
-float S_ThetaMultPlastic = 4.0f;
-
-[Setting category="Theta mults" name="Backwards" min=0.1f max=2.0f]
-float S_ThetaMultBW = 1.0f;
-
-[Setting category="Theta mults" name="Wood" min=0.1f max=2.0f]
-float S_ThetaMultWood = 1.0f;
-
-[Setting category="Theta mults" name="Derivative" min=0.1f max=0.5f]
-float S_ThetaMultDerivative = 0.35f;
-
-
-[Setting category="Cam3" name="Internal cam3 start" min=0.1f max=10.0f]
-float S_Cam3InternalStart = 5.629f;
-
-[Setting category="Cam3" name="Internal cam3 length" min=0.1f max=100.0f]
-float S_Cam3InternalLength = 100.0f;
-
-[Setting category="Cam3" name="External cam3 start" min=0.1f max=10.0f]
-float S_Cam3ExternalStart = 2.792f;
-
-[Setting category="Cam3" name="External cam3 length" min=0.1f max=100]
-float S_Cam3ExternalLength = 100.0f;
-
-
 [Setting category="Simplified view" name="Simplified view"]
 bool S_Simplified = false;
 
-[Setting category="Simplified view" name="Simplified view X offset" min=-2.0f max=2.0f]
+[Setting category="Simplified view" name="X offset" min=-2.0f max=2.0f]
 float S_SimplifiedOffsetX = -1.5f;
 
-[Setting category="Simplified view" name="Simplified view Z offset" min=0.1f max=2.0f]
+[Setting category="Simplified view" name="Z offset" min=0.1f max=2.0f]
 float S_SimplifiedOffsetZ = 0.867f;
 
-[Setting category="Simplified view" name="Simplified view pointer start" min=0.1f max=1.0f]
+[Setting category="Simplified view" name="Pointer start" min=0.1f max=1.0f]
 float S_SimplifiedStart = 0.1f;
 
-[Setting category="Simplified view" name="Simplified view pointer length" min=0.5f max=2.0f]
+[Setting category="Simplified view" name="Pointer length" min=0.5f max=2.0f]
 float S_SimplifiedLength = 1.5f;
 
-[Setting category="Simplified view" name="Simplified opacity override" min=0.0f max=1.0f]
+[Setting category="Simplified view" name="Opacity override" min=0.0f max=1.0f]
 float S_SimplifiedOpacity = 0.117f;
 
-[Setting category="Simplified view" name="Simplified view line thickness" min=1.0f max=20.0f]
+[Setting category="Simplified view" name="Line thickness" min=1.0f max=20.0f]
 float S_SimplifiedLineThickness = 10.0f;
 
-[Setting category="Simplified view" name="Draw Cam 3 lines in simplified view"]
+[Setting category="Simplified view" name="Draw Cam 3 lines"]
 bool S_SimplifiedCam3 = false;
 
 
-[Setting category="Preview" name="Preview road"]
+[Setting category="Preview" name="Road"]
 bool S_PreviewRoad = false;
 
-[Setting category="Preview" name="Preview grass"]
+[Setting category="Preview" name="Grass"]
 bool S_PreviewGrass = false;
 
-[Setting category="Preview" name="Preview dirt"]
+[Setting category="Preview" name="Dirt"]
 bool S_PreviewDirt = false;
 
-[Setting category="Preview" name="Preview plastic"]
+[Setting category="Preview" name="Plastic"]
 bool S_PreviewPlastic = false;
 
-[Setting category="Preview" name="Preview ice"]
+[Setting category="Preview" name="Ice"]
 bool S_PreviewIce = false;
 
-[Setting category="Preview" name="Preview wood"]
+[Setting category="Preview" name="Wood"]
 bool S_PreviewWood = false;
 
-[Setting category="Preview" name="Preview speed" min=0.0f max=1000.0f]
-float S_PreviewSpeed = 500.0f;
-
-[Setting category="Preview" name="Preview slip" min=-3.14f max=3.14f]
-float S_PreviewSlip = 0.1f;
-
-[Setting category="Preview" name="Preview gear" min=1 max=5]
-int S_PreviewGear = 5;
-
-[Setting category="Preview" name="Wet Preview"]
+[Setting category="Preview" name="Wet"]
 bool S_PreviewWet = false;
 
-[Setting category="Preview" name="Icy Preview"]
+[Setting category="Preview" name="Icy"]
 bool S_PreviewIcy = false;
 
+[Setting category="Preview" name="Speed" min=0.0f max=1000.0f]
+float S_PreviewSpeed = 500.0f;
 
-[Setting category="History" name="Enable run history view"]
+[Setting category="Preview" name="Slip" min=-3.14f max=3.14f]
+float S_PreviewSlip = 0.1f;
+
+[Setting category="Preview" name="Gear" min=1 max=5]
+int S_PreviewGear = 5;
+
+
+[Setting category="History" name="Enabled"]
 bool S_History = true;
 
-[Setting category="History" name="Number of run history points to draw" min=1 max=100]
+[Setting category="History" name="Number of points to draw" min=1 max=100]
 int S_HistoryPoints = 60;
 
-[Setting category="History" name="Amount of time to show in history (in seconds)" min=0.5 max=5.0f]
+[Setting category="History" name="Amount of time to show" min=0.5 max=5.0f description="in seconds"]
 float S_HistorySeconds = 1.0f;
 
-[Setting category="History" name="History min width" min=1.0f max=4.0f]
+[Setting category="History" name="Minimum width" min=1.0f max=4.0f]
 float S_HistoryWidthMin = 1.32f;
 
-[Setting category="History" name="History max width" min=4.0f max=16.0f]
+[Setting category="History" name="Maximum width" min=4.0f max=16.0f]
 float S_HistoryWidthMax = 12.13f;
 
 [Setting category="History" name="Start opacity" min=0.05f max=1.0f]
@@ -324,27 +297,11 @@ float S_HistoryStartHeight = 5.599f;
 [Setting category="History" name="End offset" min=0.0f max=3.0f]
 float S_HistoryEndHeight = 0.289f;
 
-[Setting category="History" name="History distance factor" min=0.5f max=5.0f]
+[Setting category="History" name="Distance factor" min=0.5f max=5.0f]
 float S_HistoryDistanceFactor = 1.0f;
 
 
-[Setting category="Advanced" name="Player Pointer Opacity Derivative" min=0.001f max=0.01f]
-float S_PlayerOpacityDerivative = 0.003f;
-
-[Setting category="Advanced" name="Gear pointer offset" min=0.0f max=1.0f]
-float S_GearPointerOffset = 0.2f;
-
-[Setting category="Advanced" name="Gear theta flip threshold (in rads)"]
-float S_ThetaFlipThreshold = 0.1f;
-
-[Setting category="Advanced" name="Perspective constant" min=1.0f max=20.0f]
-float S_PerspectiveConstant = 7.0f;
-
-[Setting category="Advanced" name="History Perspective constant" min=0.5f max=40.0f]
-float S_HistoryPerspectiveConstant = 30.0f;
-
-
-[Setting category="Overrides" name="Is Rally Car"]
+[Setting category="Overrides" name="Rally Car"]
 bool S_RallyOverride = false;
 
 

@@ -48,12 +48,11 @@ CameraMode GetCameraMode(CSceneVehicleVisState@ visState) {
 
 vec4 GetColor(const int index) {
     switch (index) {
-        case 0: return S_ColorOptimal;
-        case 1: return S_Color90;
-        case 2: return S_Color50;
-        case 3: return S_Color0;
+        case 0:  return S_OptimalAccelColor;
+        case 1:  return S_GoodAccelColor;
+        case 2:  return S_BaseAccelColor;
+        default: return S_ZeroAccelColor;
     }
-    return S_Color0;
 }
 
 CSmPlayer@ GetPlayer() {
@@ -85,7 +84,7 @@ vec2 GetStartAndLength() {
     switch (camera) {
         case CameraMode::Cam3:    return vec2(S_Cam3InternalStart, S_Cam3InternalLength);
         case CameraMode::AltCam3: return vec2(S_Cam3ExternalStart, S_Cam3ExternalLength);
-        default:                  return vec2(S_SDPointerStart,    S_SDPointerLength);
+        default:                  return vec2(S_Start,             S_Length);
     }
 }
 

@@ -6,18 +6,6 @@ const string  pluginTitle = pluginColor + pluginIcon + "\\$G " + pluginMeta.Name
 float g_dt = 0.0f;
 
 void OnSettingsChanged() {
-    if (S_ResetFront) {
-        S_SDPointerStart = 3.8f;
-        S_SDPointerLength = 8.0f;
-        S_ResetFront = false;
-    }
-
-    if (S_ResetBack) {
-        S_SDPointerStart = 1.731f;
-        S_SDPointerLength = 2.69f;
-        S_ResetBack = false;
-    }
-
     if (S_IcePointerFrontCorner) {
         S_IcePointerOffsetX = 1.7f;
         S_IcePointerOffsetZ = -0.7f;

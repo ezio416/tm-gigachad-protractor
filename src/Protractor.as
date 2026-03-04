@@ -6,8 +6,6 @@ GearStateManager       gearStateManager;
 HistoryTrail           historyTrail;
 float                  playerFadeOpacity;
 RenderMode             renderMode          = RenderMode::Normal;
-float[]                slipArr(100);
-int                    slipPos             = 0;
 float                  slipAngle           = 0.0f;
 EPlugSurfaceMaterialId surfaceNormalized;
 float                  thetaMult;
@@ -55,13 +53,13 @@ vec4 GetPlayerPointerColor(const float sideSpeed, const float target, const floa
         lcol = 2;
         ucol = 3;
     } else {
-        pos = Math::InvLerp(outer, outer * S_OverslideFadeMult, sideSpeed);
+        pos = Math::InvLerp(outer, outer, sideSpeed);
         lcol = 3;
         ucol = 3;
     }
 
     if (lcol == ucol) {
-        return S_Color0;
+        return S_ZeroAccelColor;
     }
 
     return GetColor(lcol) * (1.0f - pos) + GetColor(ucol) * pos;
@@ -72,15 +70,7 @@ float GetSlipSmoothed(const vec3&in left, const vec3&in vel) {
         return S_PreviewSlip;
     }
 
-    slipArr[slipPos % S_SlipSmoothing] = CalcVecAngle(left, vel);
-    slipPos += 1;
-
-    float ret = 0.0f;
-    for (int i = 0; i < S_SlipSmoothing; i++) {
-        ret += slipArr[i];
-    }
-
-    return ret / S_SlipSmoothing;
+    return CalcVecAngle(left, vel);
 }
 
 void HandleGearPointerFlip(const float theta) {
@@ -89,7 +79,7 @@ void HandleGearPointerFlip(const float theta) {
         return;
     }
 
-    if (Math::Abs(theta) > S_ThetaFlipThreshold) {
+    if (Math::Abs(theta) > 0.0f) {
         gearPointerFlip = (theta < 0.0f ? -1.0f : 1.0f);
     }
 }
@@ -143,7 +133,7 @@ float ProcessTheta(float theta) {
     }
 
     theta *= thetaMult;
-    if (S_FlipDisplay xor (renderMode == RenderMode::Backwards)) {
+    if (renderMode == RenderMode::Backwards) {
         theta = Math::PI + theta;
     }
 
@@ -187,7 +177,7 @@ void RenderPlayerPointer(
     HandleGearPointerFlip(theta);
 
     if (badSlide and S_ShowBadSlide and !IsPreview()) {
-        color = S_Color50;
+        color = S_BaseAccelColor;
     }
 
     RenderAngle(
@@ -201,7 +191,7 @@ void RenderPlayerPointer(
     );
 
     if (false
-        or !S_PointerGears
+        or !S_Gears
         or (S_HideGear5 and visState.CurGear == 5)
         or (IsPreview() and S_PreviewGear == 5)
         or (renderMode == RenderMode::Ice and !S_VerboseIceGears)
@@ -225,7 +215,7 @@ void RenderPlayerPointer(
 
         if (rpm < GEARDOWN_RPM_THRESH) {
             const float color_pos = Math::InvLerp(abs_min, GEARDOWN_RPM_THRESH, rpm);
-            const vec4 color1 = S_ColorUpshiftDanger * (1.0f - color_pos) + S_ColorUpshiftNormal * color_pos;
+            const vec4 color1 = S_UpshiftDangerColor * (1.0f - color_pos) + S_UpshiftNormalColor * color_pos;
 
             RenderAngle(
                 visState,
@@ -245,12 +235,12 @@ void RenderPlayerPointer(
                 pointer_width,
                 theta,
                 i * offset_apply,
-                ApplyOpacityToColor(S_ColorUpshiftNormal, playerFadeOpacity)
+                ApplyOpacityToColor(S_UpshiftNormalColor, playerFadeOpacity)
             );
 
         } else {
             const float color_pos = Math::InvLerp(GEARUP_RPM_THRESH, abs_max, rpm);
-            const vec4 color1 = S_ColorUpshiftDanger * color_pos + S_ColorUpshiftNormal * (1 - color_pos);
+            const vec4 color1 = S_UpshiftDangerColor * color_pos + S_UpshiftNormalColor * (1 - color_pos);
 
             RenderAngle(
                 visState,
@@ -478,11 +468,6 @@ void _RenderAngle(
         theta += (theta < 0.0f ? -1.0f : 1.0f) * S_IcePointerOffsetAngle;
     }
 
-    if (S_LineBackground) {
-        vec4 c = color * S_LineBackgroundColorFraction + (1.0f - S_LineBackgroundColorFraction) * S_ColorLineBackground;
-        c.w = color.w;
-        __RenderAngle(visState, start, length, width * S_LineBackgroundWidth, theta, offset, c);
-    }
     __RenderAngle(visState, start, length, width, theta, offset, color);
 }
 
@@ -581,26 +566,19 @@ void __RenderAngle(
         width = S_SimplifiedLineThickness;
     }
 
-    vec3 o, v_start, v_end;
+    const vec3 v_start = ProjectOffset(visState, ProjectAngle(visState, start, theta), offset);
+    const vec3 v_end = ProjectOffset(visState, ProjectAngle(visState, start + length, theta), offset);
 
-    for (int i = 0; i < (camera != CameraMode::External ? 1 : S_LayerCount); i++) {
-        o = offset;
-        o.y += S_LayerHeight * i;
-
-        v_start = ProjectOffset(visState, ProjectAngle(visState, start, theta), o);
-        v_end = ProjectOffset(visState, ProjectAngle(visState, start + length, theta), o);
-
-        if (Camera::IsBehind(v_start) or Camera::IsBehind(v_end)) {
-            return;
-        }
-
-        nvg::BeginPath();
-        nvg::MoveTo(Camera::ToScreenSpace(v_start));
-        nvg::LineTo(Camera::ToScreenSpace(v_end));
-        nvg::StrokeColor(ApplyOpacityToColor(color, playerFadeOpacity));
-        nvg::StrokeWidth(width / (v_start - Camera::GetCurrentPosition()).Length() * S_PerspectiveConstant);
-        nvg::LineCap(nvg::LineCapType::Round);
-        nvg::Stroke();
-        nvg::ClosePath();
+    if (Camera::IsBehind(v_start) or Camera::IsBehind(v_end)) {
+        return;
     }
+
+    nvg::BeginPath();
+    nvg::MoveTo(Camera::ToScreenSpace(v_start));
+    nvg::LineTo(Camera::ToScreenSpace(v_end));
+    nvg::StrokeColor(ApplyOpacityToColor(color, playerFadeOpacity));
+    nvg::StrokeWidth(width / (v_start - Camera::GetCurrentPosition()).Length() * 7.0f);
+    nvg::LineCap(nvg::LineCapType::Round);
+    nvg::Stroke();
+    nvg::ClosePath();
 }

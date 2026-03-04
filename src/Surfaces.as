@@ -46,7 +46,7 @@ namespace Surface {
         const float target_ss = ApproximateSideSpeed(ideal_config, speed);
         const float outer_ss = ApproximateSideSpeed(zero_config, speed);
         const float base_ss = ApproximateSideSpeed(base_config, speed);
-        const float good_ss = Math::Lerp(outer_ss, target_ss, S_GoodSDThreshold);
+        const float good_ss = Math::Lerp(outer_ss, target_ss, S_GoodAccelThreshold);
 
         const float slip = PreviewSlip(GetSlipSmoothed(visState.Left, vec_vel));
         const float sideSpeed = speed * Math::Sin(PreviewSlip(Math::Angle(visState.Dir, vec_vel)));
@@ -59,7 +59,7 @@ namespace Surface {
             visState,
             startAndLength.x,
             startAndLength.y,
-            S_FullspeedPlayerPointerWidth,
+            S_Width,
             slip,
             vec3(),
             ApplyOpacityToColor(GetPlayerPointerColor(abs_sidespeed, target_ss, good_ss, base_ss, outer_ss), 1.0f)
@@ -88,14 +88,14 @@ namespace Surface {
                 }
 
             } else {
-                OP_RES = abs_sidespeed > outer_ss * S_OverslideFadeMult ? -1 : 1;
+                OP_RES = abs_sidespeed > outer_ss ? -1 : 1;
             }
         }
 
         if (OP_RES > 0) {
-            playerFadeOpacity = Math::Min(1.0f, playerFadeOpacity + S_PlayerOpacityDerivative);
+            playerFadeOpacity = Math::Min(1.0f, playerFadeOpacity + S_OpacityDerivative);
         } else {
-            playerFadeOpacity = Math::Max(0.0f, playerFadeOpacity - S_PlayerOpacityDerivative);
+            playerFadeOpacity = Math::Max(0.0f, playerFadeOpacity - S_OpacityDerivative);
         }
 
         if (playerFadeOpacity == 0.0f) {
@@ -113,8 +113,8 @@ namespace Surface {
                 RenderAngle(
                     visState,
                     startAndLength.x,
-                    startAndLength.y / S_PlayerFraction,
-                    S_FullspeedPlayerPointerWidth,
+                    startAndLength.y / S_AssistLength,
+                    S_Width,
                     (GetSideSpeedAngle(speed, targets[j].x * i)),
                     vec3(),
                     ApplyOpacityToColor(GetColor(int(targets[j].y)), i == polarity ? targetOpacity : S_BrightnessMin)
@@ -342,7 +342,7 @@ namespace Surface {
 
         vec4 GetGeardownColor() {
             if (gearStateManager.expectedTrueRpm < GEARDOWN_RPM_THRESH) {
-                vec4 c = S_ColorUpshiftNormal;
+                vec4 c = S_UpshiftNormalColor;
                 c.w *= GetGeardownMult();
                 return c;
             }
@@ -364,7 +364,7 @@ namespace Surface {
         vec4 GetGearupColor() {
             if (gearStateManager.expectedTrueRpm > GEARUP_RPM_THRESH) {
                 const float pos = gearStateManager.GetGearupScore() / gearStateManager.GetScoreMax();
-                vec4 c = S_ColorUpshiftDanger * pos + S_ColorUpshiftNormal * (1.0f - pos);
+                vec4 c = S_UpshiftDangerColor * pos + S_UpshiftNormalColor * (1.0f - pos);
                 c.w *= GetGearupMult();
                 return c;
             }
@@ -477,7 +477,7 @@ namespace Surface {
                 visState,
                 S_IcePlayerPointerStart,
                 S_IcePlayerPointerLength,
-                S_FullspeedPlayerPointerWidth,
+                S_Width,
                 t,
                 vec3(),
                 color
@@ -489,7 +489,7 @@ namespace Surface {
                 visState,
                 S_IcePlayerPointerStart,
                 S_IcePlayerPointerLength / S_IcePlayerFraction,
-                S_FullspeedPlayerPointerWidth,
+                S_Width,
                 t,
                 vec3(),
                 color
@@ -576,7 +576,7 @@ namespace Surface {
                             visState,
                             S_IcePlayerPointerStart,
                             S_IcePlayerPointerLength / S_IcePlayerFraction,
-                            S_FullspeedPlayerPointerWidth,
+                            S_Width,
                             t,
                             vec3(),
                             Opacity(color, slip, t)
@@ -606,7 +606,7 @@ namespace Surface {
                             visState,
                             S_IcePlayerPointerStart,
                             S_IcePlayerPointerLength / S_IcePlayerFraction,
-                            S_FullspeedPlayerPointerWidth,
+                            S_Width,
                             t,
                             vec3(),
                             color

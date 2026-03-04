@@ -54,7 +54,7 @@ class HistoryTrail {
                 nvg::MoveTo(Camera::ToScreenSpace(start_p));
                 nvg::LineTo(Camera::ToScreenSpace(end_p));
                 nvg::StrokeColor(ApplyOpacityToColor(GetAtIdx(j).color, playerFadeOpacity * opacity));
-                nvg::StrokeWidth(stroke_width / (start_p - Camera::GetCurrentPosition()).Length() * S_HistoryPerspectiveConstant);
+                nvg::StrokeWidth(stroke_width / (start_p - Camera::GetCurrentPosition()).Length() * 30.0f);
                 nvg::LineCap(nvg::LineCapType::Round);
                 nvg::Stroke();
                 nvg::ClosePath();
