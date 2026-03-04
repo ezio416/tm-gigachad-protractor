@@ -174,6 +174,7 @@ namespace Surface {
                 case EPlugSurfaceMaterialId::DirtRoad:
                     return true;
             }
+
             return false;
         }
 
@@ -236,6 +237,7 @@ namespace Surface {
                 case EPlugSurfaceMaterialId::Grass:
                     return true;
             }
+
             return false;
         }
 
@@ -476,6 +478,7 @@ namespace Surface {
                 case EPlugSurfaceMaterialId::Snow:
                     return true;
             }
+
             return false;
         }
 
@@ -673,8 +676,10 @@ namespace Surface {
 
             if (S_IceRegions) {
                 float appliedOpacity;
+
                 if (relativePos >= 0.5f) {
                     appliedOpacity = GetGearupMult();
+
                     RenderRegion(
                         visState,
                         (S_IceStart + S_IceLength) * S_IceRegionStart,
@@ -687,6 +692,7 @@ namespace Surface {
                         true,
                         appliedOpacity
                     );
+
                     RenderRegion(
                         visState,
                         (S_IceStart + S_IceLength) * S_IceRegionStart,
@@ -699,6 +705,7 @@ namespace Surface {
                         true,
                         appliedOpacity
                     );
+
                     RenderRegion(
                         visState,
                         (S_IceStart + S_IceLength) * S_IceRegionStart,
@@ -714,6 +721,7 @@ namespace Surface {
 
                 } else {
                     appliedOpacity = Math::Min((0.5f - relativePos), 1);
+
                     RenderRegion(
                         visState,
                         (S_IceStart + S_IceLength) * S_IceRegionStart,
@@ -790,6 +798,7 @@ namespace Surface {
                 case EPlugSurfaceMaterialId::Water:  // ??? is this a good fit?
                     return true;
             }
+
             return false;
         }
 
@@ -859,6 +868,7 @@ namespace Surface {
                 case EPlugSurfaceMaterialId::ResonantMetal:
                     return true;
             }
+
             return false;
         }
 
@@ -926,6 +936,7 @@ namespace Surface {
                 case EPlugSurfaceMaterialId::Wood:
                     return true;
             }
+
             return false;
         }
 
