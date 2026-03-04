@@ -208,6 +208,40 @@ vec4 S_IceDangerWedgeColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 bool S_HistoryHideIce = true;
 
 
+[Setting category="History Trail" name="Enabled"]
+bool S_History = true;
+
+[Setting category="History Trail" name="Number of points to draw" min=1 max=100]
+int S_HistoryPoints = 60;
+
+[Setting category="History Trail" name="Amount of time to show" min=0.5 max=5.0f description="in seconds"]
+float S_HistorySeconds = 1.0f;
+
+[Setting category="History Trail" name="Minimum width" min=1.0f max=4.0f]
+float S_HistoryWidthMin = 1.32f;
+
+[Setting category="History Trail" name="Maximum width" min=4.0f max=16.0f]
+float S_HistoryWidthMax = 12.13f;
+
+[Setting category="History Trail" name="Start opacity" min=0.05f max=1.0f]
+float S_HistoryStartOpacity = 0.115f;
+
+[Setting category="History Trail" name="Decay factor" min=1.01f max=10.0f]
+float S_HistoryDecayFactor = 7.583f;
+
+[Setting category="History Trail" name="Start base offset" min=-3.0f max=3.0f]
+float S_HistoryStartOffset = 1.09f;
+
+[Setting category="History Trail" name="Start offset" min=-3.0f max=10.0f]
+float S_HistoryStartHeight = 5.599f;
+
+[Setting category="History Trail" name="End offset" min=0.0f max=3.0f]
+float S_HistoryEndHeight = 0.289f;
+
+[Setting category="History Trail" name="Distance factor" min=0.5f max=5.0f]
+float S_HistoryDistanceFactor = 1.0f;
+
+
 [Setting category="Simplified View" name="Enabled"]
 bool S_Simplified = false;
 
@@ -265,40 +299,6 @@ float S_PreviewSlip = 0.1f;
 
 [Setting category="Preview" name="Gear" min=1 max=5]
 int S_PreviewGear = 5;
-
-
-[Setting category="History" name="Enabled"]
-bool S_History = true;
-
-[Setting category="History" name="Number of points to draw" min=1 max=100]
-int S_HistoryPoints = 60;
-
-[Setting category="History" name="Amount of time to show" min=0.5 max=5.0f description="in seconds"]
-float S_HistorySeconds = 1.0f;
-
-[Setting category="History" name="Minimum width" min=1.0f max=4.0f]
-float S_HistoryWidthMin = 1.32f;
-
-[Setting category="History" name="Maximum width" min=4.0f max=16.0f]
-float S_HistoryWidthMax = 12.13f;
-
-[Setting category="History" name="Start opacity" min=0.05f max=1.0f]
-float S_HistoryStartOpacity = 0.115f;
-
-[Setting category="History" name="Decay factor" min=1.01f max=10.0f]
-float S_HistoryDecayFactor = 7.583f;
-
-[Setting category="History" name="Start base offset" min=-3.0f max=3.0f]
-float S_HistoryStartOffset = 1.09f;
-
-[Setting category="History" name="Start offset" min=-3.0f max=10.0f]
-float S_HistoryStartHeight = 5.599f;
-
-[Setting category="History" name="End offset" min=0.0f max=3.0f]
-float S_HistoryEndHeight = 0.289f;
-
-[Setting category="History" name="Distance factor" min=0.5f max=5.0f]
-float S_HistoryDistanceFactor = 1.0f;
 
 
 [Setting category="Overrides" name="Rally Car"]
