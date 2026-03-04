@@ -565,7 +565,7 @@ void __RenderAngle(
         and camera == CameraMode::External
     ) {
         color = ApplyOpacityToColor(color, S_SimplifiedOpacity);
-        width = S_SimplifiedLineThickness;
+        width = S_SimplifiedWidth;
     }
 
     const vec3 v_start = ProjectOffset(visState, ProjectAngle(visState, start, theta), offset);

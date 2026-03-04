@@ -208,29 +208,29 @@ vec4 S_IceDangerWedgeColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 bool S_HistoryHideIce = true;
 
 
-[Setting category="Simplified view" name="Simplified view"]
+[Setting category="Simplified View" name="Enabled"]
 bool S_Simplified = false;
 
-[Setting category="Simplified view" name="X offset" min=-2.0f max=2.0f]
-float S_SimplifiedOffsetX = -1.5f;
-
-[Setting category="Simplified view" name="Z offset" min=0.1f max=2.0f]
-float S_SimplifiedOffsetZ = 0.867f;
-
-[Setting category="Simplified view" name="Pointer start" min=0.1f max=1.0f]
+[Setting category="Simplified View" name="Start" min=0.1f max=1.0f]
 float S_SimplifiedStart = 0.1f;
 
-[Setting category="Simplified view" name="Pointer length" min=0.5f max=2.0f]
+[Setting category="Simplified View" name="Length" min=0.5f max=2.0f]
 float S_SimplifiedLength = 1.5f;
 
-[Setting category="Simplified view" name="Opacity override" min=0.0f max=1.0f]
+[Setting category="Simplified View" name="Width" min=1.0f max=20.0f]
+float S_SimplifiedWidth = 10.0f;
+
+[Setting category="Simplified View" name="X offset" min=-2.0f max=2.0f]
+float S_SimplifiedOffsetX = -1.5f;
+
+[Setting category="Simplified View" name="Z offset" min=0.1f max=2.0f]
+float S_SimplifiedOffsetZ = 0.867f;
+
+[Setting category="Simplified View" name="Opacity override" min=0.0f max=1.0f]
 float S_SimplifiedOpacity = 0.117f;
 
-[Setting category="Simplified view" name="Line thickness" min=1.0f max=20.0f]
-float S_SimplifiedLineThickness = 10.0f;
-
-[Setting category="Simplified view" name="Draw Cam 3 lines"]
-bool S_SimplifiedCam3 = false;
+[Setting category="Simplified View" name="Draw in cam 3"]
+bool S_SimplifiedCam3 = true;
 
 
 [Setting category="Preview" name="Road"]
