@@ -18,7 +18,9 @@ vec2[] GetLinesToBeRendered(const float ideal, const float good, const float bas
     vec2[] ret;
 
     if (!S_Simplified) {
-        ret.InsertLast(vec2(ideal, 0.0f));
+        if (S_OptimalAccel) {
+            ret.InsertLast(vec2(ideal, 0.0f));
+        }
 
         if (S_GoodAccel and drawGood) {
             ret.InsertLast(vec2(good, 1.0f));

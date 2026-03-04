@@ -59,7 +59,7 @@ float S_ThetaMultBW = 1.0f;
 [Setting category="SD Pointer" name="Spacing (derivative)" min=0.1f max=0.5f]  // TODO
 float S_ThetaMultDerivative = 0.35f;
 
-[Setting category="SD Pointer" name="Optimal acceleration assist lines"]  // TODO
+[Setting category="SD Pointer" name="Optimal acceleration assist lines"]
 bool S_OptimalAccel = true;
 
 [Setting category="SD Pointer" name="Optimal acceleration color" color if="S_OptimalAccel"]
